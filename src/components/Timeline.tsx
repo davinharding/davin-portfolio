@@ -1,10 +1,8 @@
 // components/Timeline.tsx
-import { faCircleDot } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { motion, useAnimation } from "framer-motion";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, MutableRefObject } from "react";
 
-const useOnScreen = (ref) => {
+const useOnScreen = (ref: MutableRefObject<HTMLDivElement | null>) => {
   const [isIntersecting, setIntersecting] = useState(false);
 
   useEffect(() => {
@@ -22,9 +20,14 @@ const useOnScreen = (ref) => {
   return isIntersecting;
 };
 
-const TimelineItem = ({ title, direction = "left" }) => {
+type TimeLineItemProps = {
+    title: string;
+    direction: string;
+}
+
+const TimelineItem = (props: TimeLineItemProps) => {
   const controls = useAnimation();
-  const ref = useRef();
+  const ref = useRef<HTMLDivElement>(null);
   const onScreen = useOnScreen(ref);
 
   useEffect(() => {
@@ -42,7 +45,7 @@ const TimelineItem = ({ title, direction = "left" }) => {
         hidden: { opacity: 0 },
         visible: { opacity: 1 }
       }}
-      className={`flex ${direction === "left" ? "flex-row-reverse" : "flex-row"} items-center mb-12`}
+      className={`flex ${props.direction === "left" ? "flex-row-reverse" : "flex-row"} items-center mb-12`}
     >
       <motion.div
         className="w-24 h-1 bg-gray-300"
@@ -55,7 +58,7 @@ const TimelineItem = ({ title, direction = "left" }) => {
       />
       <motion.div className="mx-4 w-6 h-6 bg-gray-500 rounded-full"></motion.div>
       <motion.div className="w-1/3">
-        <motion.h2 className="text-white">{title}</motion.h2>
+        <motion.h2 className="text-white">{props.title}</motion.h2>
         <motion.p className="text-white text-sm mt-2">Lorem ipsum content...</motion.p>
       </motion.div>
     </motion.div>

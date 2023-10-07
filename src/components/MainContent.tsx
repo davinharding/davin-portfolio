@@ -19,7 +19,7 @@ const MainContent: React.FC = () => {
     }, 3000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [words.length]);
 
   return (
     <Background>
