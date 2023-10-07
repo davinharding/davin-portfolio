@@ -15,7 +15,7 @@ const useOnScreen = (ref: MutableRefObject<HTMLDivElement | null>) => {
     return () => {
       observer.disconnect();
     };
-  }, []);
+  }, [ref]);
 
   return isIntersecting;
 };

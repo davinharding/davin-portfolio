@@ -25,7 +25,7 @@ const MainContent: React.FC = () => {
     <Background>
       <div className="flex items-center justify-center h-screen">
         <div className="lg:w-5/12 w-9/12">
-          <h1 className="lg:text-6xl text-2xl font-bold">Hi, I'm Davin.</h1>
+        <h1 className="lg:text-6xl text-2xl font-bold">Hi, {"I'm"} Davin.</h1>
           <h1 className="lg:text-6xl text-2xl font-bold">
             I build{" "}
             <span className={`inline-block`}>
