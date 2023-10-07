@@ -14,7 +14,6 @@ const Home: React.FC = () => {
       <MainContent />
       <ScrollArrow />
       <Timeline />
-      {/* Add your timeline component and other content here */}
     </div>
   );
 };
