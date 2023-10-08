@@ -38,10 +38,10 @@ const Background: React.FC<BackgroundProps> = ({ children }) => {
           backgroundImage: "url(/abstract_shape_bg.svg)",
           transform: `
                         translate(${Math.round(x * 40)}px, ${Math.round(
-                          y * 40,
+                          y * 100,
                         )}px)
-                        rotateX(${y * 20}deg) 
-                        rotateY(${x * 20}deg)
+                        rotateX(${y * 60}deg) 
+                        rotateY(${x * 60}deg)
                     `,
         }}
       ></div>

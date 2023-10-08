@@ -1,5 +1,4 @@
 // components/MainContent.tsx
-
 import { useState, useEffect } from "react";
 import Background from "./Background";
 
@@ -16,7 +15,7 @@ const MainContent: React.FC = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentWord((prevWord) => (prevWord + 1) % words.length);
-    }, 3000);
+    }, 2400);
 
     return () => clearInterval(interval);
   }, [words.length]);

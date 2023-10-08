@@ -1,123 +1,93 @@
 // components/Timeline.tsx
-import { motion, useAnimation } from "framer-motion";
-import { useEffect, useState, useRef, MutableRefObject } from "react";
+import React from "react";
+import { Chrono } from "react-chrono";
+import { Fade } from 'react-awesome-reveal';
 
-const useOnScreen = (ref: MutableRefObject<HTMLDivElement | null>) => {
-  const [isIntersecting, setIntersecting] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      setIntersecting(entry.isIntersecting);
-    });
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
-    return () => {
-      observer.disconnect();
-    };
-  }, [ref]);
-
-  return isIntersecting;
-};
-
-type TimeLineItemProps = {
-  title: string;
-  direction: string;
-};
-
-const TimelineItem = (props: TimeLineItemProps) => {
-  const controls = useAnimation();
-  const ref = useRef<HTMLDivElement>(null);
-  const onScreen = useOnScreen(ref);
-
-  useEffect(() => {
-    if (onScreen) {
-      controls.start("visible");
-    }
-  }, [controls, onScreen]);
-
-  return (
-    <motion.div
-      ref={ref}
-      initial="hidden"
-      animate={controls}
-      variants={{
-        hidden: { opacity: 0 },
-        visible: { opacity: 1 },
-      }}
-      className={`flex ${
-        props.direction === "left" ? "flex-row-reverse" : "flex-row"
-      } items-center mb-12`}
-    >
-      <motion.div
-        className="w-24 h-1 bg-gray-300"
-        initial={{ width: 0 }}
-        animate={controls}
-        variants={{
-          hidden: { width: 0 },
-          visible: { width: "6rem" },
-        }}
-      />
-      <motion.div className="mx-4 w-6 h-6 bg-gray-500 rounded-full"></motion.div>
-      <motion.div className="w-1/3">
-        <motion.h2 className="text-white">{props.title}</motion.h2>
-        <motion.p className="text-white text-sm mt-2">
-          Lorem ipsum content...
-        </motion.p>
-      </motion.div>
-    </motion.div>
-  );
-};
+const items = [
+  {
+    title: "Event 1",
+    cardTitle: "Card Title 1",
+    cardSubtitle: "Card Subtitle 1",
+    cardDetailedText: "Detailed description about Event 1.",
+    id: 1
+  },
+  {
+    title: "Event 2",
+    cardTitle: "Card Title 2",
+    cardSubtitle: "Card Subtitle 2",
+    cardDetailedText: "Detailed description about Event 2.",
+    id: 2
+  },
+  {
+    title: "Event 1",
+    cardTitle: "Card Title 1",
+    cardSubtitle: "Card Subtitle 1",
+    cardDetailedText: "Detailed description about Event 1.",
+    id: 3
+  },
+  {
+    title: "Event 2",
+    cardTitle: "Card Title 2",
+    cardSubtitle: "Card Subtitle 2",
+    cardDetailedText: "Detailed description about Event 2.",
+    id: 4
+  },
+  {
+    title: "Event 1",
+    cardTitle: "Card Title 1",
+    cardSubtitle: "Card Subtitle 1",
+    cardDetailedText: "Detailed description about Event 1.",
+    id: 5
+  },
+  {
+    title: "Event 2",
+    cardTitle: "Card Title 2",
+    cardSubtitle: "Card Subtitle 2",
+    cardDetailedText: "Detailed description about Event 2.",
+    id: 6
+  },
+  {
+    title: "Event 1",
+    cardTitle: "Card Title 1",
+    cardSubtitle: "Card Subtitle 1",
+    cardDetailedText: "Detailed description about Event 1.",
+    id: 7
+  },
+  {
+    title: "Event 2",
+    cardTitle: "Card Title 2",
+    cardSubtitle: "Card Subtitle 2",
+    cardDetailedText: "Detailed description about Event 2.",
+    id: 8
+  },
+  // Add more events as required
+];
 
 const Timeline: React.FC = () => {
-  const [scrollY, setScrollY] = useState(0);
-  const [pageHeight, setPageHeight] = useState(0);
-  const controls = useAnimation();
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
-
-    // Set initial pageHeight value
-    setPageHeight(document.documentElement.scrollHeight - window.innerHeight);
-
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
-  // Use the pageHeight from the state rather than directly accessing `document`
-  const drawHeight = (scrollY / (pageHeight - window.innerHeight)) * 100;
-
-  useEffect(() => {
-    controls.start({ height: `${drawHeight}%` });
-  }, [controls, drawHeight]);
-
   return (
-    <div className="relative mt-20 bg-gray-900 p-10 h-screen">
-      <motion.div
-        className="absolute left-1/2 bg-gray-300"
-        style={{ width: "6px" }}
-        initial={{ height: "0%" }}
-        animate={controls}
-      />
-      {[
-        "Title #1",
-        "Title #2",
-        "Title #3",
-        "Title #4",
-        "Title #5",
-        "Title #6",
-        "Title #7",
-      ].map((title, index) => (
-        <TimelineItem
-          title={title}
-          direction={index % 2 === 0 ? "left" : "right"}
-          key={index}
+    <div style={{ width: '100%', height: '100%', backgroundColor: 'rgba(37, 39, 89, 0.8)' }}>
+      <Fade cascade>
+        <div className="text-6xl">test</div>
+      </Fade>
+        <Chrono
+          theme={{
+            primary: '#ffffff',
+            secondary: '#7C3AED',
+            cardBgColor: '#373B59',
+            cardForeColor: '#ffffff',
+            titleColor: '#D1D5DB',
+          }}
+          items={items}
+          mode="VERTICAL_ALTERNATING"
+          cardHeight={250}
+          cardWidth={500}
+          slideShow
+          slideItemDuration={4500}
+          slideShowType="reveal"
+          scrollable={{ scrollbar: false }}
+          hideControls
         />
-      ))}
+      
     </div>
   );
 };

@@ -2,6 +2,7 @@
 
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Link from "next/link";
 import { useState } from "react";
 
 const Header: React.FC = () => {
@@ -10,12 +11,14 @@ const Header: React.FC = () => {
   return (
     <div className="fixed top-0 left-0 w-full bg-gray-800 text-white p-4 shadow-md z-50">
       <div className="container mx-auto flex justify-between items-center">
-        <div>DH</div>
+        <Link href={"/"}>DH</Link>
 
         {/* Desktop Links */}
         <ul className="hidden md:flex space-x-4">
           <li>
-            <button className="text-white hover:text-gray-400">About</button>
+            <Link href="/about">
+              <button className="text-white hover:text-gray-400">About</button>
+            </Link>
           </li>
           <li>
             <button className="text-white hover:text-gray-400">
@@ -45,12 +48,14 @@ const Header: React.FC = () => {
         >
           <ul className="flex flex-col space-y-2 p-4">
             <li>
-              <button
-                className="text-white hover:text-gray-400 w-full text-left"
-                onClick={() => setIsOpen(false)}
-              >
-                About
-              </button>
+              <Link href="/about">
+                <button
+                  className="text-white hover:text-gray-400 w-full text-left"
+                  onClick={() => setIsOpen(false)}
+                >
+                  About
+                </button>
+              </Link>
             </li>
             <li>
               <button
