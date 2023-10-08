@@ -8,7 +8,7 @@ const MainContent: React.FC = () => {
     "Mint Pages",
     "Smart Contracts",
     "Landing Pages",
-    "SaaS Platforms"
+    "SaaS Platforms",
   ];
   const [currentWord, setCurrentWord] = useState<number>(0);
 
@@ -23,9 +23,11 @@ const MainContent: React.FC = () => {
   return (
     <Background>
       <div className="flex items-center justify-center h-screen">
-        <div className="lg:w-1/2 w-9/12 flex justify-between items-center">
+        <div className="flex flex-col-reverse lg:flex-row justify-between items-center w-9/12 lg:w-1/2">
           <div>
-            <h1 className="lg:text-6xl text-2xl font-bold">Hi, {"I'm"} Davin.</h1>
+            <h1 className="lg:text-6xl text-2xl font-bold">
+              Hi, {"I'm"} Davin.
+            </h1>
             <h1 className="lg:text-6xl text-2xl font-bold">
               I build{" "}
               <span className={`inline-block`}>
@@ -43,7 +45,7 @@ const MainContent: React.FC = () => {
           <img
             src="/profile_picture.jpg"
             alt="Davin's Profile"
-            className="rounded-full h-28 lg:h-72 shadow-lg shadow-inherit transform transition-transform duration-300 ml-6"
+            className="rounded-full h-28 lg:h-72 shadow-lg shadow-gray-600  transform transition-transform duration-300 my-6 lg:mt-0 lg:ml-6"
           />
         </div>
 
