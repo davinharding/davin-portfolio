@@ -25,7 +25,7 @@ const MainContent: React.FC = () => {
   return (
     <>
       <Background>
-        <div className="flex items-center justify-center h-screen">
+        <div className="flex items-center justify-center h-screen pb-14">
           <div className="flex flex-col-reverse lg:flex-row justify-between items-center w-9/12 lg:w-1/2">
             <div>
               <h1 className="lg:text-6xl text-2xl font-bold">
@@ -42,7 +42,15 @@ const MainContent: React.FC = () => {
                   </span>
                 </span>
                 .
-              </h1>
+              </h1>{" "}
+              <div>
+                Bar brewed con panna, brewed, mug frappuccino grounds seasonal
+                percolator. Affogato macchiato a organic and arabica whipped.
+                Affogato, instant kopi-luwak medium, beans mug skinny doppio
+                french press roast fair trade. White, single origin aged
+                espresso saucer sweet dripper cream et kopi-luwak flavour
+                decaffeinated. 
+              </div>
             </div>
 
             <Image
