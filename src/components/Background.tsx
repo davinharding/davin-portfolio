@@ -5,13 +5,15 @@ type BackgroundProps = {
   noMouseMovement?: boolean;
 };
 
-const Background: React.FC<BackgroundProps> = ({ children }) => {
+const Background: React.FC<BackgroundProps> = ({ children, noMouseMovement }) => {
   const [x, setX] = useState(0);
   const [y, setY] = useState(0);
 
   const handleMouseMove = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>,
   ) => {
+    if (noMouseMovement) return;
+
     const { clientX, clientY } = event;
     const { innerWidth, innerHeight } = window;
 

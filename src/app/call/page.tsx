@@ -1,12 +1,12 @@
 "use client";
 import ContainerLayout from "@/components/ContainerLayout";
 
-const Portfolio = () => (
+const Call = () => (
   <ContainerLayout>
     <div className="absolute top-28 text-4xl font-bold container">
-      Portfolio
+      Book a Call
     </div>
   </ContainerLayout>
 );
 
-export default Portfolio;
+export default Call;

@@ -2,7 +2,7 @@ import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import { Transition } from "@headlessui/react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 
@@ -13,7 +13,7 @@ const Header: React.FC = () => {
   const navigationItems = [
     { label: "About", href: "/about" },
     { label: "Portfolio", href: "/portfolio" },
-    { label: "Book a Call", href: "#" },
+    { label: "Book a Call", href: "/call" },
   ];
 
   return (
