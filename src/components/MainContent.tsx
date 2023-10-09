@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Background from "./Background";
+import Image from "next/image";
 
 const MainContent: React.FC = () => {
   const words = [
@@ -42,10 +43,13 @@ const MainContent: React.FC = () => {
             </h1>
           </div>
 
-          <img
+          <Image
             src="/profile_picture.jpg"
             alt="Davin's Profile"
-            className="rounded-full h-28 lg:h-72 shadow-lg shadow-gray-600  transform transition-transform duration-300 my-6 lg:mt-0 lg:ml-6"
+            width={300}
+            height={325}
+            // className="rounded-full h-28 lg:h-72 shadow-lg shadow-gray-600  transform transition-transform duration-300 my-6 lg:mt-0 lg:ml-6"
+            className="rounded-full shadow-gray-600 scale-75"
           />
         </div>
 

@@ -2,27 +2,37 @@ import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import { Transition } from "@headlessui/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 const Header: React.FC = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const pathName = usePathname();
 
   const navigationItems = [
-    { label: 'About', href: '/about' },
-    { label: 'Portfolio', href: '#' },
-    { label: 'Book a Call', href: '#' },
+    { label: "About", href: "/about" },
+    { label: "Portfolio", href: "/portfolio" },
+    { label: "Book a Call", href: "#" },
   ];
 
   return (
-    <div className="fixed top-0 left-0 w-full bg-gray-800 text-white p-4 shadow-md z-50">
+    <div className="fixed top-0 left-0 w-full bg-gray-800 text-white p-2 shadow-md z-50">
       <div className="container mx-auto flex justify-between items-center">
-        <Link href={"/"}>DH</Link>
+        <Link href={"/"}>
+          <Image src="/logo.png" alt="logo" width="45" height="45" />
+        </Link>
 
         {/* Desktop Links */}
         <ul className="hidden md:flex space-x-4">
-          {navigationItems.map(item => (
+          {navigationItems.map((item) => (
             <li key={item.label}>
-              <Link className="text-white hover:text-gray-400" href={item.href}>
+              <Link
+                href={item.href}
+                className={`text-white hover:text-gray-400 ${
+                  pathName === item.href ? "border-b-2 border-white" : ""
+                } hover:border-b-2 hover:border-gray-400`}
+              >
                 {item.label}
               </Link>
             </li>
@@ -46,10 +56,18 @@ const Header: React.FC = () => {
             leaveTo="opacity-0 scale-95"
           >
             <div className="absolute right-0 mt-4 w-48 py-2 bg-gray-700 rounded-md shadow-xl z-10">
-              {navigationItems.map(item => (
-                <Link onClick={() => setIsOpen(false)} className="block w-full px-4 py-2 text-sm text-white hover:bg-gray-600" key={item.label} href={item.href}>
-             
-                    {item.label}
+              {navigationItems.map((item) => (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  onClick={() => setIsOpen(false)}
+                  className={`block w-full px-4 py-2 text-sm text-white hover:bg-gray-600 ${
+                    pathName === item.href
+                      ? "border-l-4 border-white pl-2"
+                      : ""
+                  }`}
+                >
+                  {item.label}
                 </Link>
               ))}
             </div>

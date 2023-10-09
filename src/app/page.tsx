@@ -6,6 +6,7 @@ import ScrollArrow from "@/components/ScrollArrow";
 import MainContent from "../components/MainContent";
 import Timeline from "@/components/Timeline";
 import Layout from "@/components/Layout";
+import React from "react";
 
 const Home: React.FC = () => {
   return (

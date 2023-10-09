@@ -2,6 +2,7 @@ import React, { useState } from "react";
 
 type BackgroundProps = {
   children?: React.ReactNode;
+  noMouseMovement?: boolean;
 };
 
 const Background: React.FC<BackgroundProps> = ({ children }) => {
