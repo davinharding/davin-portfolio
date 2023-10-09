@@ -35,7 +35,7 @@ const Header: React.FC = () => {
 
   return (
     <div
-      className={`fixed top-0 left-0 w-full text-white p-2 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-4 w-full text-white p-2 z-50 transition-all duration-300 ${
         isScrolled ? "bg-gray-800 shadow-md" : "bg-transparent"
       }`}
     >
@@ -61,8 +61,8 @@ const Header: React.FC = () => {
         </ul>
 
         {/* Mobile Hamburger Menu */}
-        <div className="md:hidden relative">
-          <button onClick={() => setIsOpen(!isOpen)}>
+        <div className="md:hidden relative mr-8">
+          <button className="text-2xl" onClick={() => setIsOpen(!isOpen)}>
             <FontAwesomeIcon icon={faBars} />
           </button>
 
