@@ -17,7 +17,7 @@ const ContainerLayout: React.FC<ContainerLayoutProps> = ({ children }) => (
         <div className="min-h-screen flex justify-center">
           {children}
 
-          <div className="absolute bottom-8 text-2xl container">
+          <div className="absolute bottom-2 lg:bottom-8 text-2xl container">
             <Link href="/">
               <FontAwesomeIcon icon={faArrowLeft} /> Back
             </Link>
