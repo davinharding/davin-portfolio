@@ -13,8 +13,9 @@ export class ParticlesContainer extends React.PureComponent {
   render() {
     const options = {
       preset: "links",
+      fullScreen: false,
     };
 
-    return <Particles className="hidden lg:flex" options={options} init={this.customInit} />;
+    return <Particles className="hidden lg:flex lg:absolute inset-0 z-0" options={options} init={this.customInit} />;
   }
 }

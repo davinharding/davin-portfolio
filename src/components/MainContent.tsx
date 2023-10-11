@@ -64,9 +64,9 @@ const MainContent: React.FC = () => {
             <Image
               src="/profile_picture.jpg"
               alt="Davin's Profile"
-              width={350}
+              width={325}
               height={300}
-              className="rounded-full shadow-gray-600 scale-75"
+              className="rounded-full shadow-xl shadow-gray-600 hover:animate-spinTowards animate-spinAway"
             />
           </div>
 
