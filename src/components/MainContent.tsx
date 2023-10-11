@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import Background from "./Background";
 import Image from "next/image";
-import { ParticlesContainer } from "./Particles";
+import Button from "./Button";
+import Link from "next/link";
 
 const MainContent: React.FC = () => {
   const words = [
@@ -26,9 +27,9 @@ const MainContent: React.FC = () => {
     <>
       <Background>
         <div className="flex items-center justify-center h-screen pb-14">
-          <div className="flex flex-col-reverse lg:flex-row justify-between items-center w-9/12 lg:w-1/2">
+          <div className="flex flex-col-reverse lg:flex-row justify-between items-center w-9/12 lg:w-7/12">
             <div>
-              <h1 className="lg:text-6xl text-2xl font-bold">
+              <h1 className="lg:text-6xl text-2xl font-bold -left-5">
                 Hi, {"I'm"} Davin.
               </h1>
               <h1 className="lg:text-6xl text-2xl font-bold">
@@ -36,29 +37,35 @@ const MainContent: React.FC = () => {
                 <span className={`inline-block`}>
                   <span
                     key={currentWord}
-                    className="block bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 animate-slide pb-4"
+                    className="block bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 animate-slide pb-2"
                   >
                     {words[currentWord]}
                   </span>
                 </span>
-                .
               </h1>{" "}
-              <div>
-                Bar brewed con panna, brewed, mug frappuccino grounds seasonal
-                percolator. Affogato macchiato a organic and arabica whipped.
-                Affogato, instant kopi-luwak medium, beans mug skinny doppio
-                french press roast fair trade. White, single origin aged
-                espresso saucer sweet dripper cream et kopi-luwak flavour
-                decaffeinated. 
+              <div className="text-xl">
+                and am a skilled developer with over 5+ years of experience
+                building web based software. My current focus is on web3 enabled
+                decentralized applications. Schedule a call with me today and{" "}
+                {"let's"} turn your ideas into reality!
               </div>
+              <div className="flex justify-center top-10 max-h-fit pt-12">
+                <Link href="/call">
+                  <Button size="large" className="hover:border-transparent bg-transparent hover:bg-gradient-to-r from-purple-400 via-pink-500 to-red-500">
+                    Book a Call
+                  </Button>
+                </Link>
+              </div>
+            </div>
+            <div>
+              <button></button>
             </div>
 
             <Image
               src="/profile_picture.jpg"
               alt="Davin's Profile"
-              width={300}
-              height={325}
-              // className="rounded-full h-28 lg:h-72 shadow-lg shadow-gray-600  transform transition-transform duration-300 my-6 lg:mt-0 lg:ml-6"
+              width={350}
+              height={300}
               className="rounded-full shadow-gray-600 scale-75"
             />
           </div>
