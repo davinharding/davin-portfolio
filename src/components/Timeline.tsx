@@ -1,4 +1,6 @@
 // components/Timeline.tsx
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faIslandTropical } from "@fortawesome/pro-solid-svg-icons";
 import React from "react";
 import {
   VerticalTimeline,
@@ -71,18 +73,21 @@ const Timeline: React.FC = () => {
     <div className="bg-gradient-to-b from-slate-950 via-slate-700  to-slate-500">
       <VerticalTimeline>
         <VerticalTimelineElement
-          className="vertical-timeline-element--work"
-          contentStyle={{ background: "#B784A7", color: "#fff" }}
+        //   className="vertical-timeline-element--work"
+          contentStyle={{ background: "rgb(239 68 68)", color: "#fff" }}
           contentArrowStyle={{ borderRight: "7px solid #B784A7" }}
           date="2011 - present"
-          iconStyle={{ background: "#D8B4E2", color: "#fff" }}
-          //   icon={<WorkIcon />}
+          iconStyle={{ background: "rgb(192 132 252)", color: "#fff" }}
+          icon={<FontAwesomeIcon icon={faIslandTropical} />}
         >
-          <h3 className="vertical-timeline-element-title">Creative Director</h3>
-          <h4 className="vertical-timeline-element-subtitle">Miami, FL</h4>
+          <h3 className="vertical-timeline-element-title">
+            Full Stack Developer
+          </h3>
+          <h4 className="vertical-timeline-element-subtitle">
+            Palm Tree NFT, West Palm Beach, FL
+          </h4>
           <p>
-            Creative Direction, User Experience, Visual Design, Project
-            Management, Team Leading
+
           </p>
         </VerticalTimelineElement>
         <VerticalTimelineElement

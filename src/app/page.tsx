@@ -8,6 +8,7 @@ import Timeline from "@/components/Timeline";
 import Layout from "@/components/HeaderFooter";
 import React from "react";
 import { ParticlesContainer } from "@/components/ParticlesContainer";
+import ProjectCard from "@/components/ProjectCard";
 
 const Home: React.FC = () => {
   return (
@@ -17,6 +18,7 @@ const Home: React.FC = () => {
         <MainContent />
         <ScrollArrow />
       </div>
+      <ProjectCard />
       <Timeline />
     </Layout>
   );
