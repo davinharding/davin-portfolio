@@ -18,7 +18,7 @@ const Home: React.FC = () => {
         <MainContent />
         <ScrollArrow />
       </div>
-      <ProjectCard />
+      {/* <ProjectCard /> */}
       <Timeline />
     </Layout>
   );
