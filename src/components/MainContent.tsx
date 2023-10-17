@@ -49,7 +49,7 @@ const MainContent: React.FC = () => {
                 decentralized applications. Schedule a call with me today and{" "}
                 {"let's"} turn your ideas into reality!
               </div>
-              <div className="flex justify-center top-10 max-h-fit pt-12">
+              <div className="flex justify-center top-10 max-h-fit pt-4 lg:pt-12">
                 <Link href="/call">
                   <Button size="large" className="hover:border-transparent bg-transparent hover:bg-gradient-to-r from-purple-400 via-pink-500 to-red-500">
                     Book a Call
@@ -66,7 +66,7 @@ const MainContent: React.FC = () => {
               alt="Davin's Profile"
               width={325}
               height={300}
-              className="rounded-full shadow-xl shadow-gray-600 hover:animate-spinTowards animate-spinAway"
+              className="rounded-full shadow-xl mt-16 lg:mt-0 h-56 w-56 lg:h-80 lg:w-80 shadow-gray-600 hover:animate-spinTowards animate-spinAway"
             />
           </div>
 
