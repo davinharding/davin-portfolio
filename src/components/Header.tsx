@@ -36,7 +36,7 @@ const Header: React.FC = () => {
   return (
     <div
       className={`fixed top-0 w-full text-white p-4 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-gray-800 shadow-md" : "bg-transparent"
+        isScrolled ? "bg-fuchsia-950 shadow-md" : "bg-transparent"
       }`}
     >
       <div className="container mx-auto flex justify-between items-center">

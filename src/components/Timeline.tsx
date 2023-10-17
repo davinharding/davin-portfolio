@@ -15,7 +15,7 @@ const Timeline: React.FC = () => {
   };
 
   return (
-    <div className="bg-gradient-to-b from-slate-950 via-slate-700  to-slate-500">
+    <div className="bg-gradient-to-b from-slate-950   to-fuchsia-950">
       <VerticalTimeline>
         {timelineData.map((item: TimelineElement) => (
           <VerticalTimelineElement
