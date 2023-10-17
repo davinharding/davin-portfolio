@@ -38,7 +38,7 @@ export const timelineData: TimelineElement[] = [
     role: "Full Stack Web Developer",
     orgAndLocation: "Davin Harding, Fort Lauderdale, FL",
     summary:
-      "Provided comprehensive consultation and development services for NFT collections, encompassing web3 front ends, smart contract deployment, integrated e-commerce, and backend user data management",
+      "Provided comprehensive consultation and development services for NFT collections, encompassing web3 front ends, smart contract deployment, integrated e-commerce, and backend user data management.",
     icon: faUserTieHair,
     iconStyle: { background: "#8b498e", color: "#fff" },
     contentStyle: { background: "#bc4282" },
@@ -47,6 +47,18 @@ export const timelineData: TimelineElement[] = [
   },
   {
     id: 3,
+    role: "Eat The Blocks - Blockchain Developer Course",
+    orgAndLocation: "Remote",
+    summary:
+      "Completed the Eat the Blocks Blockchain developer course, acquiring hands-on expertise in Ethereum smart contract programming and DApp development. The curriculum provided in-depth training on Solidity, Ethereum tools, and effective testing strategies.",
+    icon: faLaptopCode,
+    iconStyle: { background: "#32e0db", color: "#fff" },
+    contentStyle: { background: "#bc4282" },
+    contentArrowStyle: { borderRight: "7px solid #bc4282", color: "#60406a" },
+    date: "2021-08 => 2021-12",
+  },
+  {
+    id: 4,
     role: "Software Consultant",
     orgAndLocation: "Maryville Consulting Group",
     summary:
@@ -56,18 +68,6 @@ export const timelineData: TimelineElement[] = [
     contentStyle: { background: "#75a1d1" },
     contentArrowStyle: { borderRight: "7px solid #75a1d1", color: "#60406a" },
     date: "2019-01 => 2021-08",
-  },
-  {
-    id: 4,
-    role: "Eat The Blocks - Blockchain Developer Course",
-    orgAndLocation: "Remote",
-    summary:
-      "Completed the Eat the Blocks Blockchain developer course, acquiring hands-on expertise in Ethereum smart contract programming and DApp development. The curriculum provided in-depth training on Solidity, Ethereum tools, and effective testing strategies.",
-    icon: faLaptopCode,
-    iconStyle: { background: "#32e0db", color: "#fff" },
-    contentStyle: { background: "#bc4282" },
-    contentArrowStyle: { borderRight: "7px solid #bc4282", color: "#60406a" },
-    date: "2021-08 => 2022-12",
   },
   {
     id: 5,
