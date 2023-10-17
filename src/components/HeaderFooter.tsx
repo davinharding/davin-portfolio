@@ -1,16 +1,19 @@
 import Header from "./Header";
-import Footer from './Footer'
+import Footer from "./Footer";
 
 type LayoutProps = {
   children?: React.ReactNode;
+  page?: string;
 };
 
-const HeaderFooter: React.FC<LayoutProps> = ({ children }) => {
+const HeaderFooter: React.FC<LayoutProps> = ({ children, page }) => {
   return (
     <>
-      <Header />
-      <main>{children}</main>
-      <Footer />
+      <main>
+        <Header page={page} />
+        {children}
+        <Footer />
+      </main>
     </>
   );
 };

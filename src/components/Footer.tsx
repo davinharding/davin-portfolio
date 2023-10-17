@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGithub, faLinkedin } from '@fortawesome/free-brands-svg-icons';
 
-export default function Footer() {
-    const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+const Footer: React.FC = () => {
+    const [currentYear, setCurrentYear] = useState<number>(new Date().getFullYear());
 
     useEffect(() => {
         setCurrentYear(new Date().getFullYear());
@@ -19,10 +19,11 @@ export default function Footer() {
                     <a href="https://github.com/davinharding" className="mx-2 hover:text-gray-500" target="_blank" rel="noreferrer">
                         <FontAwesomeIcon icon={faGithub} size="2x" />
                     </a>
-                    {/* You can add more social links following the same pattern */}
                 </div>
                 <p>&copy; {currentYear} Davin Harding</p>
             </div>
         </footer>
     );
 }
+
+export default Footer;

@@ -6,7 +6,11 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 
-const Header: React.FC = () => {
+type IHeaderProps = {
+  page?: string;
+};
+
+const Header: React.FC<IHeaderProps> = ({ page }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const pathName = usePathname();
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
@@ -37,7 +41,7 @@ const Header: React.FC = () => {
     <div
       className={`fixed top-0 w-full text-white p-4 z-50 transition-all duration-300 ${
         isScrolled ? "bg-fuchsia-950 shadow-md" : "bg-transparent"
-      }`}
+      } ${page !== "index" ? "bg-fuchsia-950 shadow-md" : ""}`}
     >
       <div className="container mx-auto flex justify-between items-center">
         <Link href={"/"}>
@@ -83,9 +87,7 @@ const Header: React.FC = () => {
                   href={item.href}
                   onClick={() => setIsOpen(false)}
                   className={`block w-full px-4 py-2 text-sm text-white hover:bg-gray-600 ${
-                    pathName === item.href
-                      ? "border-l-4 border-white pl-2"
-                      : ""
+                    pathName === item.href ? "border-l-4 border-white pl-2" : ""
                   }`}
                 >
                   {item.label}
