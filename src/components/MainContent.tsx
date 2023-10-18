@@ -3,6 +3,7 @@ import Background from "./Background";
 import Image from "next/image";
 import Button from "./Button";
 import Link from "next/link";
+import { Fade } from "react-awesome-reveal";
 
 const MainContent: React.FC = () => {
   const words = [
@@ -26,6 +27,7 @@ const MainContent: React.FC = () => {
   return (
     <>
       <Background>
+      <Fade cascade={true}>
         <div className="flex items-center justify-center h-screen pb-14">
           <div className="flex flex-col-reverse lg:flex-row justify-between items-center w-9/12 lg:w-7/12">
             <div>
@@ -84,6 +86,7 @@ const MainContent: React.FC = () => {
             }
           `}</style>
         </div>
+        </Fade>
       </Background>
     </>
   );
