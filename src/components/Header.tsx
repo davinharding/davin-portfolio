@@ -5,6 +5,7 @@ import { Transition } from "@headlessui/react";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import Hamburger from 'hamburger-react'
 
 type IHeaderProps = {
   page?: string;
@@ -67,7 +68,7 @@ const Header: React.FC<IHeaderProps> = ({ page }) => {
         {/* Mobile Hamburger Menu */}
         <div className="md:hidden relative">
           <button className="text-2xl" onClick={() => setIsOpen(!isOpen)}>
-            <FontAwesomeIcon icon={faBars} />
+          <Hamburger toggled={isOpen} toggle={setIsOpen} />
           </button>
 
           {/* Mobile Menu Dropdown */}
