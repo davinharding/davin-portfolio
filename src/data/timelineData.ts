@@ -18,6 +18,7 @@ export type TimelineElement = {
   contentStyle?: object;
   contentArrowStyle?: object;
   date: string;
+  link: string
 };
 
 export const timelineData: TimelineElement[] = [
@@ -32,6 +33,7 @@ export const timelineData: TimelineElement[] = [
     contentStyle: { background: "#75a1d1" },
     contentArrowStyle: { borderRight: "7px solid #75a1d1", color: "#60406a" },
     date: "2022-04 => Present",
+    link: "https://www.palmtreenft.com/"
   },
   {
     id: 2,
@@ -44,6 +46,7 @@ export const timelineData: TimelineElement[] = [
     contentStyle: { background: "#bc4282" },
     contentArrowStyle: { borderRight: "7px solid #bc4282", color: "#60406a" },
     date: "2022-01 => Present",
+    link: "https://davin.io"
   },
   {
     id: 3,
@@ -56,6 +59,7 @@ export const timelineData: TimelineElement[] = [
     contentStyle: { background: "#bc4282" },
     contentArrowStyle: { borderRight: "7px solid #bc4282", color: "#60406a" },
     date: "2021-08 => 2021-12",
+    link: "https://eattheblocks.com/course/"
   },
   {
     id: 4,
@@ -68,6 +72,7 @@ export const timelineData: TimelineElement[] = [
     contentStyle: { background: "#75a1d1" },
     contentArrowStyle: { borderRight: "7px solid #75a1d1", color: "#60406a" },
     date: "2019-01 => 2021-08",
+    link: "https://maryville.com/"
   },
   {
     id: 5,
@@ -80,6 +85,7 @@ export const timelineData: TimelineElement[] = [
     contentStyle: { background: "#75a1d1" },
     contentArrowStyle: { borderRight: "7px solid #75a1d1", color: "#60406a" },
     date: "2018-08 => 2018-11",
+    link: "https://brainstation.io/miami"
   },
   {
     id: 6,

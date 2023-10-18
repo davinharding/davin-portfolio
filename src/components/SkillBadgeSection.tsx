@@ -1,9 +1,9 @@
 import React from "react";
 import SkillBadge from "./SkillBadge";
-import { skillBadgeData } from "@/data/skillBadgeData";
-import { Fade, Slide, Hinge, Roll, Zoom } from "react-awesome-reveal";
+import { SkillData, skillBadgeData } from "@/data/skillBadgeData";
+import { Fade } from "react-awesome-reveal";
 
-const SkillBadgeContainer: React.FC = () => {
+const SkillBadgeSection: React.FC = () => {
   return (
     <div className="p-4 container mx-auto">
       <Fade cascade={true} direction={"up"}>
@@ -13,9 +13,9 @@ const SkillBadgeContainer: React.FC = () => {
         </h2>
       </Fade>
       <div className="flex flex-wrap justify-center gap-4">
-        {skillBadgeData.map((skill, index) => (
+        {skillBadgeData.map((skill: SkillData, index) => (
           <Fade key={index} cascade={true} direction={"up"}>
-            <SkillBadge key={index} name={skill.name} image={skill.image} />
+            <SkillBadge key={index} skill={skill} />
           </Fade>
         ))}
       </div>
@@ -23,4 +23,4 @@ const SkillBadgeContainer: React.FC = () => {
   );
 };
 
-export default SkillBadgeContainer;
+export default SkillBadgeSection;

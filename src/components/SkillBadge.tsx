@@ -1,18 +1,26 @@
-import Image, { StaticImageData } from "next/image";
+import { SkillData } from "@/data/skillBadgeData";
+import Image from "next/image";
+import Link from "next/link";
 
 type SkillBadgeProps = {
-  name: string;
-  image: StaticImageData;
+  skill: SkillData;
 };
 
-const SkillBadge: React.FC<SkillBadgeProps> = ({ name, image }) => {
+const SkillBadge: React.FC<SkillBadgeProps> = ({ skill }) => {
   return (
-    <div className="flex items-center bg-gradient-to-r from-fuchsia-900 to-slate-800 p-4 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 m-2">
-      <div className="relative h-6 w-6 lg:w-10 lg:h-10 mr-3 overflow-hidden">
-        <Image src={image} alt={name} fill={true} objectFit="contain" />
+    <Link href={skill.link} target="_blank">
+      <div className="flex items-center bg-gradient-to-r from-fuchsia-900 to-slate-800 p-4 rounded-lg shadow-md hover:shadow-xl m-2 transform hover:scale-110 transition-transform duration-500">
+        <div className="relative h-6 w-6 lg:w-10 lg:h-10 mr-3 overflow-hidden">
+          <Image
+            src={skill.image}
+            alt={skill.name}
+            fill={true}
+            objectFit="contain"
+          />
+        </div>
+        <span className="text-white font-semibold">{skill.name}</span>
       </div>
-      <span className="text-white font-semibold">{name}</span>
-    </div>
+    </Link>
   );
 };
 

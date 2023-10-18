@@ -23,27 +23,88 @@ import FirebaseLogo from "../../public/logos/firebase_logo.png";
 export type SkillData = {
   name: string;
   image: StaticImageData;
+  link: string;
 };
 
 export const skillBadgeData: SkillData[] = [
-  { name: "TypeScript", image: TypeScriptLogo },
-  { name: "Node.js", image: NodejsLogo },
-  { name: "Next.js", image: NextjsLogo },
-  { name: "Vercel", image: VercelLogo },
-  { name: "React", image: ReactLogo },
-  { name: "TailwindCSS", image: TailwindLogo },
-  { name: "AWS Suite", image: AWSLogo },
-  { name: "NPM", image: NPMLogo },
-  { name: "Ethers.js", image: EtherjsLogo },
-  { name: "Hardhat", image: HardhatLogo },
-  { name: "Arweave", image: ArweaveLogo },
-  { name: "IPFS", image: IPFSLogo },
+  {
+    name: "TypeScript",
+    image: TypeScriptLogo,
+    link: "https://www.typescriptlang.org/",
+  },
+  {
+    name: "Node.js",
+    image: NodejsLogo,
+    link: "https://nodejs.org/en",
+  },
+  {
+    name: "Next.js",
+    image: NextjsLogo,
+    link: "https://nextjs.org/",
+  },
+  {
+    name: "Vercel",
+    image: VercelLogo,
+    link: "https://vercel.com/",
+  },
+  { name: "React", image: ReactLogo, link: "hhttps://react.dev/" },
+  {
+    name: "TailwindCSS",
+    image: TailwindLogo,
+    link: "https://tailwindcss.com/",
+  },
+  {
+    name: "AWS Suite",
+    image: AWSLogo,
+    link: "https://aws.amazon.com/",
+  },
+  { name: "NPM", image: NPMLogo, link: "https://www.npmjs.com/" },
+  {
+    name: "Ethers.js",
+    image: EtherjsLogo,
+    link: "https://docs.ethers.org/v6/",
+  },
+  {
+    name: "Hardhat",
+    image: HardhatLogo,
+    link: "https://hardhat.org/",
+  },
+  {
+    name: "Arweave",
+    image: ArweaveLogo,
+    link: "https://www.arweave.org/",
+  },
+  { name: "IPFS", image: IPFSLogo, link: "https://www.ipfs.com/" },
   //   { name: "AWS Amplify", image: AWSAmplifyLogo },
-  { name: "web3js", image: Web3jsLogo },
-  { name: "Express", image: ExpressLogo },
-  { name: "postgres", image: PostgresLogo },
-  { name: "serverless", image: ServerlessLogo },
-  { name: "dynamodb", image: DynamodbLogo },
-  { name: "jest", image: JestLogo },
-  { name: "firebase", image: FirebaseLogo },
+  {
+    name: "web3js",
+    image: Web3jsLogo,
+    link: "https://web3js.org/",
+  },
+  {
+    name: "Express",
+    image: ExpressLogo,
+    link: "https://expressjs.com/",
+  },
+  {
+    name: "postgres",
+    image: PostgresLogo,
+    link: "https://www.postgresql.org/",
+  },
+  {
+    name: "serverless",
+    image: ServerlessLogo,
+    link: "https://www.serverless.com/",
+  },
+  {
+    name: "dynamodb",
+    image: DynamodbLogo,
+    link: "https://aws.amazon.com/dynamodb/",
+  },
+  { name: "jest", image: JestLogo, link: "https://jestjs.io/" },
+  {
+    name: "firebase",
+    image: FirebaseLogo,
+    link: "https://firebase.google.com/",
+  },
 ];

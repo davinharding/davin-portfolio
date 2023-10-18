@@ -9,7 +9,7 @@ import Layout from "@/components/HeaderFooter";
 import React from "react";
 import { ParticlesContainer } from "@/components/ParticlesContainer";
 import ProjectCard from "@/components/ProjectCard";
-import SkillBadgeContainer from "@/components/SkillBadgeContainer";
+import SkillBadgeSection from "@/components/SkillBadgeSection";
 
 const Home: React.FC = () => {
   return (
@@ -20,7 +20,7 @@ const Home: React.FC = () => {
         <ScrollArrow />
       </div>
       <div className="bg-gradient-to-b from-slate-950   to-fuchsia-950">
-        <SkillBadgeContainer />
+        <SkillBadgeSection />
         <Timeline />
       </div>
       {/* <ProjectCard /> */}
