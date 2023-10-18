@@ -1,35 +1,74 @@
-import Image from 'next/image';
+import Image from "next/image";
+import { Project } from "@/data/projectData";
+import Button from "./Button";
+import Link from "next/link";
 
-interface CardProps {
-  imageSrc: string;
-  title: string;
-  description: string;
-  badges: string[];
-  githubLink: string;
-  demoLink: string;
-}
+type IProjectCardProps = {
+  project: Project;
+};
 
-const ProjectCard: React.FC<CardProps> = ({ imageSrc, title, description, badges=["test", "test2"], githubLink, demoLink }) => {
+const ProjectCard: React.FC<IProjectCardProps> = ({ project }) => {
   return (
-    <div className="max-w-sm mx-auto bg-white rounded-xl shadow-lg transform transition-transform duration-200 hover:-translate-y-2 hover:shadow-xl p-4">
-      <div className="relative w-full h-48">
-        <Image src={imageSrc} alt={title} layout="fill" objectFit="cover" className="rounded-t-xl" />
-      </div>
-      <div className="p-4">
-        <h2 className="font-bold text-xl mb-2">{title}</h2>
-        <p className="text-gray-600 mb-4">{description}</p>
-        <div className="flex flex-wrap mb-4">
-          {badges.map((badge, index) => (
-            <span key={index} className="bg-gray-200 text-gray-600 mr-2 mb-2 px-2 py-1 rounded-md text-sm">
-              {badge}
+    <div className="max-w-md mx-auto m-8 bg-gradient-to-r from-fuchsia-900 to-slate-800 rounded-xl shadow-lg transform transition-transform duration-200 hover:-translate-y-4 hover:shadow-xl">
+      <Link href={"/portfolio/" + project.name}>
+        <div className="relative w-full h-72">
+          <Image
+            src={project.image}
+            alt={project.title}
+            fill={true}
+            className="rounded-t-xl object-cover"
+          />
+        </div>
+        <div className="p-6">
+          <h2 className="font-bold text-xl mb-2">{project.title}</h2>
+          <p className="text-white mb-4">{project.description}</p>{" "}
+          {project.projectTags.map((projectTag, index) => (
+            <span
+              key={index}
+              className="inline-flex items-center bg-white text-gray-600 mr-2 mb-2 pr-2 py-1 rounded-md text-sm"
+            >
+              <div className="relative h-4 w-4 lg:w-10 lg:h-6 mx-2">
+                <Image
+                  src={projectTag.icon}
+                  alt={projectTag.title}
+                  fill={true}
+                  className="object-contain"
+                />
+              </div>
+              {projectTag.title}
             </span>
           ))}
+          <div className="flex justify-between pt-4">
+            {project.githubLink ? (
+              <Button className="hover:border-transparent bg-transparent hover:bg-white">
+                <Link href={project.githubLink} target="_blank">
+                  GitHub
+                </Link>
+              </Button>
+            ) : (
+              ""
+            )}
+            {project.demoLink ? (
+              <Button className="hover:border-transparent bg-transparent hover:bg-white">
+                <Link href={project.demoLink} target="_blank">
+                  Demo
+                </Link>
+              </Button>
+            ) : (
+              ""
+            )}
+            {project.liveLink ? (
+              <Button className="hover:border-transparent bg-transparent hover:bg-white">
+                <Link href={project.liveLink} target="_blank">
+                  Live
+                </Link>
+              </Button>
+            ) : (
+              ""
+            )}
+          </div>
         </div>
-        <div className="flex justify-between">
-          <a href={githubLink} className="text-blue-600 hover:underline">GitHub</a>
-          <a href={demoLink} className="text-blue-600 hover:underline">Demo</a>
-        </div>
-      </div>
+      </Link>
     </div>
   );
 };

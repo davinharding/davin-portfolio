@@ -76,7 +76,7 @@ export const timelineData: TimelineElement[] = [
   },
   {
     id: 5,
-    role: "Full Stack Web Developer",
+    role: "Full Stack Web Developer Bootcamp",
     orgAndLocation: "Wyncode Academy - Miami, Fl",
     summary:
       "Graduated from the Wyncode Academy Full Stack Web Developer immersive bootcamp, gaining comprehensive skills in end-to-end web development. The intensive program offered deep dives into front-end and back-end technologies, frameworks, and best practices.",
