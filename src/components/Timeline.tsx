@@ -19,7 +19,7 @@ const Timeline: React.FC = () => {
   return (
     <div>
       <div className="p-4 container mx-auto">
-        <Fade cascade={true} direction={"up"}>
+        <Fade cascade={true} direction={"up"} triggerOnce>
           <div className="text-5xl font-bold mb-2">Experiences</div>
           <h2 className="text-lg mb-6 ml-2 lg:ml-4">
             both proffesional and educational

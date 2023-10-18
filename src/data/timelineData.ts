@@ -56,8 +56,8 @@ export const timelineData: TimelineElement[] = [
       "Completed the Eat the Blocks Blockchain developer course, acquiring hands-on expertise in Ethereum smart contract programming and DApp development. The curriculum provided in-depth training on Solidity, Ethereum tools, and effective testing strategies.",
     icon: faLaptopCode,
     iconStyle: { background: "#32e0db", color: "#fff" },
-    contentStyle: { background: "#bc4282" },
-    contentArrowStyle: { borderRight: "7px solid #bc4282", color: "#60406a" },
+    contentStyle: { background: "#75a1d1" },
+    contentArrowStyle: { borderRight: "7px solid #75a1d1", color: "#60406a" },
     date: "2021-08 => 2021-12",
     link: "https://eattheblocks.com/course/"
   },
@@ -66,11 +66,11 @@ export const timelineData: TimelineElement[] = [
     role: "Software Consultant",
     orgAndLocation: "Maryville Consulting Group",
     summary:
-      "Led ITSM application projects for Fortune 500 clients as an Associate Consultant and played a pivotal role in modernizing data access for Canada's 2nd largest grain distributor as a Senior Associate. As an Independent Consultant, contributed to a data-driven application for a top-tier health administration client and provided technical support to team members.",
+      "Led ITSM application projects for Fortune 500 clients as an Associate Consultant and played a pivotal role in modernizing data access for Canada's 2nd largest grain distributor as a Senior Associate. As an Independent Consultant, contributed to a data-driven application for a Fortune 50 health administration client and provided technical support to team members.",
     icon: faBriefcase,
     iconStyle: { background: "#0e406b", color: "#fff" },
-    contentStyle: { background: "#75a1d1" },
-    contentArrowStyle: { borderRight: "7px solid #75a1d1", color: "#60406a" },
+    contentStyle: { background: "#bc4282" },
+    contentArrowStyle: { borderRight: "7px solid #bc4282", color: "#60406a" },
     date: "2019-01 => 2021-08",
     link: "https://maryville.com/"
   },
@@ -92,5 +92,6 @@ export const timelineData: TimelineElement[] = [
     date: "2018",
     icon: faPlay,
     iconStyle: { background: "#60a658", color: "#fff" },
+    link: ''
   },
 ];

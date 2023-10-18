@@ -6,7 +6,7 @@ import { Fade } from "react-awesome-reveal";
 const SkillBadgeSection: React.FC = () => {
   return (
     <div className="p-4 container mx-auto">
-      <Fade cascade={true} direction={"up"}>
+      <Fade cascade={true} direction={"up"} triggerOnce>
         <div className="text-5xl font-bold mb-2">Technologies</div>
         <h2 className="text-lg mb-6 ml-2 lg:ml-4">
           and services that I have expertise in
@@ -14,7 +14,7 @@ const SkillBadgeSection: React.FC = () => {
       </Fade>
       <div className="flex flex-wrap justify-center gap-4">
         {skillBadgeData.map((skill: SkillData, index) => (
-          <Fade key={index} cascade={true} direction={"up"}>
+          <Fade key={index} cascade={true} direction={"up"} triggerOnce>
             <SkillBadge key={index} skill={skill} />
           </Fade>
         ))}
