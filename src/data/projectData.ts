@@ -86,6 +86,7 @@ export const projects: Project[] = [
       "A comprehensive toolset for NFT creators to build, deploy and maintain digital collectibles with multi tenet support for teams and agencies.",
     projectTags: [
       projectTags.TypeScript,
+      projectTags.React,
       projectTags.Nextjs,
       projectTags.Ethersjs,
       projectTags.AWS,
@@ -104,9 +105,10 @@ export const projects: Project[] = [
     title: "Davin Harding - Developer Portfolio",
     name: "Developer Portfolio",
     description:
-      "A developer portfolio site",
+      "A mobile responsive developer portfolio site built for speed and interactivity.  Integrated with Calendly for call scheduling.",
     projectTags: [
       projectTags.TypeScript,
+      projectTags.React,
       projectTags.Nextjs,
       projectTags.NPM,
       projectTags.Vercel,
@@ -124,6 +126,7 @@ export const projects: Project[] = [
       "A landing page and NFT staking dApp for the Theta Vibes project, built on the Theta Network.  A place for info on the project as well as a UI to view, deposit, withdraw and collect TNT-20 tokens from stakeable NFTs.",
     projectTags: [
       projectTags.JavaScript,
+      projectTags.React,
       projectTags.Nextjs,
       projectTags.Solidity,
       projectTags.Ethersjs,

@@ -3,7 +3,7 @@ import { Transition } from "@headlessui/react";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import Hamburger from 'hamburger-react'
+import Hamburger from "hamburger-react";
 
 type IHeaderProps = {
   page?: string;
@@ -39,8 +39,8 @@ const Header: React.FC<IHeaderProps> = ({ page }) => {
   return (
     <div
       className={`fixed top-0 w-full text-white p-4 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-fuchsia-950 shadow-md" : "bg-transparent"
-      } ${page !== "index" ? "bg-fuchsia-950 shadow-md" : ""}`}
+        isScrolled ? "bg-fuchsia-950" : "bg-transparent"
+      }`}
     >
       <div className="container mx-auto flex justify-between items-center">
         <Link href={"/"}>
@@ -66,7 +66,7 @@ const Header: React.FC<IHeaderProps> = ({ page }) => {
         {/* Mobile Hamburger Menu */}
         <div className="md:hidden relative">
           <button className="text-2xl" onClick={() => setIsOpen(!isOpen)}>
-          <Hamburger toggled={isOpen} toggle={setIsOpen} />
+            <Hamburger toggled={isOpen} toggle={setIsOpen} />
           </button>
 
           {/* Mobile Menu Dropdown */}

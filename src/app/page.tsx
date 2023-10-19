@@ -8,6 +8,7 @@ import React from "react";
 import { ParticlesContainer } from "@/components/ParticlesContainer";
 import SkillBadgeSection from "@/components/SkillBadgeSection";
 import { ProjectsSection } from "@/components/ProjectsSection";
+import { GithubSection } from "@/components/GithubSection";
 
 const Home: React.FC = () => {
   return (
@@ -20,6 +21,7 @@ const Home: React.FC = () => {
       <div className="bg-gradient-to-b from-slate-950   to-fuchsia-950">
         <SkillBadgeSection />
         <ProjectsSection />
+        <GithubSection />
         <Timeline />
       </div>
       {/* <ProjectCard /> */}
