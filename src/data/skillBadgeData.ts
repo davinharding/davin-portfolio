@@ -22,6 +22,8 @@ import FirebaseLogo from "../../public/logos/firebase_logo.png";
 import MaterialUILogo from "../../public/logos/materialuilogo.png";
 import JavaScriptLogo from "../../public/logos/JavaScript_logo.png";
 import SolidityLogo from "../../public/logos/solidity_logo.png";
+import ShopifyLogo from "../../public/logos/shopify_logo.png";
+import StripeLogo from "../../public/logos/stripe_logo.png";
 
 export type SkillData = {
   name: string;
@@ -105,24 +107,34 @@ export const skillBadgeData: SkillData[] = [
     link: "https://expressjs.com/",
   },
   {
-    name: "postgres",
+    name: "Postgres",
     image: PostgresLogo,
     link: "https://www.postgresql.org/",
   },
   {
-    name: "serverless",
+    name: "Serverless",
     image: ServerlessLogo,
     link: "https://www.serverless.com/",
   },
   {
-    name: "dynamodb",
+    name: "Dynamodb",
     image: DynamodbLogo,
     link: "https://aws.amazon.com/dynamodb/",
   },
-  { name: "jest", image: JestLogo, link: "https://jestjs.io/" },
+  { name: "Jest", image: JestLogo, link: "https://jestjs.io/" },
   {
-    name: "firebase",
+    name: "Firebase",
     image: FirebaseLogo,
     link: "https://firebase.google.com/",
   },
+  {
+    name: 'Shopify',
+    image: ShopifyLogo,
+    link: 'https://www.shopify.com/'
+  },
+  {
+    name: 'Stripe',
+    image: StripeLogo,
+    link: 'https://stripe.com/'
+  }
 ];

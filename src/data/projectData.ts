@@ -1,6 +1,11 @@
 import { StaticImageData } from "next/image";
 import Mintly from "../../public/projectScreenshots/mintly.png";
 import ThetaVibes from "../../public/projectScreenshots/theta_vibes.png";
+import MythicalMushrooms from "../../public/projectScreenshots/mythical_mushrooms.png";
+import Tunies from "../../public/projectScreenshots/tunies.png";
+import MetaverseHospitality from "../../public/projectScreenshots/metaverse_hospitality.png";
+
+
 import TypeScriptLogo from "../../public/logos/Typescript_logo.png";
 import NodejsLogo from "../../public/logos/nodejs_logo.png";
 import NextjsLogo from "../../public/logos/nextjs_logo.png";
@@ -24,6 +29,8 @@ import FirebaseLogo from "../../public/logos/firebase_logo.png";
 import MaterialUILogo from "../../public/logos/materialuilogo.png";
 import JavaScriptLogo from "../../public/logos/JavaScript_logo.png";
 import SolidityLogo from "../../public/logos/solidity_logo.png";
+import ShopifyLogo from "../../public/logos/shopify_logo.png";
+import StripeLogo from "../../public/logos/stripe_logo.png";
 
 export type ProjectTag = {
   title: string;
@@ -38,6 +45,7 @@ export type Project = {
   githubLink?: string;
   demoLink?: string;
   liveLink?: string;
+  smartContractLink?: string;
   name: string;
 };
 
@@ -65,12 +73,14 @@ const projectTags: { [key: string]: ProjectTag } = {
   Jest: { title: "Jest", icon: JestLogo },
   Firebase: { title: "Firebase", icon: FirebaseLogo },
   MaterialUI: { title: "MaterialUI", icon: MaterialUILogo },
+  Shopify: { title: "Shopify", icon: ShopifyLogo },
+  Stripe: { title: "Stripe", icon: StripeLogo },
 };
 
 export const projects: Project[] = [
   {
     image: Mintly,
-    title: "Mintly - Digital Collectible Tools for Brands and Agencies",
+    title: "Mintly",
     name: "Mintly",
     description:
       "A comprehensive toolset for NFT creators to build, deploy and maintain digital collectibles with multi tenet support for teams and agencies.",
@@ -81,11 +91,11 @@ export const projects: Project[] = [
       projectTags.AWS,
       projectTags.NPM,
       projectTags.Nodejs,
-      projectTags.Vercel,
       projectTags.Express,
       projectTags.Dynamodb,
       projectTags.Jest,
       projectTags.Serverless,
+      projectTags.Stripe
     ],
     liveLink: "https://mintlyapp.com/",
   },
@@ -107,69 +117,56 @@ export const projects: Project[] = [
     ],
     liveLink: "https://www.thetavibes.io/",
     githubLink: "https://github.com/davinharding/guardian-of-theta-frontend",
+    smartContractLink: 'https://explorer.thetatoken.org/account/0x4031f51e61dc249688f4a1da1ed6dc240f366846'
   },
   {
-    image: Mintly,
-    title: "Mintly - Digital Collectible Tools for Brands and Agencies",
-    name: "Mintly",
+    image: MythicalMushrooms,
+    title: "Mythical Mushrooms",
+    name: "Mythical Mushrooms",
     description:
-      "A comprehensive toolset for NFT creators to build, deploy and maintain digital collectibles with multi tenet support for teams and agencies.",
+      "A Web3 enabled landing page and token gated merch store for an artist led NFT collection on the Theta Blockchain.",
     projectTags: [
       projectTags.TypeScript,
       projectTags.Nextjs,
       projectTags.Ethersjs,
-      projectTags.AWS,
+      projectTags.Firebase,
       projectTags.NPM,
       projectTags.Nodejs,
       projectTags.Vercel,
       projectTags.Express,
-      projectTags.Dynamodb,
-      projectTags.Jest,
-      projectTags.Serverless,
+      projectTags.Shopify
     ],
     liveLink: "https://mintlyapp.com/",
   },
   {
-    image: Mintly,
-    title: "Mintly - Digital Collectible Tools for Brands and Agencies",
-    name: "Mintly",
+    image: Tunies,
+    title: "Tunies - NFT Smart Contract",
+    name: "Tunies",
     description:
-      "A comprehensive toolset for NFT creators to build, deploy and maintain digital collectibles with multi tenet support for teams and agencies.",
+      "NFT smart contract on the Ethereum blockchain.  Features include merkleproof allowlist, freeMint and internalMint functions as well as NFT staking.  Contract shipped with comprehensive hardhat/chai test suite for each function.",
     projectTags: [
       projectTags.TypeScript,
-      projectTags.Nextjs,
-      projectTags.Ethersjs,
-      projectTags.AWS,
+      projectTags.Solidity,
       projectTags.NPM,
-      projectTags.Nodejs,
-      projectTags.Vercel,
-      projectTags.Express,
-      projectTags.Dynamodb,
-      projectTags.Jest,
-      projectTags.Serverless,
+      projectTags.Hardhat
     ],
-    liveLink: "https://mintlyapp.com/",
+    liveLink: "https://www.jakebaynham.com/tunies",
+    smartContractLink: 'https://etherscan.io/address/0xec10158c372ee3d78f256ad1a8e0ae672e8ac161#code'
   },
   {
-    image: Mintly,
-    title: "Mintly - Digital Collectible Tools for Brands and Agencies",
-    name: "Mintly",
+    image: MetaverseHospitality,
+    title: "Metaverse Hospitality - Smart Contract",
+    name: "Metaverse Hospitality",
     description:
-      "A comprehensive toolset for NFT creators to build, deploy and maintain digital collectibles with multi tenet support for teams and agencies.",
+      "NFT smart contract on the Ethereum blockchain.  Features include merkleproof waitlis",
     projectTags: [
-      projectTags.TypeScript,
-      projectTags.Nextjs,
-      projectTags.Ethersjs,
-      projectTags.AWS,
-      projectTags.NPM,
-      projectTags.Nodejs,
-      projectTags.Vercel,
-      projectTags.Express,
-      projectTags.Dynamodb,
-      projectTags.Jest,
-      projectTags.Serverless,
+        projectTags.TypeScript,
+        projectTags.Solidity,
+        projectTags.NPM,
+        projectTags.Hardhat
     ],
-    liveLink: "https://mintlyapp.com/",
+    liveLink: "https://www.metaversehospitality.io/",
+    smartContractLink: "https://etherscan.io/token/0x67e1033277CE54c538725a98EC83997335DEb713#code"
   },
   {
     image: Mintly,

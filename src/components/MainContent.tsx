@@ -9,7 +9,9 @@ const MainContent: React.FC = () => {
   const words = [
     "Web3 dApps",
     "NFTs",
+    "Web Apps",
     "Mint Pages",
+    "E-commerce Stores",
     "Smart Contracts",
     "Landing Pages",
     "SaaS Platforms",

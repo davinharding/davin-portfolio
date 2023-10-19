@@ -1,5 +1,5 @@
 import React from "react";
-import ProjectCard from "./ProjectCard";
+import { ProjectCard } from "./ProjectCard";
 import { projects } from "../data/projectData"; // Import the data
 import { Fade } from "react-awesome-reveal";
 
