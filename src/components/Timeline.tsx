@@ -8,8 +8,8 @@ import { timelineData } from "@/data/timelineData";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { TimelineElement } from "@/data/timelineData";
-import { Fade } from "react-awesome-reveal";
 import Link from "next/link";
+import { SectionHeading } from "./SectionHeading";
 
 const Timeline: React.FC = () => {
   const generateFontAwesomeIcon = (icon: IconDefinition) => {
@@ -19,12 +19,10 @@ const Timeline: React.FC = () => {
   return (
     <div>
       <div className="p-4 container mx-auto">
-        <Fade cascade={true} direction={"up"} triggerOnce>
-          <div className="text-5xl font-bold mb-2">Experience</div>
-          <h2 className="text-lg mb-6 ml-2 lg:ml-4">
-            both proffesional and educational
-          </h2>
-        </Fade>
+        <SectionHeading
+          title="Experience"
+          subTitle="both proffesional and educational"
+        />
       </div>
       <VerticalTimeline>
         {timelineData.map((item: TimelineElement) => (

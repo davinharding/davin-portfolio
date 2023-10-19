@@ -23,7 +23,7 @@ const ProjectCard: React.FC<IProjectCardProps> = ({ project }) => {
               src={project.image}
               alt={project.title}
               fill={true}
-              className="rounded-t-xl object-cover z-0 w-full h-72"
+              className="rounded-t-xl object-cover z-0 w-full"
             />
             <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-50 text-opacity-0 hover:text-opacity-100 text-transparent text-white">
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 font-bold text-lg z-10 transition-scale duration-300 hover:scale-125">

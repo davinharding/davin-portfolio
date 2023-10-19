@@ -81,7 +81,7 @@ const Header: React.FC<IHeaderProps> = ({ page }) => {
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <div className="absolute right-0 mt-4 w-48 py-2 bg-gray-700 rounded-md shadow-xl z-10">
+            <div className="absolute -right-4 mt-4 w-48 py-2 bg-fuchsia-900 rounded-md shadow-xl z-10">
               {navigationItems.map((item) => (
                 <Link
                   key={item.label}

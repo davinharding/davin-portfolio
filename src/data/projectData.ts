@@ -4,7 +4,7 @@ import ThetaVibes from "../../public/projectScreenshots/theta_vibes.png";
 import MythicalMushrooms from "../../public/projectScreenshots/mythical_mushrooms.png";
 import Tunies from "../../public/projectScreenshots/tunies.png";
 import MetaverseHospitality from "../../public/projectScreenshots/metaverse_hospitality.png";
-
+import DavinPortfolio from "../../public/projectScreenshots/davin_portfolio.png";
 
 import TypeScriptLogo from "../../public/logos/Typescript_logo.png";
 import NodejsLogo from "../../public/logos/nodejs_logo.png";
@@ -95,9 +95,26 @@ export const projects: Project[] = [
       projectTags.Dynamodb,
       projectTags.Jest,
       projectTags.Serverless,
-      projectTags.Stripe
+      projectTags.Stripe,
     ],
     liveLink: "https://mintlyapp.com/",
+  },
+  {
+    image: DavinPortfolio,
+    title: "Davin Harding - Developer Portfolio",
+    name: "Developer Portfolio",
+    description:
+      "A developer portfolio ",
+    projectTags: [
+      projectTags.TypeScript,
+      projectTags.Nextjs,
+      projectTags.NPM,
+      projectTags.Vercel,
+      projectTags.Tailwind,
+
+    ],
+    liveLink: "https://www.davin.io/",
+    githubLink: "https://github.com/davinharding/davin-portfolio",
   },
   {
     image: ThetaVibes,
@@ -113,11 +130,44 @@ export const projects: Project[] = [
       projectTags.Hardhat,
       projectTags.NPM,
       projectTags.Vercel,
-      projectTags.MaterialUI
+      projectTags.MaterialUI,
     ],
     liveLink: "https://www.thetavibes.io/",
     githubLink: "https://github.com/davinharding/guardian-of-theta-frontend",
-    smartContractLink: 'https://explorer.thetatoken.org/account/0x4031f51e61dc249688f4a1da1ed6dc240f366846'
+    smartContractLink:
+      "https://explorer.thetatoken.org/account/0x4031f51e61dc249688f4a1da1ed6dc240f366846",
+  },
+  {
+    image: MetaverseHospitality,
+    title: "Metaverse Hospitality - Smart Contract",
+    name: "Metaverse Hospitality",
+    description:
+      "NFT smart contract on the Ethereum blockchain.  Features include merkleproof waitlis",
+    projectTags: [
+      projectTags.TypeScript,
+      projectTags.Solidity,
+      projectTags.NPM,
+      projectTags.Hardhat,
+    ],
+    liveLink: "https://www.metaversehospitality.io/",
+    smartContractLink:
+      "https://etherscan.io/token/0x67e1033277CE54c538725a98EC83997335DEb713#code",
+  },
+  {
+    image: Tunies,
+    title: "Tunies - NFT Smart Contract",
+    name: "Tunies",
+    description:
+      "NFT smart contract on the Ethereum blockchain.  Features include merkleproof allowlist, freeMint and internalMint functions as well as NFT staking.  Contract shipped with comprehensive hardhat/chai test suite for each function.",
+    projectTags: [
+      projectTags.TypeScript,
+      projectTags.Solidity,
+      projectTags.NPM,
+      projectTags.Hardhat,
+    ],
+    liveLink: "https://www.jakebaynham.com/tunies",
+    smartContractLink:
+      "https://etherscan.io/address/0xec10158c372ee3d78f256ad1a8e0ae672e8ac161#code",
   },
   {
     image: MythicalMushrooms,
@@ -134,60 +184,8 @@ export const projects: Project[] = [
       projectTags.Nodejs,
       projectTags.Vercel,
       projectTags.Express,
-      projectTags.Shopify
+      projectTags.Shopify,
     ],
     liveLink: "https://mintlyapp.com/",
   },
-  {
-    image: Tunies,
-    title: "Tunies - NFT Smart Contract",
-    name: "Tunies",
-    description:
-      "NFT smart contract on the Ethereum blockchain.  Features include merkleproof allowlist, freeMint and internalMint functions as well as NFT staking.  Contract shipped with comprehensive hardhat/chai test suite for each function.",
-    projectTags: [
-      projectTags.TypeScript,
-      projectTags.Solidity,
-      projectTags.NPM,
-      projectTags.Hardhat
-    ],
-    liveLink: "https://www.jakebaynham.com/tunies",
-    smartContractLink: 'https://etherscan.io/address/0xec10158c372ee3d78f256ad1a8e0ae672e8ac161#code'
-  },
-  {
-    image: MetaverseHospitality,
-    title: "Metaverse Hospitality - Smart Contract",
-    name: "Metaverse Hospitality",
-    description:
-      "NFT smart contract on the Ethereum blockchain.  Features include merkleproof waitlis",
-    projectTags: [
-        projectTags.TypeScript,
-        projectTags.Solidity,
-        projectTags.NPM,
-        projectTags.Hardhat
-    ],
-    liveLink: "https://www.metaversehospitality.io/",
-    smartContractLink: "https://etherscan.io/token/0x67e1033277CE54c538725a98EC83997335DEb713#code"
-  },
-  {
-    image: Mintly,
-    title: "Mintly - Digital Collectible Tools for Brands and Agencies",
-    name: "Mintly",
-    description:
-      "A comprehensive toolset for NFT creators to build, deploy and maintain digital collectibles with multi tenet support for teams and agencies.",
-    projectTags: [
-      projectTags.TypeScript,
-      projectTags.Nextjs,
-      projectTags.Ethersjs,
-      projectTags.AWS,
-      projectTags.NPM,
-      projectTags.Nodejs,
-      projectTags.Vercel,
-      projectTags.Express,
-      projectTags.Dynamodb,
-      projectTags.Jest,
-      projectTags.Serverless,
-    ],
-    liveLink: "https://mintlyapp.com/",
-  },
-  // ... Add more projects as needed
 ];
