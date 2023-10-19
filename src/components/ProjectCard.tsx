@@ -2,15 +2,20 @@ import Image from "next/image";
 import { Project } from "@/data/projectData";
 import Button from "./Button";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 type IProjectCardProps = {
   project: Project;
 };
 
 const ProjectCard: React.FC<IProjectCardProps> = ({ project }) => {
+  const router = useRouter();
   return (
     <div className="max-w-md mx-auto m-8 bg-gradient-to-r from-fuchsia-900 to-slate-800 rounded-xl shadow-lg transform transition-transform duration-200 hover:-translate-y-4 hover:shadow-xl">
-      <Link href={"/portfolio/" + project.name}>
+      <div
+        onClick={() => router.push("/portfolio/" + project.name)}
+        className="hover:cursor-pointer"
+      >
         <div className="relative w-full h-72">
           <Image
             src={project.image}
@@ -21,7 +26,7 @@ const ProjectCard: React.FC<IProjectCardProps> = ({ project }) => {
         </div>
         <div className="p-6">
           <h2 className="font-bold text-xl mb-2">{project.title}</h2>
-          <p className="text-white mb-4">{project.description}</p>{" "}
+          <div className="text-white mb-4">{project.description}</div>{" "}
           {project.projectTags.map((projectTag, index) => (
             <span
               key={index}
@@ -40,35 +45,51 @@ const ProjectCard: React.FC<IProjectCardProps> = ({ project }) => {
           ))}
           <div className="flex justify-between pt-4">
             {project.githubLink ? (
-              <Button className="hover:border-transparent bg-transparent hover:bg-white">
-                <Link href={project.githubLink} target="_blank">
+              <Link href={project.githubLink} target="_blank">
+                {" "}
+                <Button
+                  className="hover:border-transparent bg-transparent hover:bg-white"
+                  onClick={(e: React.MouseEvent<HTMLElement>) =>
+                    e.stopPropagation()
+                  }
+                >
                   GitHub
-                </Link>
-              </Button>
+                </Button>
+              </Link>
             ) : (
               ""
             )}
             {project.demoLink ? (
-              <Button className="hover:border-transparent bg-transparent hover:bg-white">
-                <Link href={project.demoLink} target="_blank">
+              <Link href={project.demoLink} target="_blank">
+                <Button
+                  className="hover:border-transparent bg-transparent hover:bg-white"
+                  onClick={(e: React.MouseEvent<HTMLElement>) =>
+                    e.stopPropagation()
+                  }
+                >
                   Demo
-                </Link>
-              </Button>
+                </Button>
+              </Link>
             ) : (
               ""
             )}
             {project.liveLink ? (
-              <Button className="hover:border-transparent bg-transparent hover:bg-white">
-                <Link href={project.liveLink} target="_blank">
+              <Link href={project.liveLink} target="_blank">
+                <Button
+                  className="hover:border-transparent bg-transparent hover:bg-white"
+                  onClick={(e: React.MouseEvent<HTMLElement>) =>
+                    e.stopPropagation()
+                  }
+                >
                   Live
-                </Link>
-              </Button>
+                </Button>
+              </Link>
             ) : (
               ""
             )}
           </div>
         </div>
-      </Link>
+      </div>
     </div>
   );
 };

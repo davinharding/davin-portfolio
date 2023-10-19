@@ -1,10 +1,10 @@
-import React from 'react';
-import { LoadingSpinner } from './LoadingSpinner';
+import React from "react";
+import { LoadingSpinner } from "./LoadingSpinner";
 
 interface ButtonProps {
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent<HTMLElement>) => void;
   children: React.ReactNode;
-  size?: 'small' | 'medium' | 'large';
+  size?: "small" | "medium" | "large";
   className?: string;
   loading?: boolean;
 }
@@ -12,24 +12,24 @@ interface ButtonProps {
 const Button: React.FC<ButtonProps> = ({
   onClick,
   children,
-  size = 'medium',
-  className = '',
+  size = "medium",
+  className = "",
   loading = false,
 }) => {
   let paddingSize, textSize;
 
   switch (size) {
-    case 'small':
-      paddingSize = 'px-2 py-1';
-      textSize = 'text-sm';
+    case "small":
+      paddingSize = "px-2 py-1";
+      textSize = "text-sm";
       break;
-    case 'large':
-      paddingSize = 'px-6 py-3';
-      textSize = 'text-lg';
+    case "large":
+      paddingSize = "px-6 py-3";
+      textSize = "text-lg";
       break;
     default:
-      paddingSize = 'px-4 py-2';
-      textSize = 'text-base';
+      paddingSize = "px-4 py-2";
+      textSize = "text-base";
       break;
   }
 
@@ -43,7 +43,7 @@ const Button: React.FC<ButtonProps> = ({
           <LoadingSpinner />
         </span>
       )}
-      <span className={`${loading ? 'ml-4' : ''}`}>{children}</span>
+      <span className={`${loading ? "ml-4" : ""}`}>{children}</span>
     </button>
   );
 };
