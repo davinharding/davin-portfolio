@@ -19,6 +19,9 @@ import ServerlessLogo from "../../public/logos/serverless_logo.png";
 import DynamodbLogo from "../../public/logos/dynamodb_logo.png";
 import JestLogo from "../../public/logos/jest_logo.png";
 import FirebaseLogo from "../../public/logos/firebase_logo.png";
+import MaterialUILogo from "../../public/logos/materialuilogo.png";
+import JavaScriptLogo from "../../public/logos/JavaScript_logo.png";
+import SolidityLogo from "../../public/logos/solidity_logo.png";
 
 export type SkillData = {
   name: string;
@@ -31,6 +34,11 @@ export const skillBadgeData: SkillData[] = [
     name: "TypeScript",
     image: TypeScriptLogo,
     link: "https://www.typescriptlang.org/",
+  },
+  {
+    name: "JavaScript",
+    image: JavaScriptLogo,
+    link: "https://www.javascript.com/"
   },
   {
     name: "Node.js",
@@ -54,11 +62,21 @@ export const skillBadgeData: SkillData[] = [
     link: "https://tailwindcss.com/",
   },
   {
+    name: "MaterialUI",
+    image: MaterialUILogo,
+    link: "https://mui.com/"
+  },
+  {
     name: "AWS Suite",
     image: AWSLogo,
     link: "https://aws.amazon.com/",
   },
   { name: "NPM", image: NPMLogo, link: "https://www.npmjs.com/" },
+  {
+    name: "Solidity",
+    image: SolidityLogo,
+    link: "https://soliditylang.org/",
+  },
   {
     name: "Ethers.js",
     image: EtherjsLogo,

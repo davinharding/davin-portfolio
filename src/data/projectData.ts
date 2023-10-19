@@ -1,10 +1,10 @@
 import { StaticImageData } from "next/image";
 import Mintly from "../../public/projectScreenshots/mintly.png";
-import { SkillData } from "./skillBadgeData";
+import ThetaVibes from "../../public/projectScreenshots/theta_vibes.png";
 import TypeScriptLogo from "../../public/logos/Typescript_logo.png";
 import NodejsLogo from "../../public/logos/nodejs_logo.png";
 import NextjsLogo from "../../public/logos/nextjs_logo.png";
-import EtherjsLogo from "../../public/logos/ethersjs_logo.png";
+import EthersjsLogo from "../../public/logos/ethersjs_logo.png";
 import HardhatLogo from "../../public/logos/hardhat_logo.png";
 import ReactLogo from "../../public/logos/react_logo.png";
 import TailwindLogo from "../../public/logos/tailwind_logo.png";
@@ -21,6 +21,9 @@ import ServerlessLogo from "../../public/logos/serverless_logo.png";
 import DynamodbLogo from "../../public/logos/dynamodb_logo.png";
 import JestLogo from "../../public/logos/jest_logo.png";
 import FirebaseLogo from "../../public/logos/firebase_logo.png";
+import MaterialUILogo from "../../public/logos/materialuilogo.png";
+import JavaScriptLogo from "../../public/logos/JavaScript_logo.png";
+import SolidityLogo from "../../public/logos/solidity_logo.png";
 
 export type ProjectTag = {
   title: string;
@@ -40,9 +43,11 @@ export type Project = {
 
 const projectTags: { [key: string]: ProjectTag } = {
   TypeScript: { title: "Typescript", icon: TypeScriptLogo },
+  JavaScript: { title: "JavaScript", icon: JavaScriptLogo },
   Nodejs: { title: "Node.js", icon: NodejsLogo },
   Nextjs: { title: "Next.js", icon: NextjsLogo },
-  Ethersjs: { title: "Ethers.js", icon: EtherjsLogo },
+  Solidity: { title: "Solidity", icon: SolidityLogo },
+  Ethersjs: { title: "Ethers.js", icon: EthersjsLogo },
   Hardhat: { title: "Hardhat", icon: HardhatLogo },
   React: { title: "React", icon: ReactLogo },
   Tailwind: { title: "Tailwind", icon: TailwindLogo },
@@ -59,6 +64,7 @@ const projectTags: { [key: string]: ProjectTag } = {
   Dynamodb: { title: "Dynamodb", icon: DynamodbLogo },
   Jest: { title: "Jest", icon: JestLogo },
   Firebase: { title: "Firebase", icon: FirebaseLogo },
+  MaterialUI: { title: "MaterialUI", icon: MaterialUILogo },
 };
 
 export const projects: Project[] = [
@@ -84,25 +90,23 @@ export const projects: Project[] = [
     liveLink: "https://mintlyapp.com/",
   },
   {
-    image: Mintly,
-    title: "Mintly - Digital Collectible Tools for Brands and Agencies",
+    image: ThetaVibes,
+    title: "Theta Vibes",
     name: "Mintly",
     description:
-      "A comprehensive toolset for NFT creators to build, deploy and maintain digital collectibles with multi tenet support for teams and agencies.",
+      "A landing page and NFT staking dApp for the Theta Vibes project, built on the Theta Network.  A place for info on the project as well as a UI to view, deposit, withdraw and collect TNT-20 tokens from stakeable NFTs.",
     projectTags: [
-      projectTags.TypeScript,
+      projectTags.JavaScript,
       projectTags.Nextjs,
+      projectTags.Solidity,
       projectTags.Ethersjs,
-      projectTags.AWS,
+      projectTags.Hardhat,
       projectTags.NPM,
-      projectTags.Nodejs,
       projectTags.Vercel,
-      projectTags.Express,
-      projectTags.Dynamodb,
-      projectTags.Jest,
-      projectTags.Serverless,
+      projectTags.MaterialUI
     ],
-    liveLink: "https://mintlyapp.com/",
+    liveLink: "https://www.thetavibes.io/",
+    githubLink: "https://github.com/davinharding/guardian-of-theta-frontend",
   },
   {
     image: Mintly,
