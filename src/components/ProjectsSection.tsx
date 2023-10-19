@@ -1,6 +1,6 @@
 import React from "react";
 import { ProjectCard } from "./ProjectCard";
-import { projects } from "../data/projectData"; // Import the data
+import { projects } from "@/data/projectData"; // Import the data
 import { SectionHeading } from "./SectionHeading";
 
 const ProjectsSection: React.FC = () => {

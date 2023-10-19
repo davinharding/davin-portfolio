@@ -1,7 +1,7 @@
 'use client'
 
 import ScrollArrow from "@/components/ScrollArrow";
-import MainContent from "../components/MainContent";
+import MainContent from "@/components/MainContent";
 import Timeline from "@/components/Timeline";
 import Layout from "@/components/HeaderFooter";
 import React from "react";
