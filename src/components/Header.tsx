@@ -1,5 +1,3 @@
-import { faBars } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import { Transition } from "@headlessui/react";
 import { useEffect, useState } from "react";

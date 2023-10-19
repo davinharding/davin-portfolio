@@ -104,7 +104,7 @@ export const projects: Project[] = [
     title: "Davin Harding - Developer Portfolio",
     name: "Developer Portfolio",
     description:
-      "A developer portfolio ",
+      "A developer portfolio site",
     projectTags: [
       projectTags.TypeScript,
       projectTags.Nextjs,

@@ -1,6 +1,4 @@
-// pages/index.tsx
-
-"use client";
+'use client'
 
 import ScrollArrow from "@/components/ScrollArrow";
 import MainContent from "../components/MainContent";
