@@ -5,7 +5,7 @@ import ContainerLayout from "@/components/ContainerLayout";
 const PortfolioProjectDetail = ({ params }: { params: { name: string }}) => (
   <ContainerLayout>
     <div className="absolute top-28 text-4xl font-bold container">
-      {params.name}
+      {decodeURI(params.name)}
     </div>
   </ContainerLayout>
 );
