@@ -31,12 +31,12 @@ const MainContent: React.FC = () => {
       <Background>
       <Fade cascade={true}>
         <div className="flex items-center justify-center h-screen pb-14">
-          <div className="flex flex-col-reverse lg:flex-row justify-between items-center w-9/12 lg:w-7/12">
+          <div className="flex flex-col-reverse lg:flex-row justify-between items-center w-10/12 lg:w-7/12">
             <div>
-              <h1 className="lg:text-6xl text-2xl font-bold -left-5">
+              <h1 className="lg:text-7xl text-3xl font-bold -left-5">
                 Hi, {"I'm"} Davin.
               </h1>
-              <h1 className="lg:text-6xl text-2xl font-bold">
+              <h1 className="lg:text-7xl text-3xl font-bold">
                 I build{" "}
                 <span className={`inline-block`}>
                   <span
@@ -47,13 +47,13 @@ const MainContent: React.FC = () => {
                   </span>
                 </span>
               </h1>{" "}
-              <div className="text-xl">
+              <div className="text-sm lg:text-2xl">
                 and am a skilled developer with over 5+ years of experience
                 building web based software. My current focus is on web3 enabled
                 decentralized applications. Schedule a call with me today and{" "}
                 {"let's"} turn your ideas into reality!
               </div>
-              <div className="flex justify-center top-10 max-h-fit pt-4 lg:pt-12">
+              <div className="flex justify-center top-10 max-h-fit pt-16 lg:pt-12">
                 <Link href="/call">
                   <Button size="large" className="hover:border-transparent bg-transparent hover:bg-gradient-to-r from-purple-400 via-pink-500 to-red-500">
                     Book a Call

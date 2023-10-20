@@ -34,7 +34,7 @@ const ProjectCard: React.FC<IProjectCardProps> = ({ project }) => {
 
           <div className="p-6">
             <h2 className="font-bold text-xl mb-2">{project.title}</h2>
-            <div className="text-white mb-4">{project.description}</div>{" "}
+            <div className="text-white mb-4">{project.previewDescription}</div>{" "}
             {project.projectTags.map((projectTag, index) => (
               <span
                 key={index}

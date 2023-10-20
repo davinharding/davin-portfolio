@@ -40,7 +40,8 @@ export type ProjectTag = {
 export type Project = {
   image: StaticImageData;
   title: string;
-  description: string;
+  previewDescription: string;
+  description?: string;
   projectTags: ProjectTag[];
   githubLink?: string;
   demoLink?: string;
@@ -82,7 +83,7 @@ export const projects: Project[] = [
     image: Mintly,
     title: "Mintly",
     name: "Mintly",
-    description:
+    previewDescription:
       "A comprehensive toolset for NFT creators to build, deploy and maintain digital collectibles with multi tenet support for teams and agencies.",
     projectTags: [
       projectTags.TypeScript,
@@ -104,7 +105,7 @@ export const projects: Project[] = [
     image: DavinPortfolio,
     title: "Davin Harding - Developer Portfolio",
     name: "Developer Portfolio",
-    description:
+    previewDescription:
       "A mobile responsive developer portfolio site built for speed and interactivity.  Integrated with Calendly for call scheduling.",
     projectTags: [
       projectTags.TypeScript,
@@ -122,7 +123,7 @@ export const projects: Project[] = [
     image: ThetaVibes,
     title: "Theta Vibes",
     name: "Theta Vibes",
-    description:
+    previewDescription:
       "A landing page and NFT staking dApp for the Theta Vibes project, built on the Theta Network.  A place for info on the project as well as a UI to view, deposit, withdraw and collect TNT-20 tokens from stakeable NFTs.",
     projectTags: [
       projectTags.JavaScript,
@@ -144,8 +145,8 @@ export const projects: Project[] = [
     image: MetaverseHospitality,
     title: "Metaverse Hospitality - Smart Contract",
     name: "Metaverse Hospitality",
-    description:
-      "NFT smart contract on the Ethereum blockchain.  Features include merkleproof waitlis",
+    previewDescription:
+      "NFT smart contract on the Ethereum blockchain.  Advanced features include merkleproof allowList, freeMint, internalMint and staking. ",
     projectTags: [
       projectTags.TypeScript,
       projectTags.Solidity,
@@ -160,8 +161,8 @@ export const projects: Project[] = [
     image: Tunies,
     title: "Tunies - NFT Smart Contract",
     name: "Tunies",
-    description:
-      "NFT smart contract on the Ethereum blockchain.  Features include merkleproof allowlist, freeMint and internalMint functions as well as NFT staking.  Contract shipped with comprehensive hardhat/chai test suite for each function.",
+    previewDescription:
+      "NFT smart contract on the Ethereum blockchain.  Advanced features include merkleproof allowlist, freeMint and internalMint functions as well as NFT staking.  Contract shipped with comprehensive hardhat/chai test suite for each function.",
     projectTags: [
       projectTags.TypeScript,
       projectTags.Solidity,
@@ -176,7 +177,7 @@ export const projects: Project[] = [
     image: MythicalMushrooms,
     title: "Mythical Mushrooms",
     name: "Mythical Mushrooms",
-    description:
+    previewDescription:
       "A Web3 enabled landing page and token gated merch store for an artist led NFT collection on the Theta Blockchain.",
     projectTags: [
       projectTags.TypeScript,
