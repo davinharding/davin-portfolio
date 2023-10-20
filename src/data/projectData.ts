@@ -191,5 +191,6 @@ export const projects: Project[] = [
       projectTags.Shopify,
     ],
     liveLink: "https://mintlyapp.com/",
+    githubLink: "https://github.com/DentonWeb3/Mythical-Mushroom"
   },
 ];
