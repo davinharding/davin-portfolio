@@ -7,9 +7,10 @@ import Hamburger from "hamburger-react";
 
 type IHeaderProps = {
   page?: string;
+  mobile?: boolean;
 };
 
-const Header: React.FC<IHeaderProps> = ({ page }) => {
+const Header: React.FC<IHeaderProps> = ({ page, mobile }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const pathName = usePathname();
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
@@ -21,8 +22,12 @@ const Header: React.FC<IHeaderProps> = ({ page }) => {
   ];
 
   useEffect(() => {
+    let scrollValue = 200;
+    if (mobile) {
+      scrollValue = 50;
+    }
     const handleScroll = () => {
-      if (window.scrollY > 200) {
+      if (window.scrollY > scrollValue) {
         setIsScrolled(true);
       } else {
         setIsScrolled(false);
@@ -39,7 +44,7 @@ const Header: React.FC<IHeaderProps> = ({ page }) => {
   return (
     <div
       className={`fixed top-0 w-full text-white p-4 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-fuchsia-950" : "bg-transparent"
+        isScrolled ? "bg-fuchsia-950 shadow-lg" : "bg-transparent"
       }`}
     >
       <div className="container mx-auto flex justify-between items-center">

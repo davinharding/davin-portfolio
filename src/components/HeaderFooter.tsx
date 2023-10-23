@@ -4,13 +4,18 @@ import Footer from "./Footer";
 type HeaderFooterProps = {
   children?: React.ReactNode;
   page?: string;
+  mobile?: boolean;
 };
 
-const HeaderFooter: React.FC<HeaderFooterProps> = ({ children, page }) => {
+const HeaderFooter: React.FC<HeaderFooterProps> = ({
+  children,
+  page,
+  mobile,
+}) => {
   return (
     <>
       <main>
-        <Header page={page} />
+        <Header page={page} mobile={mobile} />
         {children}
         <Footer />
       </main>

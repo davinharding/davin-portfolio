@@ -21,8 +21,8 @@ const Home: React.FC = () => {
       <div className="bg-gradient-to-b from-slate-950   to-fuchsia-950">
         <SkillBadgeSection />
         <ProjectsSection />
-        <GithubSection />
         <Timeline />
+        <GithubSection />
       </div>
       {/* <ProjectCard /> */}
     </Layout>
