@@ -39,6 +39,10 @@ export type ProjectTag = {
 
 export type Project = {
   image: StaticImageData;
+  image2?: StaticImageData;
+  image3?: StaticImageData;
+  image4?: StaticImageData;
+  image5?: StaticImageData;
   title: string;
   previewDescription: string;
   description?: string;
@@ -81,10 +85,16 @@ const projectTags: { [key: string]: ProjectTag } = {
 export const projects: Project[] = [
   {
     image: Mintly,
+    image2: Mintly,
+    image3: Mintly,
+    image4: Mintly,
+    image5: Mintly,
     title: "Mintly",
     name: "Mintly",
     previewDescription:
       "A comprehensive toolset for NFT creators to build, deploy and maintain digital collectibles with multi tenet support for teams and agencies.",
+    description:
+      "Grinder mazagran blue mountain black, beans mug turkish at trifecta irish decaffeinated strong. French press bar  eu breve, mazagran, single origin dark single origin aftertaste caffeine grounds. Grounds, as est milk, cappuccino, breve dripper aged roast as aftertaste. Grinder ristretto whipped, galão spoon java sweet, eu skinny siphon turkish mocha.",
     projectTags: [
       projectTags.TypeScript,
       projectTags.React,
@@ -107,6 +117,8 @@ export const projects: Project[] = [
     name: "Developer Portfolio",
     previewDescription:
       "A mobile responsive developer portfolio site built for speed and interactivity.  Integrated with Calendly for call scheduling.",
+    description:
+      "Grinder mazagran blue mountain black, beans mug turkish at trifecta irish decaffeinated strong. French press bar  eu breve, mazagran, single origin dark single origin aftertaste caffeine grounds. Grounds, as est milk, cappuccino, breve dripper aged roast as aftertaste. Grinder ristretto whipped, galão spoon java sweet, eu skinny siphon turkish mocha.",
     projectTags: [
       projectTags.TypeScript,
       projectTags.React,
@@ -114,7 +126,6 @@ export const projects: Project[] = [
       projectTags.NPM,
       projectTags.Vercel,
       projectTags.Tailwind,
-
     ],
     liveLink: "https://www.davin.io/",
     githubLink: "https://github.com/davinharding/davin-portfolio",
@@ -125,6 +136,8 @@ export const projects: Project[] = [
     name: "Theta Vibes",
     previewDescription:
       "A landing page and NFT staking dApp for the Theta Vibes project, built on the Theta Network.  A place for info on the project as well as a UI to view, deposit, withdraw and collect TNT-20 tokens from stakeable NFTs.",
+    description:
+      "Grinder mazagran blue mountain black, beans mug turkish at trifecta irish decaffeinated strong. French press bar  eu breve, mazagran, single origin dark single origin aftertaste caffeine grounds. Grounds, as est milk, cappuccino, breve dripper aged roast as aftertaste. Grinder ristretto whipped, galão spoon java sweet, eu skinny siphon turkish mocha.",
     projectTags: [
       projectTags.JavaScript,
       projectTags.React,
@@ -147,6 +160,8 @@ export const projects: Project[] = [
     name: "Metaverse Hospitality",
     previewDescription:
       "NFT smart contract on the Ethereum blockchain.  Advanced features include merkleproof allowList, freeMint, internalMint and staking. ",
+    description:
+      "Grinder mazagran blue mountain black, beans mug turkish at trifecta irish decaffeinated strong. French press bar  eu breve, mazagran, single origin dark single origin aftertaste caffeine grounds. Grounds, as est milk, cappuccino, breve dripper aged roast as aftertaste. Grinder ristretto whipped, galão spoon java sweet, eu skinny siphon turkish mocha.",
     projectTags: [
       projectTags.TypeScript,
       projectTags.Solidity,
@@ -163,6 +178,8 @@ export const projects: Project[] = [
     name: "Tunies",
     previewDescription:
       "NFT smart contract on the Ethereum blockchain.  Advanced features include merkleproof allowlist, freeMint and internalMint functions as well as NFT staking.  Contract shipped with comprehensive hardhat/chai test suite for each function.",
+    description:
+      "Grinder mazagran blue mountain black, beans mug turkish at trifecta irish decaffeinated strong. French press bar  eu breve, mazagran, single origin dark single origin aftertaste caffeine grounds. Grounds, as est milk, cappuccino, breve dripper aged roast as aftertaste. Grinder ristretto whipped, galão spoon java sweet, eu skinny siphon turkish mocha.",
     projectTags: [
       projectTags.TypeScript,
       projectTags.Solidity,
@@ -179,6 +196,8 @@ export const projects: Project[] = [
     name: "Mythical Mushrooms",
     previewDescription:
       "A Web3 enabled landing page and token gated merch store for an artist led NFT collection on the Theta Blockchain.",
+    description:
+      "Grinder mazagran blue mountain black, beans mug turkish at trifecta irish decaffeinated strong. French press bar  eu breve, mazagran, single origin dark single origin aftertaste caffeine grounds. Grounds, as est milk, cappuccino, breve dripper aged roast as aftertaste. Grinder ristretto whipped, galão spoon java sweet, eu skinny siphon turkish mocha.",
     projectTags: [
       projectTags.TypeScript,
       projectTags.Nextjs,
@@ -191,6 +210,6 @@ export const projects: Project[] = [
       projectTags.Shopify,
     ],
     liveLink: "https://mintlyapp.com/",
-    githubLink: "https://github.com/DentonWeb3/Mythical-Mushroom"
+    githubLink: "https://github.com/DentonWeb3/Mythical-Mushroom",
   },
 ];
