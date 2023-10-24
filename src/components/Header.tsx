@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import Hamburger from "hamburger-react";
+import { projects } from "@/data/projectData";
 
 type IHeaderProps = {
   page?: string;
@@ -14,6 +15,7 @@ const Header: React.FC<IHeaderProps> = ({ page, mobile }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const pathName = usePathname();
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
+  const [isSlideoutOpen, setIsSlideoutOpen] = useState<boolean>(false);
 
   const navigationItems = [
     { label: "About", href: "/about" },
@@ -22,6 +24,16 @@ const Header: React.FC<IHeaderProps> = ({ page, mobile }) => {
   ];
 
   useEffect(() => {
+    const closeSlideout = (event: MouseEvent) => {
+      if (!event.target) return;
+      const target = event.target as Node;
+      if (!document.querySelector(".portfolio-slideout")?.contains(target)) {
+        setIsSlideoutOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", closeSlideout);
+
     let scrollValue = 200;
     if (mobile) {
       scrollValue = 50;
@@ -37,6 +49,7 @@ const Header: React.FC<IHeaderProps> = ({ page, mobile }) => {
     window.addEventListener("scroll", handleScroll);
 
     return () => {
+      document.removeEventListener("mousedown", closeSlideout);
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
@@ -54,18 +67,48 @@ const Header: React.FC<IHeaderProps> = ({ page, mobile }) => {
 
         {/* Desktop Links */}
         <ul className="hidden md:flex space-x-4">
-          {navigationItems.map((item) => (
-            <li key={item.label} className="hover:scale-125 ease-in-out">
-              <Link
-                href={item.href}
-                className={`text-white hover:text-gray-400 ${
-                  pathName === item.href ? "border-b-2 border-white" : ""
-                } hover:border-b-2 hover:border-gray-400 `}
-              >
-                <span className="scale-150">{item.label}</span>
-              </Link>
-            </li>
-          ))}
+          {navigationItems.map((item) => {
+            if (item.label === "Portfolio") {
+              return (
+                <li key={item.label} className="hover:scale-125 ease-in-out">
+                  <span
+                    onClick={() => setIsSlideoutOpen(!isSlideoutOpen)}
+                    className={`text-white hover:text-gray-400 ${
+                      pathName === item.href ? "border-b-2 border-white" : ""
+                    } hover:border-b-2 hover:border-gray-400 `}
+                  >
+                    {item.label}
+                  </span>
+                </li>
+              );
+            } else {
+              return (
+                <li key={item.label} className="hover:scale-125 ease-in-out">
+                  <Link
+                    href={item.href}
+                    className={`text-white hover:text-gray-400 ${
+                      pathName === item.href ? "border-b-2 border-white" : ""
+                    } hover:border-b-2 hover:border-gray-400 `}
+                  >
+                    <span className="scale-150">{item.label}</span>
+                  </Link>
+                </li>
+              );
+            }
+          })}
+          {isSlideoutOpen && (
+            <div className="absolute mt-8 bg-fuchsia-900 shadow-lg rounded p-4 portfolio-slideout">
+              <ul>
+                {projects.map((project) => (
+                  <li key={project.name}>
+                    <Link href={`/portfolio/${encodeURI(project.name)}`}>
+                      <span>{project.name}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </ul>
 
         {/* Mobile Hamburger Menu */}
