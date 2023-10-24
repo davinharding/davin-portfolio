@@ -20,13 +20,15 @@ const ContainerLayout: React.FC<ContainerLayoutProps> = ({
   <HeaderFooter page="test" mobile={mobile}>
     <div className="bg-gray-900">
       <Background noMouseMovement>
-        <div className="flex flex-col items-center mt-28">
+        <div className="flex flex-col items-center mt-20 lg:mt-28">
           <div className="container mx-4 px-4">
             <div className="text-4xl font-bold flex">{pageTitle}</div>
             <div
               className={`container text-xl  ${
-                pageTitle === "Book a Call" ? "" : "flex justify-around"
-              } lg:mt-12`}
+                pageTitle === "Book a Call"
+                  ? ""
+                  : "flex justify-around lg:mt-12"
+              } `}
             >
               {children}
             </div>
