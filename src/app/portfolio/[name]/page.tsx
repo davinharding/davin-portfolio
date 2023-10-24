@@ -20,7 +20,7 @@ const PortfolioProjectDetail = ({ params }: { params: { name: string } }) => {
 
   return (
     <ContainerLayout pageTitle={project.name} mobile={true}>
-      <div className="lg:max-w-screen-xl flex items-center lg:flex-row flex-col">
+      <div className="lg:max-w-screen-xl flex lg:flex-row flex-col">
         <div className="flex-1 pr-6 my-6">
           <div>{project.description}</div>
         </div>
