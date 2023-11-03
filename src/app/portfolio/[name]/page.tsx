@@ -3,6 +3,8 @@
 import Image from "next/image";
 import ContainerLayout from "@/components/ContainerLayout";
 import { projects, Project } from "@/data/projectData";
+import parse from 'html-react-parser';
+
 
 const PortfolioProjectDetail = ({ params }: { params: { name: string } }) => {
   // Filter the project based on the name parameter.
@@ -22,7 +24,7 @@ const PortfolioProjectDetail = ({ params }: { params: { name: string } }) => {
     <ContainerLayout pageTitle={project.name} mobile={true}>
       <div className="lg:max-w-screen-xl flex lg:flex-row flex-col">
         <div className="flex-1 pr-6 my-6">
-          <div>{project.description}</div>
+          <div>{parse(project.description)}</div>
         </div>
 
         <div className="flex flex-wrap flex-1">
