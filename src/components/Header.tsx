@@ -5,6 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import Hamburger from "hamburger-react";
 import { projects } from "@/data/projectData";
+import { Disclosure } from "@headlessui/react";
 
 type IHeaderProps = {
   page?: string;
@@ -75,7 +76,7 @@ const Header: React.FC<IHeaderProps> = ({ page, mobile }) => {
                     onClick={() => setIsSlideoutOpen(!isSlideoutOpen)}
                     className={`text-white hover:text-gray-400 ${
                       pathName === item.href ? "border-b-2 border-white" : ""
-                    } hover:border-b-2 hover:border-gray-400 `}
+                    } hover:border-b-2 hover:border-gray-400 cursor-pointer`}
                   >
                     {item.label}
                   </span>
@@ -97,14 +98,18 @@ const Header: React.FC<IHeaderProps> = ({ page, mobile }) => {
             }
           })}
           {isSlideoutOpen && (
-            <div className="absolute mt-8 bg-fuchsia-900 shadow-lg rounded p-4 portfolio-slideout">
-              <ul>
+            <div className="absolute mt-8 bg-fuchsia-900 shadow-lg rounded py-3 portfolio-slideout">
+              <ul className="pr-3">
                 {projects.map((project) => (
-                  <li key={project.name}>
-                    <Link href={`/portfolio/${encodeURI(project.name)}`}>
-                      <span>{project.name}</span>
-                    </Link>
-                  </li>
+                  <Link href={`/portfolio/${encodeURI(project.name)}`}>
+                    <li
+                      key={project.name}
+                      className="p-1 hover:bg-white hover:text-fuchsia-900 rounded-r-md"
+                      onClick={() => setIsSlideoutOpen(!isSlideoutOpen)}
+                    >
+                      <span className="pl-3">{project.name}</span>
+                    </li>
+                  </Link>
                 ))}
               </ul>
             </div>
@@ -134,8 +139,10 @@ const Header: React.FC<IHeaderProps> = ({ page, mobile }) => {
                   href={item.href}
                   onClick={() => setIsOpen(false)}
                   className={`block w-full px-4 py-2 text-sm text-white hover:bg-gray-600 ${
-                    pathName === item.href ? "border-l-4 border-white pl-2" : ""
-                  }`}
+                    pathName === item.href
+                      ? "border-l-4 border-white pl-2 rounded-none"
+                      : ""
+                  } hover:bg-white hover:text-fuchsia-900 rounded-r-md`}
                 >
                   {item.label}
                 </Link>
