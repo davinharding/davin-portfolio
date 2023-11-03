@@ -100,8 +100,8 @@ const Header: React.FC<IHeaderProps> = ({ page, mobile }) => {
           {isSlideoutOpen && (
             <div className="absolute mt-8 bg-fuchsia-900 shadow-lg rounded py-3 portfolio-slideout">
               <ul className="pr-3">
-                {projects.map((project) => (
-                  <Link href={`/portfolio/${encodeURI(project.name)}`}>
+                {projects.map((project, idx) => (
+                  <Link key={idx} href={`/portfolio/${encodeURI(project.name)}`}>
                     <li
                       key={project.name}
                       className="p-1 hover:bg-white hover:text-fuchsia-900 rounded-r-md"
