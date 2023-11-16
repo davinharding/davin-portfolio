@@ -88,27 +88,28 @@ const projectTags: { [key: string]: ProjectTag } = {
 
 export const projects: Project[] = [
   {
-    image: MintlyProjectOptions,
-    image2: MintlyProjectList,
-    image3: MintlyTeamPage,
-    // image4: Mintly,
+    image: Mintly,
+    image2: MintlyProjectOptions,
+    image3: MintlyProjectList,
+    image4: MintlyTeamPage,
+    // image5: Mintly,
     // image5: Mintly,
     title: "Mintly",
     name: "Mintly",
     previewDescription:
       "A comprehensive toolset for NFT creators to build, deploy and maintain digital collectibles with multi tenet support for teams and agencies.",
     description:
-      `<p>Mintly is an innovative cloud-based SaaS application that streamlines the creation, deployment, and maintenance of NFT collections. It boasts a user-friendly project wizard, which guides creators through each step of the process, ensuring all necessary data and metrics are captured for effortless one-click contract compilation, deployment, and Etherscan verification.</p>
-
-      <p>Furthermore, Mintly features a sophisticated generative art studio, providing storage, organization, and previewing capabilities for artwork layers. This functionality allows for the exploration of various combinations before the final generation, ensuring a high level of creative control and precision.</p>
-      
-      <p>Once deployed, Mintly offers an intuitive UI for straightforward management of mint phases and contract controls. The proprietary NFT smart contract embedded within Mintly affords creators granular control over each mint phase. It includes advanced optional features such as staking and soulbound properties, catering to a wide array of NFT project requirements.</p>
-      
-      <p>Mintly also excels in collaborative environments. Its support for multi-tenancy enables agencies and teams to work collectively in shared spaces, enhancing project collaboration and productivity.</p>
-      
-      <p>From a technical standpoint, Mintly leverages the robustness of Next.js and Tailwind CSS in its front-end design for enhanced speed and modularity. The back end is powered by a serverless architecture, ensuring superior scalability and reduced latency. Hosting is seamlessly managed using a suite of AWS services, including Lambda, S3, DynamoDB, and Amplify, guaranteeing a resilient and responsive user experience.</p>
-      
-      <p>As the lead engineer on this project, I am very proud of the technical solution we have put together, the challenges we've overcome, and our commitment to building a superior product. Mintly is currently in a closed alpha and will be open for an invite-only beta launch soon!</p>
+      `Mintly is an innovative cloud-based SaaS that streamlines the creation, deployment, and maintenance of NFT collections. It boasts a user-friendly project wizard, which guides creators through each step of the way, ensuring all necessary data and metrics are captured for effortless one-click contract compilation, deployment, and Etherscan verification.
+      |
+      Furthermore, Mintly features a sophisticated generative art studio, providing storage, organization, and previewing capabilities for artwork layers. This functionality allows for the exploration of various combinations before the final generation, ensuring a high level of creative control and precision.
+      |
+      Once a contract is deployed, Mintly offers an intuitive UI for straightforward management of mint phases and contract controls. The proprietary NFT smart contract embedded within Mintly affords creators granular control over each mint phase. It includes advanced optional features such as staking and soulbound properties, catering to a wide array of NFT project requirements.
+      |
+      Mintly also excels in collaborative environments. Its support for multi-tenancy enables agencies and teams to work collectively in shared spaces, enhancing project collaboration and productivity.
+      |
+      From a technical standpoint, Mintly leverages the robustness of Next.js and Tailwind CSS in its front-end design for enhanced speed and modularity. The back end is powered by a serverless architecture, ensuring superior scalability and reduced latency. Hosting is seamlessly managed using a suite of AWS services, including Lambda, S3, DynamoDB, and Amplify, guaranteeing a resilient and responsive user experience.
+      |
+      As the lead engineer on this project, I am very proud of the technical solution we have put together, the challenges we've overcome, and our commitment to building a superior product. Mintly is currently in a closed alpha and will be open for an invite-only beta launch soon!
       `,
     projectTags: [
       projectTags.TypeScript,
