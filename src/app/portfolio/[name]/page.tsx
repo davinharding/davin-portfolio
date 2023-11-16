@@ -48,13 +48,13 @@ const PortfolioProjectDetail = ({ params }: { params: { name: string } }) => {
 
         <div className="flex flex-wrap flex-1">
           {project.image && (
-            <div onClick={() => openModal(project.image)}>
+            // <div onClick={() => openModal(project.image)}>
               <Image
                 src={project.image}
                 alt={project.title}
                 className="w-full mb-4 object-cover"
               />
-            </div>
+            // </div>
           )}
           <div className="w-1/2 pr-2">
             {project.image2 && (
