@@ -5,23 +5,24 @@ import ContainerLayout from "@/components/ContainerLayout";
 import { projects, Project } from "@/data/projectData";
 import { useState } from "react";
 import { Dialog } from "@headlessui/react";
+import Link from "next/link";
 
 const PortfolioProjectDetail = ({ params }: { params: { name: string } }) => {
-//   const [isModalOpen, setModalOpen] = useState(false);
-//   const [selectedImage, setSelectedImage] = useState<StaticImageData>();
+  //   const [isModalOpen, setModalOpen] = useState(false);
+  //   const [selectedImage, setSelectedImage] = useState<StaticImageData>();
   // Filter the project based on the name parameter.
   const project: Project | undefined = projects.find(
     (p) => p.name === decodeURI(params.name),
   );
 
-//   const openModal = (imageSrc: StaticImageData) => {
-//     setSelectedImage(imageSrc);
-//     setModalOpen(true);
-//   };
+  //   const openModal = (imageSrc: StaticImageData) => {
+  //     setSelectedImage(imageSrc);
+  //     setModalOpen(true);
+  //   };
 
-//   const closeModal = () => {
-//     setModalOpen(false);
-//   };
+  //   const closeModal = () => {
+  //     setModalOpen(false);
+  //   };
 
   if (!project) {
     return (
@@ -38,22 +39,27 @@ const PortfolioProjectDetail = ({ params }: { params: { name: string } }) => {
           <div>
             {(project.description as string).split("|").map((e, idx) => {
               return (
-                <div className="pb-4 text-sm" key={idx}>
+                <div className="pb-4 text-lg" key={idx}>
                   {e}
                 </div>
               );
             })}
           </div>
+          {project.liveLink && (
+            <button>
+              <Link href={project.liveLink}>Live Link</Link>
+            </button>
+          )}
         </div>
 
         <div className="flex flex-wrap flex-1">
           {project.image && (
             // <div onClick={() => openModal(project.image)}>
-              <Image
-                src={project.image}
-                alt={project.title}
-                className="w-full mb-4 object-cover"
-              />
+            <Image
+              src={project.image}
+              alt={project.title}
+              className="w-full mb-4 object-cover"
+            />
             // </div>
           )}
           <div className="w-1/2 pr-2">

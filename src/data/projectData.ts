@@ -3,6 +3,7 @@ import Mintly from "/public/projectScreenshots/mintly.png";
 import MintlyProjectList from "/public/projectScreenshots/mintly_project_list.png";
 import MintlyTeamPage from "/public/projectScreenshots/mintly_team_page.png";
 import MintlyProjectOptions from "/public/projectScreenshots/mintly_project_options.png";
+import MintlyArtGen from "/public/projectScreenshots/mintly_art_gen.png";
 
 import ThetaVibes from "/public/projectScreenshots/theta_vibes.png";
 import MythicalMushrooms from "/public/projectScreenshots/mythical_mushrooms.png";
@@ -92,24 +93,20 @@ export const projects: Project[] = [
     image2: MintlyProjectOptions,
     image3: MintlyProjectList,
     image4: MintlyTeamPage,
-    // image5: Mintly,
+    image5: MintlyArtGen,
     // image5: Mintly,
     title: "Mintly",
     name: "Mintly",
     previewDescription:
       "A comprehensive toolset for NFT creators to build, deploy and maintain digital collectibles with multi tenet support for teams and agencies.",
     description:
-      `Mintly is an innovative cloud-based SaaS that streamlines the creation, deployment, and maintenance of NFT collections. It boasts a user-friendly project wizard, which guides creators through each step of the way, ensuring all necessary data and metrics are captured for effortless one-click contract compilation, deployment, and Etherscan verification.
+      `Mintly is the culmination of learnings from several technical implementations Palm Tree NFT has done for its various NFT clients.  It is an effort to build a tool that allows an NFT creator to accomplish all of the technical tasks of launching an NFT project through an efficient guided experience.
       |
-      Furthermore, Mintly features a sophisticated generative art studio, providing storage, organization, and previewing capabilities for artwork layers. This functionality allows for the exploration of various combinations before the final generation, ensuring a high level of creative control and precision.
+      This includes data collection, art generation, storage, one-click deployment and post-deployment contract management.  Additionally, it is built with a multi-tenancy architecture making it perfect for teams to collaborate together.  This is also great for agencies allowing them to deploy and manage multiple projects for their clients.
       |
-      Once a contract is deployed, Mintly offers an intuitive UI for straightforward management of mint phases and contract controls. The proprietary NFT smart contract embedded within Mintly affords creators granular control over each mint phase. It includes advanced optional features such as staking and soulbound properties, catering to a wide array of NFT project requirements.
+      As the lead engineer on this project it has been exciting and challenging to take on such an ambitious problem and I am looking forward to continuing to build and improve the platform with the help of our early adopters.
       |
-      Mintly also excels in collaborative environments. Its support for multi-tenancy enables agencies and teams to work collectively in shared spaces, enhancing project collaboration and productivity.
-      |
-      From a technical standpoint, Mintly leverages the robustness of Next.js and Tailwind CSS in its front-end design for enhanced speed and modularity. The back end is powered by a serverless architecture, ensuring superior scalability and reduced latency. Hosting is seamlessly managed using a suite of AWS services, including Lambda, S3, DynamoDB, and Amplify, guaranteeing a resilient and responsive user experience.
-      |
-      As the lead engineer on this project, I am very proud of the technical solution we have put together, the challenges we've overcome, and our commitment to building a superior product. Mintly is currently in a closed alpha and will be open for an invite-only beta launch soon!
+      Mintly is currently in a closed alpha testing phase, with a wider beta testing phase to be announced soon.
       `,
     projectTags: [
       projectTags.TypeScript,
