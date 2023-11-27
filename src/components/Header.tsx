@@ -14,12 +14,14 @@ type IHeaderProps = {
 
 const Header: React.FC<IHeaderProps> = ({ page, mobile }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isPortfolioSubMenuOpen, setIsPortfolioSubMenuOpen] =
+    useState<boolean>(false);
   const pathName = usePathname();
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
   const [isSlideoutOpen, setIsSlideoutOpen] = useState<boolean>(false);
 
   const navigationItems = [
-    { label: "About", href: "/about" },
+    // { label: "About", href: "/about" },
     { label: "Portfolio", href: "/portfolio" },
     { label: "Book a Call", href: "/call" },
   ];
@@ -53,7 +55,7 @@ const Header: React.FC<IHeaderProps> = ({ page, mobile }) => {
       document.removeEventListener("mousedown", closeSlideout);
       window.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [mobile]);
 
   return (
     <div
@@ -101,7 +103,10 @@ const Header: React.FC<IHeaderProps> = ({ page, mobile }) => {
             <div className="absolute mt-8 bg-fuchsia-900 shadow-lg rounded py-3 portfolio-slideout">
               <ul className="pr-3">
                 {projects.map((project, idx) => (
-                  <Link key={idx} href={`/portfolio/${encodeURI(project.name)}`}>
+                  <Link
+                    key={idx}
+                    href={`/portfolio/${encodeURI(project.name)}`}
+                  >
                     <li
                       key={project.name}
                       className="p-1 hover:bg-white hover:text-fuchsia-900 rounded-r-md"
@@ -134,18 +139,54 @@ const Header: React.FC<IHeaderProps> = ({ page, mobile }) => {
           >
             <div className="absolute -right-4 mt-4 w-48 py-2 bg-fuchsia-900 rounded-md shadow-xl z-10">
               {navigationItems.map((item) => (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  onClick={() => setIsOpen(false)}
-                  className={`block w-full px-4 py-2 text-sm text-white hover:bg-gray-600 ${
-                    pathName === item.href
-                      ? "border-l-4 border-white pl-2 rounded-none"
-                      : ""
-                  } hover:bg-white hover:text-fuchsia-900 rounded-r-md`}
-                >
-                  {item.label}
-                </Link>
+                <div key={item.label}>
+                  {item.label === "Portfolio" ? (
+                    <div
+                      onClick={() => {
+                        setIsPortfolioSubMenuOpen(!isPortfolioSubMenuOpen);
+                      }}
+                      className={`block w-full px-4 py-2 text-sm text-white hover:bg-gray-600 ${
+                        pathName === item.href
+                          ? "border-l-4 border-white pl-2 rounded-none"
+                          : ""
+                      } hover:bg-white hover:text-fuchsia-900 rounded-r-md`}
+                    >
+                      {item.label}
+                    </div>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      onClick={() => {
+                        setIsOpen(false);
+                      }}
+                      className={`block w-full px-4 py-2 text-sm text-white hover:bg-gray-600 ${
+                        pathName === item.href
+                          ? "border-l-4 border-white pl-2 rounded-none"
+                          : ""
+                      } hover:bg-white hover:text-fuchsia-900 rounded-r-md`}
+                    >
+                      {item.label}
+                    </Link>
+                  )}
+
+                  {item.label === "Portfolio" && isPortfolioSubMenuOpen && (
+                    <div className="pl-4">
+                      {projects.map((project, idx) => (
+                        <Link
+                          key={idx}
+                          href={`/portfolio/${encodeURI(project.name)}`}
+                        >
+                          <span
+                            className="block px-4 py-1 text-sm text-white hover:bg-gray-600 hover:bg-white hover:text-fuchsia-900 rounded-r-md"
+                            onClick={() => setIsPortfolioSubMenuOpen(false)}
+                          >
+                            {project.name}
+                          </span>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
               ))}
             </div>
           </Transition>
