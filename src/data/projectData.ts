@@ -131,7 +131,7 @@ export const projects: Project[] = [
     previewDescription:
       "A mobile responsive developer portfolio site built for speed and interactivity.  Integrated with Calendly for call scheduling.",
     description:
-      "Grinder mazagran blue mountain black, beans mug turkish at trifecta irish decaffeinated strong. French press bar  eu breve, mazagran, single origin dark single origin aftertaste caffeine grounds. Grounds, as est milk, cappuccino, breve dripper aged roast as aftertaste. Grinder ristretto whipped, galão spoon java sweet, eu skinny siphon turkish mocha.",
+      "For this portfolio site I specifically chose to design and build all the structural components and pages from the ground up using Next.js and Tailwind CSS.  I wanted to do this to showcase some of my frontend skills instead of using templates.  For the dynamic elements some off the shelf packages were configured and integrated like tsParticles and React-Vertical-Timeline (checkout the package.json at the Github link to see what else I used).  I also integrated the Calendly React component for call scheduling.  Overall I had a lot of fun putting this site together and I will be adding content and additional features over time.",
     projectTags: [
       projectTags.TypeScript,
       projectTags.React,
@@ -150,7 +150,7 @@ export const projects: Project[] = [
     previewDescription:
       "A landing page and NFT staking dApp for the Theta Vibes project, built on the Theta Network.  A place for info on the project as well as a UI to view, deposit, withdraw and collect TNT-20 tokens from stakeable NFTs.",
     description:
-      "Grinder mazagran blue mountain black, beans mug turkish at trifecta irish decaffeinated strong. French press bar  eu breve, mazagran, single origin dark single origin aftertaste caffeine grounds. Grounds, as est milk, cappuccino, breve dripper aged roast as aftertaste. Grinder ristretto whipped, galão spoon java sweet, eu skinny siphon turkish mocha.",
+      "For the Theta Vibes project I was contracted to build out NFT staking contracts for existing and future NFT collections as well as a dApp that included a landing/info page, wallet connectivity and an interactive UI for the staking contracts to be able to view, stake, collect and withdraw NFTs.  The dApp has collected 1k+ unique users and 2k+ staking transactions on the Theta blockchain.",
     projectTags: [
       projectTags.JavaScript,
       projectTags.React,
@@ -174,7 +174,7 @@ export const projects: Project[] = [
     previewDescription:
       "NFT smart contract on the Ethereum blockchain.  Advanced features include merkleproof allowList, freeMint, internalMint and staking. ",
     description:
-      "Grinder mazagran blue mountain black, beans mug turkish at trifecta irish decaffeinated strong. French press bar  eu breve, mazagran, single origin dark single origin aftertaste caffeine grounds. Grounds, as est milk, cappuccino, breve dripper aged roast as aftertaste. Grinder ristretto whipped, galão spoon java sweet, eu skinny siphon turkish mocha.",
+      "The Metaverse Hospitality project was a NFT smart contract implementation, landing page and mint page contracted through Palm Tree NFT.  Contract features included Merkle Proof allowlist tiers, controls around number of mints allowed in each tier, unrevealed artwork, and nft staking for rewards tiers.",
     projectTags: [
       projectTags.TypeScript,
       projectTags.Solidity,
@@ -192,7 +192,7 @@ export const projects: Project[] = [
     previewDescription:
       "NFT smart contract on the Ethereum blockchain.  Advanced features include merkleproof allowlist, freeMint and internalMint functions as well as NFT staking.  Contract shipped with comprehensive hardhat/chai test suite for each function.",
     description:
-      "Grinder mazagran blue mountain black, beans mug turkish at trifecta irish decaffeinated strong. French press bar  eu breve, mazagran, single origin dark single origin aftertaste caffeine grounds. Grounds, as est milk, cappuccino, breve dripper aged roast as aftertaste. Grinder ristretto whipped, galão spoon java sweet, eu skinny siphon turkish mocha.",
+      "The Tunies NFT project was one of the first NFT smart contract implementations I completed through Palm Tree NFT.  It was a mostly standard implementation wtih allowlist tiers, controls for various contract parameters and blockchain controlled payout splits.  One novel feature that I implemented in this project however was extending the ERC721A contract which introduced some new (at the time) gas optimizations surronding minting multiple NFTs.  This allowed Tunies to be on the cutting edge of gas optimization at a time when gas costs were soaring.",
     projectTags: [
       projectTags.TypeScript,
       projectTags.Solidity,
@@ -210,7 +210,7 @@ export const projects: Project[] = [
     previewDescription:
       "A Web3 enabled landing page and token gated merch store for an artist led NFT collection on the Theta Blockchain.",
     description:
-      "Grinder mazagran blue mountain black, beans mug turkish at trifecta irish decaffeinated strong. French press bar  eu breve, mazagran, single origin dark single origin aftertaste caffeine grounds. Grounds, as est milk, cappuccino, breve dripper aged roast as aftertaste. Grinder ristretto whipped, galão spoon java sweet, eu skinny siphon turkish mocha.",
+      "Mythical Mushrooms was my first foray into developing within the web3 space.  The project was artist led and consisted of fun mushroom character edition NFTs with 3 different rarity tiers.  The dev effort on the project consisted of a landing page with wallet connectivity and a token gated shopify merch store. |  The interesting thing we were able to implement here was a discount system based on the rarity of each NFT edition that the user owned.  Ownership of a 'Rare' tier NFT granted the user a one time 50% discount in the store and ownership of a 'Legedary' tier NFT granted a one time 100% discount in the store. | I accomplished this by seeding the store with discount codes for each NFT and its respective tiers and then storing those codes in a Firebase DB associated with their NFT id.  Once a user verified ownership of the NFT by connecting their wallet, the discount code was then looked up and displayed to the user for use in the store.  A fun and unique way to provide utility and give back to the NFT holders.",
     projectTags: [
       projectTags.TypeScript,
       projectTags.Nextjs,

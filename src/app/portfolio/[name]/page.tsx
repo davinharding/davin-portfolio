@@ -3,26 +3,13 @@
 import Image, { StaticImageData } from "next/image";
 import ContainerLayout from "@/components/ContainerLayout";
 import { projects, Project } from "@/data/projectData";
-import { useState } from "react";
-import { Dialog } from "@headlessui/react";
 import Link from "next/link";
+import Button from "@/components/Button";
 
 const PortfolioProjectDetail = ({ params }: { params: { name: string } }) => {
-  //   const [isModalOpen, setModalOpen] = useState(false);
-  //   const [selectedImage, setSelectedImage] = useState<StaticImageData>();
-  // Filter the project based on the name parameter.
   const project: Project | undefined = projects.find(
     (p) => p.name === decodeURI(params.name),
   );
-
-  //   const openModal = (imageSrc: StaticImageData) => {
-  //     setSelectedImage(imageSrc);
-  //     setModalOpen(true);
-  //   };
-
-  //   const closeModal = () => {
-  //     setModalOpen(false);
-  //   };
 
   if (!project) {
     return (
@@ -37,30 +24,51 @@ const PortfolioProjectDetail = ({ params }: { params: { name: string } }) => {
       <div className="lg:max-w-screen-xl flex lg:flex-row flex-col">
         <div className="flex-1 pr-6 my-6">
           <div>
-            {(project.description as string).split("|").map((e, idx) => {
+            {(project.description as string).split("|").map((paragraph, idx) => {
               return (
                 <div className="pb-4 text-lg" key={idx}>
-                  {e}
+                  {paragraph}
                 </div>
               );
             })}
           </div>
           {project.liveLink && (
-            <button>
-              <Link href={project.liveLink}>Live Link</Link>
-            </button>
+            <Link href={project.liveLink} target="_blank">
+              <Button className="hover:border-transparent bg-transparent hover:bg-white m-2">
+                Live
+              </Button>
+            </Link>
+          )}
+          {project.githubLink && (
+            <Link href={project.githubLink} target="_blank">
+              <Button className="hover:border-transparent bg-transparent hover:bg-white m-2">
+                Github
+              </Button>
+            </Link>
+          )}
+          {project.demoLink && (
+            <Link href={project.demoLink} target="_blank">
+              <Button className="hover:border-transparent bg-transparent hover:bg-white m-2">
+                Demo
+              </Button>
+            </Link>
+          )}
+          {project.smartContractLink && (
+            <Link href={project.smartContractLink} target="_blank">
+              <Button className="hover:border-transparent bg-transparent hover:bg-white m-2">
+                Smart Contract
+              </Button>
+            </Link>
           )}
         </div>
 
         <div className="flex flex-wrap flex-1">
           {project.image && (
-            // <div onClick={() => openModal(project.image)}>
             <Image
               src={project.image}
               alt={project.title}
               className="w-full mb-4 object-cover"
             />
-            // </div>
           )}
           <div className="w-1/2 pr-2">
             {project.image2 && (
@@ -96,21 +104,6 @@ const PortfolioProjectDetail = ({ params }: { params: { name: string } }) => {
           )}
         </div>
       </div>
-
-      {/* <Dialog
-        open={isModalOpen}
-        onClose={() => setModalOpen(false)}
-        className="modal-style"
-      >
-        <Dialog.Overlay />
-        <Dialog.Panel>
-          <Image
-            src={selectedImage as StaticImageData}
-            alt="Selected Project Image"
-            layout="fill"
-          />
-        </Dialog.Panel>
-      </Dialog> */}
     </ContainerLayout>
   );
 };
