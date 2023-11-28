@@ -106,7 +106,7 @@ export const projects: Project[] = [
       |
       As the lead engineer on this project it has been exciting and challenging to take on such an ambitious problem and I am looking forward to continuing to build and improve the platform with the help of our early adopters.
       |
-      Mintly is currently in a closed alpha testing phase, with a wider beta testing phase to be announced soon.
+      Mintly is currently in a closed alpha testing phase, with a wider beta testing phase to be announced soon.  If you are interested in joining one of the testing phases please email or book a call with me to discuss.
       `,
     projectTags: [
       projectTags.TypeScript,

@@ -24,6 +24,7 @@ const Header: React.FC<IHeaderProps> = ({ page, mobile }) => {
     // { label: "About", href: "/about" },
     { label: "Portfolio", href: "/portfolio" },
     { label: "Book a Call", href: "/call" },
+    { label: "Send an Email", href: "mailto:davinlharding+devinquiries@gmail.com"}
   ];
 
   useEffect(() => {

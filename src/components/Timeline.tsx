@@ -38,7 +38,7 @@ const Timeline: React.FC = () => {
               <>
                 <h3 className="vertical-timeline-element-title">{item.role}</h3>
                 <h4 className="vertical-timeline-element-subtitle text-slate-900 underline hover:text-slate-600 transition-colors duration-300">
-                  <Link href={item.link}>{item.orgAndLocation}</Link>
+                  <Link href={item.link} target="_blank">{item.orgAndLocation}</Link>
                 </h4>
                 <p>{item.summary}</p>
               </>
