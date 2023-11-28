@@ -5,7 +5,6 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import Hamburger from "hamburger-react";
 import { projects } from "@/data/projectData";
-import { Disclosure } from "@headlessui/react";
 
 type IHeaderProps = {
   page?: string;
@@ -24,7 +23,7 @@ const Header: React.FC<IHeaderProps> = ({ page, mobile }) => {
     // { label: "About", href: "/about" },
     { label: "Portfolio", href: "/portfolio" },
     { label: "Book a Call", href: "/call" },
-    { label: "Send an Email", href: "mailto:davinlharding+devinquiries@gmail.com"}
+    { label: "Send an Email", href: "mailto:davinlharding+dev@gmail.com"}
   ];
 
   useEffect(() => {
@@ -178,7 +177,7 @@ const Header: React.FC<IHeaderProps> = ({ page, mobile }) => {
                           href={`/portfolio/${encodeURI(project.name)}`}
                         >
                           <span
-                            className="block px-4 py-1 text-sm text-white hover:bg-gray-600 hover:bg-white hover:text-fuchsia-900 rounded-r-md"
+                            className="block px-4 py-1 text-sm text-white  hover:bg-white hover:text-fuchsia-900 rounded-r-md"
                             onClick={() => setIsPortfolioSubMenuOpen(false)}
                           >
                             {project.name}
