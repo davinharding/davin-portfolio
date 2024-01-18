@@ -222,7 +222,7 @@ export const projects: Project[] = [
       projectTags.Express,
       projectTags.Shopify,
     ],
-    liveLink: "https://mintlyapp.com/",
+    liveLink: "https://www.mythicalmushrooms.com/",
     githubLink: "https://github.com/DentonWeb3/Mythical-Mushroom",
   },
 ];
