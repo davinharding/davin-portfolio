@@ -6,6 +6,7 @@ import {
   faBriefcase,
   faLaptopCode,
   faCode,
+  faRobot,
 } from "@fortawesome/pro-solid-svg-icons";
 
 export type TimelineElement = {
@@ -22,6 +23,19 @@ export type TimelineElement = {
 };
 
 export const timelineData: TimelineElement[] = [
+  {
+    id: 0,
+    role: "Senior Software Engineer",
+    orgAndLocation: "ApparelMagic, Los Angeles, CA (Remote)",
+    summary:
+      "Leading AI product development for fashion industry ERP platform. Shipped AI Product Designer enabling prompt-to-garment visualization with ERP integration. Currently architecting context-aware independently deployable AI agents for enterprise automation.",
+    icon: faRobot,
+    iconStyle: { background: "#2563eb", color: "#fff" },
+    contentStyle: { background: "#1e40af" },
+    contentArrowStyle: { borderRight: "7px solid #1e40af", color: "#60406a" },
+    date: "2024-06 => Present",
+    link: "https://apparelmagic.com/"
+  },
   {
     id: 1,
     role: "Full Stack Developer",

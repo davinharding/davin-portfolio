@@ -24,6 +24,10 @@ import JavaScriptLogo from "../../public/logos/JavaScript_logo.png";
 import SolidityLogo from "../../public/logos/solidity_logo.png";
 import ShopifyLogo from "../../public/logos/shopify_logo.png";
 import StripeLogo from "../../public/logos/stripe_logo.png";
+import LangChainLogo from "../../public/logos/langchain_logo.svg?url";
+import AnthropicLogo from "../../public/logos/anthropic_logo.svg?url";
+import OpenAILogo from "../../public/logos/openai_logo.svg?url";
+import SupabaseLogo from "../../public/logos/supabase_logo.svg?url";
 
 export type SkillData = {
   name: string;
@@ -136,5 +140,25 @@ export const skillBadgeData: SkillData[] = [
     name: 'Stripe',
     image: StripeLogo,
     link: 'https://stripe.com/'
+  },
+  {
+    name: 'LangChain',
+    image: LangChainLogo,
+    link: 'https://langchain.com/'
+  },
+  {
+    name: 'Anthropic',
+    image: AnthropicLogo,
+    link: 'https://www.anthropic.com/'
+  },
+  {
+    name: 'OpenAI',
+    image: OpenAILogo,
+    link: 'https://openai.com/'
+  },
+  {
+    name: 'Supabase',
+    image: SupabaseLogo,
+    link: 'https://supabase.com/'
   }
 ];

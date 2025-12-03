@@ -9,7 +9,9 @@ import ThetaVibes from "/public/projectScreenshots/theta_vibes.png";
 import MythicalMushrooms from "/public/projectScreenshots/mythical_mushrooms.png";
 import Tunies from "/public/projectScreenshots/tunies.png";
 import MetaverseHospitality from "/public/projectScreenshots/metaverse_hospitality.png";
-import DavinPortfolio from "/public/projectScreenshots/davin_portfolio.png";
+import DavinPortfolioHome from "/public/projectScreenshots/davin_portfolio_home.png";
+import DavinPortfolioProjects from "/public/projectScreenshots/davin_portfolio_projects.png";
+import AIProductDesigner from "/public/projectScreenshots/ai_product_designer.png";
 
 import TypeScriptLogo from "/public/logos/Typescript_logo.png";
 import NodejsLogo from "/public/logos/nodejs_logo.png";
@@ -36,6 +38,10 @@ import JavaScriptLogo from "/public/logos/JavaScript_logo.png";
 import SolidityLogo from "/public/logos/solidity_logo.png";
 import ShopifyLogo from "/public/logos/shopify_logo.png";
 import StripeLogo from "/public/logos/stripe_logo.png";
+import LangChainLogo from "/public/logos/langchain_logo.svg?url";
+import AnthropicLogo from "/public/logos/anthropic_logo.svg?url";
+import OpenAILogo from "/public/logos/openai_logo.svg?url";
+import SupabaseLogo from "/public/logos/supabase_logo.svg?url";
 
 export type ProjectTag = {
   title: string;
@@ -85,9 +91,39 @@ const projectTags: { [key: string]: ProjectTag } = {
   MaterialUI: { title: "MaterialUI", icon: MaterialUILogo },
   Shopify: { title: "Shopify", icon: ShopifyLogo },
   Stripe: { title: "Stripe", icon: StripeLogo },
+  LangChain: { title: "LangChain", icon: LangChainLogo },
+  Anthropic: { title: "Anthropic", icon: AnthropicLogo },
+  OpenAI: { title: "OpenAI", icon: OpenAILogo },
+  Supabase: { title: "Supabase", icon: SupabaseLogo },
 };
 
 export const projects: Project[] = [
+  {
+    image: AIProductDesigner,
+    title: "AI Product Designer",
+    name: "AI Product Designer",
+    previewDescription:
+      "A generative AI tool for fashion designers that transforms text prompts into photorealistic garment visualizations, fully integrated with ApparelMagic's ERP platform.",
+    description:
+      `AI Product Designer was my first major release at ApparelMagic and represents a significant pivot in my career into AI/ML product development.  The tool enables fashion designers to go from idea to photorealistic garment visualization in seconds using natural language prompts.
+      |
+      The technical challenge here was building a conversation-based design system that could understand fashion terminology and translate it into consistent, high-quality image generations.  I architected the system with two modes - a Basic Mode that guides users through garment creation with dynamic, targeted questions, and an Advanced Mode for experienced users who want direct prompt control.
+      |
+      One of the most satisfying aspects of this project was the deep ERP integration.  Generated designs automatically come with draft product metadata - style numbers, descriptions, and all the data needed to push directly into the ApparelMagic catalog or eCommerce storefronts with a single click.  This workflow eliminates the traditional sample development cycle, potentially saving brands up to 90% on prototyping costs.
+      |
+      The branding control features allow companies to lock in approved models, poses, and studio lighting so AI renders stay 100% on-brand across collections.  It's been exciting to see fashion brands adopt this tool for pre-order campaigns, trend response, and dramatically accelerated development cycles.
+      `,
+    projectTags: [
+      projectTags.TypeScript,
+      projectTags.React,
+      projectTags.Nodejs,
+      projectTags.OpenAI,
+      projectTags.LangChain,
+      projectTags.Postgres,
+      projectTags.AWS,
+    ],
+    liveLink: "https://apparelmagic.com/ai-product-designer/",
+  },
   {
     image: Mintly,
     image2: MintlyProjectOptions,
@@ -125,7 +161,8 @@ export const projects: Project[] = [
     liveLink: "https://mintlyapp.com/",
   },
   {
-    image: DavinPortfolio,
+    image: DavinPortfolioHome,
+    image2: DavinPortfolioProjects,
     title: "Davin Harding - Developer Portfolio",
     name: "Developer Portfolio",
     previewDescription:
