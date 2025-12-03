@@ -50,7 +50,7 @@ const MainContent: React.FC = () => {
             <Card className="overflow-hidden">
               <CardContent className="p-4">
                 <Image
-                  src="/profile_picture.jpg"
+                  src="/new_profile_pic.png"
                   alt="Davin Harding"
                   width={320}
                   height={320}
