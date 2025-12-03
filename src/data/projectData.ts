@@ -6,7 +6,6 @@ import MintlyProjectOptions from "/public/projectScreenshots/mintly_project_opti
 import MintlyArtGen from "/public/projectScreenshots/mintly_art_gen.png";
 
 import ThetaVibes from "/public/projectScreenshots/theta_vibes.png";
-import MythicalMushrooms from "/public/projectScreenshots/mythical_mushrooms.png";
 import Tunies from "/public/projectScreenshots/tunies.png";
 import MetaverseHospitality from "/public/projectScreenshots/metaverse_hospitality.png";
 import DavinPortfolioHome from "/public/projectScreenshots/davin_portfolio_home.png";
@@ -239,27 +238,5 @@ export const projects: Project[] = [
     liveLink: "https://www.jakebaynham.com/tunies",
     smartContractLink:
       "https://etherscan.io/address/0xec10158c372ee3d78f256ad1a8e0ae672e8ac161#code",
-  },
-  {
-    image: MythicalMushrooms,
-    title: "Mythical Mushrooms",
-    name: "Mythical Mushrooms",
-    previewDescription:
-      "A Web3 enabled landing page and token gated merch store for an artist led NFT collection on the Theta Blockchain.",
-    description:
-      "Mythical Mushrooms was my first foray into developing within the web3 space.  The project was artist led, built on the Theta blockchain and consisted of mushroom character edition NFTs with 3 different rarity tiers.  The dev effort on the project consisted of a landing page with wallet connectivity and a token gated shopify merch store. |  The interesting thing we were able to implement here was a discount system based on the rarity of each NFT edition that the user owned.  Ownership of a 'Rare' tier NFT granted the user a one time 50% discount in the store and ownership of a 'Legedary' tier NFT granted a one time 100% discount in the store. | I accomplished this by seeding the store with discount codes for each NFT and its respective tiers and then storing those codes in a Firebase DB associated with their NFT id.  Once a user verified ownership of the NFT by connecting their wallet, the discount code was then looked up and displayed to the user for use in the store.  A fun and unique way to provide utility and give back to the NFT holders.",
-    projectTags: [
-      projectTags.TypeScript,
-      projectTags.Nextjs,
-      projectTags.Ethersjs,
-      projectTags.Firebase,
-      projectTags.NPM,
-      projectTags.Nodejs,
-      projectTags.Vercel,
-      projectTags.Express,
-      projectTags.Shopify,
-    ],
-    liveLink: "https://www.mythicalmushrooms.com/",
-    githubLink: "https://github.com/DentonWeb3/Mythical-Mushroom",
   },
 ];
