@@ -8,6 +8,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 const MainContent: React.FC = () => {
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background flex items-center">
       <div className="container-narrow w-full">
@@ -36,11 +43,13 @@ const MainContent: React.FC = () => {
                   Book a Call
                 </Link>
               </Button>
-              <Button variant="outline" asChild size="lg">
-                <Link href="/#projects">
-                  View Projects
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
+              <Button 
+                variant="outline" 
+                size="lg"
+                onClick={() => scrollToSection("projects")}
+              >
+                View Projects
+                <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
           </div>

@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
-import { Menu, ChevronDown, Mail } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Menu, ChevronDown, Mail, Briefcase } from "lucide-react";
 import { projects } from "@/data/projectData";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,7 +28,19 @@ type IHeaderProps = {
 
 const Header: React.FC<IHeaderProps> = () => {
   const pathName = usePathname();
+  const router = useRouter();
   const [sheetOpen, setSheetOpen] = useState(false);
+
+  const scrollToExperience = () => {
+    if (pathName === "/") {
+      const element = document.getElementById("experience");
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      router.push("/#experience");
+    }
+  };
 
   const navigationItems = [
     { label: "Portfolio", href: "/portfolio" },
@@ -70,6 +82,16 @@ const Header: React.FC<IHeaderProps> = () => {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
+
+          {/* Experience */}
+          <Button
+            variant="ghost"
+            className="text-sm text-muted-foreground"
+            onClick={scrollToExperience}
+          >
+            <Briefcase className="mr-1 h-4 w-4" />
+            Experience
+          </Button>
 
           {/* Book a Call */}
           <Button
@@ -132,6 +154,17 @@ const Header: React.FC<IHeaderProps> = () => {
 
               {/* Other Links */}
               <div className="space-y-1 pt-4 border-t border-border">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => {
+                    setSheetOpen(false);
+                    scrollToExperience();
+                  }}
+                >
+                  <Briefcase className="mr-2 h-4 w-4" />
+                  Experience
+                </Button>
                 <Button
                   variant="ghost"
                   asChild
