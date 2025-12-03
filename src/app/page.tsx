@@ -1,30 +1,23 @@
 'use client'
 
-import ScrollArrow from "@/components/ScrollArrow";
 import MainContent from "@/components/MainContent";
 import Timeline from "@/components/Timeline";
 import Layout from "@/components/HeaderFooter";
 import React from "react";
-import { ParticlesContainer } from "@/components/ParticlesContainer";
 import SkillBadgeSection from "@/components/SkillBadgeSection";
 import { ProjectsSection } from "@/components/ProjectsSection";
-import { GithubSection } from "@/components/GithubSection";
+// import { GithubSection } from "@/components/GithubSection";
 
 const Home: React.FC = () => {
   return (
     <Layout page="index">
-      <div className="relative bg-gray-900 text-white min-h-screen">
-        <ParticlesContainer />
+      <div className="bg-slate-950 text-white">
         <MainContent />
-        <ScrollArrow />
-      </div>
-      <div className="bg-gradient-to-b from-slate-950   to-fuchsia-950">
         <SkillBadgeSection />
         <ProjectsSection />
         <Timeline />
-        <GithubSection />
+        {/* <GithubSection /> */}
       </div>
-      {/* <ProjectCard /> */}
     </Layout>
   );
 };

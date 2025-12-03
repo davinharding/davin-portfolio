@@ -1,15 +1,17 @@
-import { Fade } from "react-awesome-reveal";
-
 type ISectionHeadingProps = {
-    title: string;
-    subTitle?: string;
-}
+  title: string;
+  subTitle?: string;
+};
 
 const SectionHeading: React.FC<ISectionHeadingProps> = ({ title, subTitle }) => (
-  <Fade cascade={true} direction={"up"} triggerOnce>
-    <div className="text-5xl font-bold mb-2">{title}</div>
-    <h2 className="text-lg mb-6 ml-2 lg:ml-4">{subTitle}</h2>
-  </Fade>
+  <div className="mb-12">
+    <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground">
+      {title}
+    </h2>
+    {subTitle && (
+      <p className="text-sm md:text-base text-muted-foreground mt-2">{subTitle}</p>
+    )}
+  </div>
 );
 
 export { SectionHeading };

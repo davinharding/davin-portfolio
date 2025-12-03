@@ -1,18 +1,21 @@
 import React from "react";
 import { ProjectCard } from "./ProjectCard";
-import { projects } from "@/data/projectData"; // Import the data
+import { projects } from "@/data/projectData";
 import { SectionHeading } from "./SectionHeading";
 
 const ProjectsSection: React.FC = () => {
   return (
-    <div className="p-4 container mx-auto">
-      <SectionHeading title="Projects" subTitle="that I have built" />
-      <div className="flex flex-wrap justify-center -mx-4">
-        {projects.map((project, index) => (
-          <div key={index} className="w-full sm:w-1/2 lg:w-1/3 px-4">
-            <ProjectCard project={project} />
-          </div>
-        ))}
+    <div className="section-spacing" id="projects">
+      <div className="container-narrow">
+        <SectionHeading 
+          title="Projects" 
+          subTitle="Selected work from my portfolio" 
+        />
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {projects.map((project, index) => (
+            <ProjectCard key={index} project={project} />
+          ))}
+        </div>
       </div>
     </div>
   );

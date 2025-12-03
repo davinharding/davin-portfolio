@@ -2,33 +2,179 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
-    scroll-behavior: smooth;
-}
-
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 84% 4.9%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 91.2% 59.8%;
+    --accent-foreground: 222.2 84% 4.9%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 217.2 91.2% 59.8%;
+    --radius: 0.5rem;
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }
 
+/* Typography utilities */
+.heading-hero {
+  @apply text-4xl md:text-6xl lg:text-7xl font-semibold tracking-tight text-foreground;
+}
 
-  
+.heading-section {
+  @apply text-2xl md:text-3xl font-semibold tracking-tight text-foreground;
+}
+
+.text-body {
+  @apply text-sm md:text-base text-muted-foreground leading-relaxed;
+}
+
+.text-meta {
+  @apply text-xs md:text-sm text-muted-foreground uppercase tracking-[0.15em];
+}
+
+/* Container utilities */
+.container-narrow {
+  @apply max-w-5xl mx-auto px-4 md:px-6 lg:px-8;
+}
+
+.section-spacing {
+  @apply py-16 md:py-24;
+}
+
+/* Lightbox custom styles */
+.yarl__root {
+  --yarl__slide_captions_container_background: rgba(2, 6, 23, 0.8);
+  font-family: inherit;
+}
+
+.yarl__container {
+  background: linear-gradient(135deg, rgba(2, 6, 23, 0.98) 0%, rgba(15, 23, 42, 0.98) 100%);
+}
+
+.yarl__button {
+  filter: none;
+  transition: all 0.2s ease;
+}
+
+.yarl__button:hover {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 12px rgba(59, 130, 246, 0.5));
+}
+
+.yarl__button:focus {
+  outline: 2px solid hsl(217.2 91.2% 59.8%);
+  outline-offset: 2px;
+}
+
+.yarl__navigation_prev,
+.yarl__navigation_next {
+  padding: 12px;
+  background: rgba(2, 6, 23, 0.6);
+  border-radius: 50%;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.yarl__navigation_prev:hover,
+.yarl__navigation_next:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+.yarl__toolbar {
+  padding: 12px 16px;
+  gap: 8px;
+}
+
+.yarl__icon {
+  width: 28px;
+  height: 28px;
+}
+
+.yarl__counter_container {
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  background: rgba(2, 6, 23, 0.8) !important;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  backdrop-filter: blur(8px);
+}
+
+.yarl__thumbnails_container {
+  padding: 16px;
+  background: linear-gradient(to top, rgba(2, 6, 23, 0.95), transparent) !important;
+}
+
+.yarl__thumbnails_thumbnail {
+  transition: all 0.3s ease;
+  opacity: 0.6;
+}
+
+.yarl__thumbnails_thumbnail:hover {
+  opacity: 0.9;
+  transform: scale(1.05);
+}
+
+.yarl__thumbnails_thumbnail_active {
+  opacity: 1;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+}
+
+.yarl__thumbnails_vignette {
+  display: none;
+}
+
+.yarl__slide_image {
+  border-radius: 8px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* Zoom cursor */
+.yarl__slide:hover {
+  cursor: zoom-in;
+}
+
+.yarl__slide[data-yarl-zoomed="true"]:hover {
+  cursor: zoom-out;
+}
+
+/* Animation for lightbox opening */
+@keyframes lightboxFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.yarl__portal {
+  animation: lightboxFadeIn 0.3s ease-out;
+}

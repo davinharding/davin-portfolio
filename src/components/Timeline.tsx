@@ -1,53 +1,58 @@
+"use client";
+
 import React from "react";
-import {
-  VerticalTimeline,
-  VerticalTimelineElement,
-} from "react-vertical-timeline-component";
-import "react-vertical-timeline-component/style.min.css";
-import { timelineData } from "@/data/timelineData";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import { TimelineElement } from "@/data/timelineData";
+import { timelineData, TimelineElement } from "@/data/timelineData";
 import Link from "next/link";
 import { SectionHeading } from "./SectionHeading";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 
 const Timeline: React.FC = () => {
-  const generateFontAwesomeIcon = (icon: IconDefinition) => {
-    return <FontAwesomeIcon icon={icon} />;
-  };
+  // Filter out the "start" marker (id: 6 with no summary)
+  const filteredData = timelineData.filter((item) => item.summary);
 
   return (
-    <div>
-      <div className="p-4 container mx-auto">
+    <div className="section-spacing" id="experience">
+      <div className="container-narrow">
         <SectionHeading
           title="Experience"
-          subTitle="both proffesional and educational"
+          subTitle="Professional and educational background"
         />
+
+        <div className="space-y-4">
+          {filteredData.map((item: TimelineElement, index) => (
+            <Card key={item.id} className="relative">
+              <CardHeader className="pb-2">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                  <div>
+                    <CardTitle className="text-lg">{item.role}</CardTitle>
+                    {item.orgAndLocation && (
+                      <CardDescription>
+                        <Link
+                          href={item.link}
+                          target="_blank"
+                          className="hover:text-primary transition-colors"
+                        >
+                          {item.orgAndLocation}
+                        </Link>
+                      </CardDescription>
+                    )}
+                  </div>
+                  <Badge variant="outline" className="w-fit">
+                    {item.date}
+                  </Badge>
+                </div>
+              </CardHeader>
+              {item.summary && (
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">{item.summary}</p>
+                </CardContent>
+              )}
+            </Card>
+          ))}
+        </div>
       </div>
-      <VerticalTimeline>
-        {timelineData.map((item: TimelineElement) => (
-          <VerticalTimelineElement
-            key={item.id}
-            contentStyle={item.contentStyle}
-            contentArrowStyle={item.contentArrowStyle}
-            iconStyle={item.iconStyle}
-            icon={generateFontAwesomeIcon(item.icon)}
-            date={item.date}
-          >
-            {item.summary ? (
-              <>
-                <h3 className="vertical-timeline-element-title">{item.role}</h3>
-                <h4 className="vertical-timeline-element-subtitle text-slate-900 underline hover:text-slate-600 transition-colors duration-300">
-                  <Link href={item.link} target="_blank">{item.orgAndLocation}</Link>
-                </h4>
-                <p>{item.summary}</p>
-              </>
-            ) : (
-              ""
-            )}
-          </VerticalTimelineElement>
-        ))}
-      </VerticalTimeline>
     </div>
   );
 };

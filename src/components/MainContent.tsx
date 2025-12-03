@@ -1,96 +1,71 @@
-import { useState, useEffect } from "react";
-import Background from "./Background";
+"use client";
+
 import Image from "next/image";
-import Button from "./Button";
 import Link from "next/link";
-import { Fade } from "react-awesome-reveal";
+import { ArrowRight, Calendar } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 const MainContent: React.FC = () => {
-  const words = [
-    "Web3 dApps",
-    "NFTs",
-    "Web Apps",
-    "Mint Pages",
-    "E-commerce Stores",
-    "Smart Contracts",
-    "Landing Pages",
-    "SaaS Platforms",
-  ];
-  const [currentWord, setCurrentWord] = useState<number>(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentWord((prevWord) => (prevWord + 1) % words.length);
-    }, 2400);
-
-    return () => clearInterval(interval);
-  }, [words.length]);
-
   return (
-    <>
-      <Background>
-      <Fade cascade={true}>
-        <div className="flex items-center justify-center h-screen pb-14">
-          <div className="flex flex-col-reverse lg:flex-row justify-between items-center w-10/12 lg:w-7/12">
-            <div>
-              <h1 className="lg:text-7xl text-3xl font-bold -left-5">
-                Hi, {"I'm"} Davin.
-              </h1>
-              <h1 className="lg:text-7xl text-3xl font-bold">
-                I build{" "}
-                <span className={`inline-block`}>
-                  <span
-                    key={currentWord}
-                    className="block bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 animate-slide pb-2"
-                  >
-                    {words[currentWord]}
-                  </span>
-                </span>
-              </h1>{" "}
-              <div className="text-sm lg:text-2xl">
-                and am a skilled developer with over 5+ years of experience
-                building web based software. My current focus is on web3 enabled
-                decentralized applications. Schedule a call with me today and{" "}
-                {"let's"} turn your ideas into reality!
-              </div>
-              <div className="flex justify-center top-10 max-h-fit pt-16 lg:pt-12">
-                <Link href="/call">
-                  <Button size="large" className="hover:border-transparent bg-transparent hover:bg-gradient-to-r from-purple-400 via-pink-500 to-red-500">
-                    Book a Call
-                  </Button>
-                </Link>
-              </div>
-            </div>
-            <div>
-              <button></button>
-            </div>
+    <div className="min-h-screen bg-background flex items-center">
+      <div className="container-narrow w-full">
+        <div className="grid gap-12 lg:gap-16 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-center py-24 lg:py-0">
+          {/* Left: Text Content */}
+          <div className="order-2 lg:order-1">
+            <Badge variant="secondary" className="mb-4">
+              Senior Full-Stack Engineer & Web3 Founder
+            </Badge>
+            <h1 className="heading-hero mb-6">Hi, I&apos;m Davin.</h1>
+            <p className="text-xl md:text-2xl mb-4 text-foreground/90">
+              I design, build, and ship production-grade SaaS and blockchain
+              products.
+            </p>
+            <p className="text-body mb-8">
+              With over 5 years of experience building web-based software, I
+              specialize in Web3 dApps, NFT platforms, smart contracts, and
+              full-stack applications. Let&apos;s turn your ideas into reality.
+            </p>
 
-            <Image
-              src="/profile_picture.jpg"
-              alt="Davin's Profile"
-              width={325}
-              height={300}
-              className="rounded-full shadow-xl mt-16 lg:mt-0 h-56 w-56 lg:h-80 lg:w-80 shadow-gray-600 hover:animate-spinTowards animate-spinAway"
-            />
+            {/* CTA Buttons */}
+            <div className="flex flex-wrap gap-4">
+              <Button asChild size="lg">
+                <Link href="/call">
+                  <Calendar className="mr-2 h-4 w-4" />
+                  Book a Call
+                </Link>
+              </Button>
+              <Button variant="outline" asChild size="lg">
+                <Link href="/#projects">
+                  View Projects
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
           </div>
 
-          <style jsx>{`
-            @keyframes slide {
-              from {
-                transform: translateY(-100%);
-              }
-              to {
-                transform: translateY(0);
-              }
-            }
-            .animate-slide {
-              animation: slide 0.4s forwards;
-            }
-          `}</style>
+          {/* Right: Profile Image */}
+          <div className="order-1 lg:order-2 flex justify-center lg:justify-end">
+            <Card className="overflow-hidden">
+              <CardContent className="p-4">
+                <Image
+                  src="/profile_picture.jpg"
+                  alt="Davin Harding"
+                  width={320}
+                  height={320}
+                  className="rounded-lg w-56 h-56 lg:w-72 lg:h-72 object-cover"
+                  priority
+                />
+                <p className="text-xs text-muted-foreground text-center mt-4 tracking-wide">
+                  Available for select projects in 2025
+                </p>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-        </Fade>
-      </Background>
-    </>
+      </div>
+    </div>
   );
 };
 
