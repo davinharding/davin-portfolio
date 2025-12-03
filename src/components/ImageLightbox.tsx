@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, CSSProperties } from "react";
 import Image, { StaticImageData } from "next/image";
 import Lightbox, { SlideImage } from "yet-another-react-lightbox";
 import Zoom from "yet-another-react-lightbox/plugins/zoom";
@@ -10,6 +10,11 @@ import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
 import "yet-another-react-lightbox/styles.css";
 import "yet-another-react-lightbox/plugins/counter.css";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
+
+// Type for lightbox CSS custom properties (mirrors internal SlotCSSProperties)
+type LightboxCSSProperties = CSSProperties & {
+  [key: `--yarl__${string}`]: string;
+};
 
 // Custom Next.js Image component for the lightbox
 interface NextJsImageProps {
@@ -197,7 +202,7 @@ export function ImageLightbox({
               "hsl(217.2 91.2% 59.8%)",
             "--yarl__thumbnails_container_background_color": "rgba(2, 6, 23, 0.8)",
             "--yarl__counter_container_background_color": "rgba(2, 6, 23, 0.7)",
-          } as React.CSSProperties,
+          } as LightboxCSSProperties,
           toolbar: {
             backgroundColor: "transparent",
           },
@@ -322,7 +327,7 @@ export function SingleImageLightbox({
             "--yarl__color_backdrop": "rgba(2, 6, 23, 0.95)",
             "--yarl__color_button": "hsl(217.2 91.2% 59.8%)",
             "--yarl__color_button_active": "hsl(217.2 91.2% 69.8%)",
-          } as React.CSSProperties,
+          } as LightboxCSSProperties,
         }}
         controller={{
           closeOnBackdropClick: true,

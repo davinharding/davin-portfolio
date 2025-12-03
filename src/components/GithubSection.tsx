@@ -9,7 +9,7 @@ import { ExternalLink } from "lucide-react";
 
 // Custom theme for GitHub calendar to match design system
 const customTheme = {
-  dark: ["#1e293b", "#1e3a5f", "#1d4ed8", "#3b82f6", "#60a5fa"],
+  dark: ["#1e293b", "#60a5fa"] as [string, string],
 };
 
 const GithubSection: React.FC = () => (
