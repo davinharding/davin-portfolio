@@ -3,9 +3,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, ChevronDown, Mail, Briefcase } from "lucide-react";
+import { Menu, ChevronDown, Mail, Briefcase, Sun, Moon } from "lucide-react";
 import { projects } from "@/data/projectData";
 import { Button } from "@/components/ui/button";
+import { useTheme } from "@/components/ThemeProvider";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,6 +31,7 @@ const Header: React.FC<IHeaderProps> = () => {
   const pathName = usePathname();
   const router = useRouter();
   const [sheetOpen, setSheetOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   const scrollToExperience = () => {
     if (pathName === "/") {
@@ -52,11 +54,37 @@ const Header: React.FC<IHeaderProps> = () => {
     <header className="fixed top-0 w-full z-50 bg-background/90 backdrop-blur-sm border-b border-border">
       <div className="container-narrow flex justify-between items-center h-16">
         <Link href="/" className="transition-opacity hover:opacity-80">
-          <Image src="/logo.png" alt="logo" width={40} height={40} />
+          <Image 
+            src={theme === "dark" ? "/logo.svg" : "/logo-light.svg"} 
+            alt="logo" 
+            width={40} 
+            height={40} 
+          />
         </Link>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-1">
+          {/* Book a Call - CTA */}
+          <Button
+            asChild
+            size="sm"
+            className="text-sm"
+          >
+            <Link href="/call">Book a Call</Link>
+          </Button>
+
+          {/* Email */}
+          <Button
+            variant="ghost"
+            asChild
+            className="text-sm text-muted-foreground"
+          >
+            <Link href="mailto:davinlharding+dev@gmail.com">
+              <Mail className="mr-1 h-4 w-4" />
+              Email
+            </Link>
+          </Button>
+
           {/* Portfolio Dropdown */}
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
@@ -93,27 +121,19 @@ const Header: React.FC<IHeaderProps> = () => {
             Experience
           </Button>
 
-          {/* Book a Call */}
+          {/* Theme Toggle */}
           <Button
             variant="ghost"
-            asChild
-            className={`text-sm ${
-              pathName === "/call" ? "text-primary" : "text-muted-foreground"
-            }`}
+            size="icon"
+            onClick={toggleTheme}
+            className="text-muted-foreground"
           >
-            <Link href="/call">Book a Call</Link>
-          </Button>
-
-          {/* Email */}
-          <Button
-            variant="ghost"
-            asChild
-            className="text-sm text-muted-foreground"
-          >
-            <Link href="mailto:davinlharding+dev@gmail.com">
-              <Mail className="mr-1 h-4 w-4" />
-              Email
-            </Link>
+            {theme === "dark" ? (
+              <Sun className="h-4 w-4" />
+            ) : (
+              <Moon className="h-4 w-4" />
+            )}
+            <span className="sr-only">Toggle theme</span>
           </Button>
         </nav>
 
@@ -130,8 +150,30 @@ const Header: React.FC<IHeaderProps> = () => {
               <SheetTitle>Navigation</SheetTitle>
             </SheetHeader>
             <nav className="flex flex-col gap-4 mt-8">
+              {/* Primary Actions */}
+              <div className="space-y-1">
+                <Button
+                  asChild
+                  className="w-full justify-center"
+                  onClick={() => setSheetOpen(false)}
+                >
+                  <Link href="/call">Book a Call</Link>
+                </Button>
+                <Button
+                  variant="ghost"
+                  asChild
+                  className="w-full justify-start"
+                  onClick={() => setSheetOpen(false)}
+                >
+                  <Link href="mailto:davinlharding+dev@gmail.com">
+                    <Mail className="mr-2 h-4 w-4" />
+                    Send Email
+                  </Link>
+                </Button>
+              </div>
+
               {/* Portfolio Section */}
-              <div className="space-y-2">
+              <div className="space-y-2 pt-4 border-t border-border">
                 <p className="text-sm font-medium text-muted-foreground px-2">
                   Portfolio
                 </p>
@@ -152,7 +194,7 @@ const Header: React.FC<IHeaderProps> = () => {
                 </div>
               </div>
 
-              {/* Other Links */}
+              {/* Experience */}
               <div className="space-y-1 pt-4 border-t border-border">
                 <Button
                   variant="ghost"
@@ -165,24 +207,26 @@ const Header: React.FC<IHeaderProps> = () => {
                   <Briefcase className="mr-2 h-4 w-4" />
                   Experience
                 </Button>
+              </div>
+
+              {/* Theme Toggle */}
+              <div className="space-y-1 pt-4 border-t border-border">
                 <Button
                   variant="ghost"
-                  asChild
                   className="w-full justify-start"
-                  onClick={() => setSheetOpen(false)}
+                  onClick={toggleTheme}
                 >
-                  <Link href="/call">Book a Call</Link>
-                </Button>
-                <Button
-                  variant="ghost"
-                  asChild
-                  className="w-full justify-start"
-                  onClick={() => setSheetOpen(false)}
-                >
-                  <Link href="mailto:davinlharding+dev@gmail.com">
-                    <Mail className="mr-2 h-4 w-4" />
-                    Send Email
-                  </Link>
+                  {theme === "dark" ? (
+                    <>
+                      <Sun className="mr-2 h-4 w-4" />
+                      Light Mode
+                    </>
+                  ) : (
+                    <>
+                      <Moon className="mr-2 h-4 w-4" />
+                      Dark Mode
+                    </>
+                  )}
                 </Button>
               </div>
             </nav>

@@ -11,10 +11,10 @@ import { ProjectsSection } from "@/components/ProjectsSection";
 const Home: React.FC = () => {
   return (
     <Layout page="index">
-      <div className="bg-slate-950 text-white">
+      <div className="bg-background text-foreground">
         <MainContent />
-        <SkillBadgeSection />
         <ProjectsSection />
+        <SkillBadgeSection />
         <Timeline />
         {/* <GithubSection /> */}
       </div>
