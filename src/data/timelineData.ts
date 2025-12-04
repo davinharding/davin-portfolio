@@ -26,7 +26,7 @@ export const timelineData: TimelineElement[] = [
   {
     id: 0,
     role: "Senior Software Engineer",
-    orgAndLocation: "ApparelMagic, Los Angeles, CA (Remote)",
+    orgAndLocation: "ApparelMagic, West Palm Beach, FL",
     summary:
       "Leading AI product development for fashion industry ERP platform. Shipped AI Designer enabling prompt-to-garment visualization with ERP integration. Currently architecting data-driven, independently deployable AI agents for enterprise automation.",
     icon: faRobot,
@@ -78,7 +78,7 @@ export const timelineData: TimelineElement[] = [
   {
     id: 4,
     role: "Software Consultant",
-    orgAndLocation: "Maryville Consulting Group",
+    orgAndLocation: "Maryville Consulting Group, St. Louis, MO",
     summary:
       "Led ITSM application projects for Fortune 500 clients as an Associate Consultant and played a pivotal role in modernizing data access for Canada's 2nd largest grain distributor as a Senior Associate. As an Independent Consultant, contributed to a data-driven application for a Fortune 50 health administration client and provided technical support to team members.",
     icon: faBriefcase,
