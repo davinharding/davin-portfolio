@@ -28,7 +28,7 @@ export const timelineData: TimelineElement[] = [
     role: "Senior Software Engineer",
     orgAndLocation: "ApparelMagic, Los Angeles, CA (Remote)",
     summary:
-      "Leading AI product development for fashion industry ERP platform. Shipped AI Product Designer enabling prompt-to-garment visualization with ERP integration. Currently architecting context-aware independently deployable AI agents for enterprise automation.",
+      "Leading AI product development for fashion industry ERP platform. Shipped AI Designer enabling prompt-to-garment visualization with ERP integration. Currently architecting data-driven, independently deployable AI agents for enterprise automation.",
     icon: faRobot,
     iconStyle: { background: "#2563eb", color: "#fff" },
     contentStyle: { background: "#1e40af" },
@@ -46,7 +46,7 @@ export const timelineData: TimelineElement[] = [
     iconStyle: { background: "#87dfda", color: "#fff" },
     contentStyle: { background: "#75a1d1" },
     contentArrowStyle: { borderRight: "7px solid #75a1d1", color: "#60406a" },
-    date: "2022-04 => Present",
+    date: "2022-04 => 2024-01",
     link: "https://www.palmtreenft.com/"
   },
   {

@@ -103,12 +103,12 @@ export const projects: Project[] = [
     image: AIDesigner1,
     image2: AIDesigner2,
     image3: AIDesigner3,
-    title: "AI Product Designer",
-    name: "AI Product Designer",
+    title: "AI Designer",
+    name: "AI Designer",
     previewDescription:
       "A generative AI tool for fashion designers that transforms text prompts into photorealistic garment visualizations, fully integrated with ApparelMagic's ERP platform.",
     description:
-      `AI Product Designer was my first major release at ApparelMagic and represents a significant pivot in my career into AI/ML product development.  The tool enables fashion designers to go from idea to photorealistic garment visualization in seconds using natural language prompts.
+      `AI Designer was my first major release at ApparelMagic and represents a significant pivot in my career into AI/ML product development.  The tool enables fashion designers to go from idea to photorealistic garment visualization in seconds using natural language prompts.
       |
       The technical challenge here was building a conversation-based design system that could understand fashion terminology and translate it into consistent, high-quality image generations.  I architected the system with two modes - a Basic Mode that guides users through garment creation with dynamic, targeted questions, and an Advanced Mode for experienced users who want direct prompt control.
       |
@@ -143,9 +143,9 @@ export const projects: Project[] = [
       |
       This includes data collection, art generation, storage, one-click deployment and post-deployment contract management.  Additionally, it is built with a multi-tenancy architecture making it perfect for teams to collaborate together.  This is also great for agencies allowing them to deploy and manage multiple projects for their clients.
       |
-      As the lead engineer on this project it has been exciting and challenging to take on such an ambitious problem and I am looking forward to continuing to build and improve the platform with the help of our early adopters.
+      As the lead engineer on this project it was exciting and challenging to take on such an ambitious problem. Unfortunately, Mintly was sunsetted by stakeholders due to shifting market conditions and was never publicly released.  Despite bringing the platform to 99% completion, the decision was made before launch.  
       |
-      Mintly is currently in a closed alpha testing phase, with a wider beta testing phase to be announced soon.  If you are interested in joining one of the testing phases please email or book a call with me to discuss.
+      It remains one of the most technically ambitious projects I've led and I'm proud of what we were able to build together.
       `,
     projectTags: [
       projectTags.TypeScript,
