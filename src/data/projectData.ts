@@ -10,7 +10,9 @@ import Tunies from "/public/projectScreenshots/tunies.png";
 import MetaverseHospitality from "/public/projectScreenshots/metaverse_hospitality.png";
 import DavinPortfolioHome from "/public/projectScreenshots/davin_portfolio_home.png";
 import DavinPortfolioProjects from "/public/projectScreenshots/davin_portfolio_projects.png";
-import AIProductDesigner from "/public/projectScreenshots/ai_product_designer.png";
+import AIDesigner1 from "/public/projectScreenshots/ai_designer_1.png";
+import AIDesigner2 from "/public/projectScreenshots/ai_designer_2.png";
+import AIDesigner3 from "/public/projectScreenshots/ai_designer_3.png";
 
 import TypeScriptLogo from "/public/logos/Typescript_logo.png";
 import NodejsLogo from "/public/logos/nodejs_logo.png";
@@ -98,7 +100,9 @@ const projectTags: { [key: string]: ProjectTag } = {
 
 export const projects: Project[] = [
   {
-    image: AIProductDesigner,
+    image: AIDesigner1,
+    image2: AIDesigner2,
+    image3: AIDesigner3,
     title: "AI Product Designer",
     name: "AI Product Designer",
     previewDescription:
