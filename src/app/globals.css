@@ -61,6 +61,20 @@
   }
 }
 
+/* Mobile viewport height fix - accounts for browser UI */
+@supports (height: 100dvh) {
+  .min-h-screen-mobile {
+    min-height: 100dvh;
+  }
+}
+
+@supports not (height: 100dvh) {
+  .min-h-screen-mobile {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
+}
+
 /* Typography utilities */
 .heading-hero {
   @apply text-4xl md:text-6xl lg:text-7xl font-semibold tracking-tight text-foreground;

@@ -17,27 +17,27 @@ const MainContent: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center relative overflow-hidden">
+    <div className="min-h-[100dvh] md:min-h-screen bg-background flex items-center relative overflow-hidden">
       <WaveParticles />
       <div className="container-narrow w-full relative" style={{ zIndex: 1 }}>
-        <div className="grid gap-12 lg:gap-16 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-center py-24 lg:py-0">
+        <div className="grid gap-8 md:gap-12 lg:gap-16 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-center py-12 md:py-16 lg:py-24">
           {/* Left: Text Content */}
           <div className="order-2 lg:order-1">
-            <Badge variant="secondary" className="mb-4">
+            <Badge variant="secondary" className="mb-3 md:mb-4">
               Senior Full-Stack Engineer
             </Badge>
-            <h1 className="heading-hero mb-6">Hi, I&apos;m Davin.</h1>
-            <p className="text-xl md:text-2xl mb-4 text-foreground/90">
+            <h1 className="heading-hero mb-4 md:mb-6">Hi, I&apos;m Davin.</h1>
+            <p className="text-lg md:text-xl lg:text-2xl mb-3 md:mb-4 text-foreground/90">
               I design, build, and ship production-grade AI and SaaS
               products.
             </p>
-            <p className="text-body mb-8">
+            <p className="text-body mb-6 md:mb-8">
               With over 6 years of experience building web-based software, I&apos;m currently focused on building AI products that delightfully solve real business problems. Let&apos;s have a chat if that interests you. 🚀
             </p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-wrap gap-4">
-              <Button asChild size="lg">
+            <div className="flex flex-wrap gap-3 md:gap-4">
+              <Button asChild size="lg" className="h-10 md:h-11 px-6 md:px-8 text-sm md:text-base">
                 <Link href="/call">
                   <Calendar className="mr-2 h-4 w-4" />
                   Book a Call
@@ -46,6 +46,7 @@ const MainContent: React.FC = () => {
               <Button 
                 variant="outline" 
                 size="lg"
+                className="h-10 md:h-11 px-6 md:px-8 text-sm md:text-base"
                 onClick={() => scrollToSection("projects")}
               >
                 View Projects
@@ -57,13 +58,13 @@ const MainContent: React.FC = () => {
           {/* Right: Profile Image */}
           <div className="order-1 lg:order-2 flex justify-center lg:justify-end">
             <Card className="overflow-hidden">
-              <CardContent className="p-4">
+              <CardContent className="p-3 md:p-4">
                 <Image
                   src="/new_profile_pic.png"
                   alt="Davin Harding"
                   width={320}
                   height={320}
-                  className="rounded-lg w-56 h-56 lg:w-72 lg:h-72 object-cover"
+                  className="rounded-lg w-48 h-48 md:w-56 md:h-56 lg:w-72 lg:h-72 object-cover"
                   priority
                 />
                 <p className="text-xs text-muted-foreground text-center mt-4 tracking-wide">
@@ -76,7 +77,7 @@ const MainContent: React.FC = () => {
       </div>
       
       {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce">
+      <div className="absolute bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce">
         <button
           onClick={() => scrollToSection("projects")}
           className="flex flex-col items-center gap-2 text-muted-foreground hover:text-primary transition-colors group"
