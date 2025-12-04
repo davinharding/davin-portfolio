@@ -58,7 +58,7 @@ const MainContent: React.FC = () => {
           {/* Right: Profile Image */}
           <div className="order-1 lg:order-2 flex justify-center lg:justify-end">
             <Card className="overflow-hidden">
-              <CardContent className="p-3 md:p-4">
+              <CardContent className="p-3 md:p-4 flex flex-col items-center">
                 <Image
                   src="/new_profile_pic.png"
                   alt="Davin Harding"
