@@ -2,10 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Calendar } from "lucide-react";
+import { ArrowRight, Calendar, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import WaveParticles from "@/components/WaveParticlesAlt";
 
 const MainContent: React.FC = () => {
   const scrollToSection = (sectionId: string) => {
@@ -16,23 +17,22 @@ const MainContent: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center">
-      <div className="container-narrow w-full">
+    <div className="min-h-screen bg-background flex items-center relative overflow-hidden">
+      <WaveParticles />
+      <div className="container-narrow w-full relative" style={{ zIndex: 1 }}>
         <div className="grid gap-12 lg:gap-16 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-center py-24 lg:py-0">
           {/* Left: Text Content */}
           <div className="order-2 lg:order-1">
             <Badge variant="secondary" className="mb-4">
-              Senior Full-Stack Engineer & Web3 Founder
+              Senior Full-Stack Engineer
             </Badge>
             <h1 className="heading-hero mb-6">Hi, I&apos;m Davin.</h1>
             <p className="text-xl md:text-2xl mb-4 text-foreground/90">
-              I design, build, and ship production-grade SaaS and blockchain
+              I design, build, and ship production-grade AI and SaaS
               products.
             </p>
             <p className="text-body mb-8">
-              With over 5 years of experience building web-based software, I
-              specialize in Web3 dApps, NFT platforms, smart contracts, and
-              full-stack applications. Let&apos;s turn your ideas into reality.
+              With over 6 years of experience building web-based software, I'm currently focused on building AI products that delightfully solve real business problems. Let's have a chat if that interests you. 🚀
             </p>
 
             {/* CTA Buttons */}
@@ -73,6 +73,17 @@ const MainContent: React.FC = () => {
             </Card>
           </div>
         </div>
+      </div>
+      
+      {/* Scroll Indicator */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce">
+        <button
+          onClick={() => scrollToSection("projects")}
+          className="flex flex-col items-center gap-2 text-muted-foreground hover:text-primary transition-colors group"
+          aria-label="Scroll to projects"
+        >
+          <ChevronDown className="h-6 w-6" />
+        </button>
       </div>
     </div>
   );
