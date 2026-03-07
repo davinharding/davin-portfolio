@@ -13,6 +13,9 @@ import DavinPortfolioProjects from "/public/projectScreenshots/davin_portfolio_p
 import AIDesigner1 from "/public/projectScreenshots/ai_designer_1.png";
 import AIDesigner2 from "/public/projectScreenshots/ai_designer_2.png";
 import AIDesigner3 from "/public/projectScreenshots/ai_designer_3.png";
+import StageSnap1 from "/public/projectScreenshots/stagesnap_1.png";
+import StageSnapBefore from "/public/projectScreenshots/stagesnap_before.png";
+import StageSnap2 from "/public/projectScreenshots/stagesnap_2.png";
 
 import TypeScriptLogo from "/public/logos/Typescript_logo.png";
 import NodejsLogo from "/public/logos/nodejs_logo.png";
@@ -99,6 +102,37 @@ const projectTags: { [key: string]: ProjectTag } = {
 };
 
 export const projects: Project[] = [
+  {
+    image: StageSnap1,
+    image2: StageSnapBefore,
+    image3: StageSnap2,
+    title: "StageSnap",
+    name: "StageSnap",
+    previewDescription:
+      "AI-powered real estate photo staging that transforms empty or cluttered rooms into beautifully furnished listings in ~30 seconds. Currently in private preview.",
+    description:
+      `StageSnap is the flagship product from Harding Labs — my own product studio focused on building and shipping AI-native applications.
+      |
+      The core problem: traditional home staging costs $2,000–$5,000 per property and takes days to arrange. Virtual staging services exist but are slow, manual, and expensive. StageSnap uses generative AI to transform raw real estate photos into professionally staged listings in about 30 seconds.
+      |
+      I built the full stack from scratch — a Next.js frontend with real-time before/after previews, a Node.js backend orchestrating multiple AI models for room detection, style selection, and high-fidelity image generation, plus Stripe integration for usage-based billing.
+      |
+      The technical challenges were interesting: maintaining architectural accuracy while generating furniture, handling diverse room types and lighting conditions, and building a pipeline fast enough for real-time use. The system processes photos through detection, segmentation, style mapping, and generation stages — each optimized for speed without sacrificing quality.
+      |
+      StageSnap is currently in private preview with early users in the real estate space, with plans to scale to agents, photographers, and property managers.`,
+    projectTags: [
+      projectTags.TypeScript,
+      projectTags.React,
+      projectTags.Nextjs,
+      projectTags.Nodejs,
+      projectTags.OpenAI,
+      projectTags.Tailwind,
+      projectTags.Supabase,
+      projectTags.Stripe,
+      projectTags.Vercel,
+    ],
+    liveLink: "https://stagesnap.xyz",
+  },
   {
     image: AIDesigner1,
     image2: AIDesigner2,

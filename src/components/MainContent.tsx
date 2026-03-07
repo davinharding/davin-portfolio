@@ -68,7 +68,7 @@ const MainContent: React.FC = () => {
                   priority
                 />
                 <p className="text-xs text-muted-foreground text-center mt-4 tracking-wide">
-                  Available for select projects in 2025
+                  Available for select projects in 2026
                 </p>
               </CardContent>
             </Card>
