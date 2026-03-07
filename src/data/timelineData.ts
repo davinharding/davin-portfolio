@@ -34,7 +34,7 @@ export const timelineData: TimelineElement[] = [
     contentStyle: { background: "#0e7490" },
     contentArrowStyle: { borderRight: "7px solid #0e7490", color: "#60406a" },
     date: "2025-11 => Present",
-    link: "https://hardinglabs.com"
+    link: "https://hardinglabs.io"
   },
   {
     id: 1,
