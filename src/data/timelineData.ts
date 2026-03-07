@@ -25,6 +25,19 @@ export type TimelineElement = {
 export const timelineData: TimelineElement[] = [
   {
     id: 0,
+    role: "Founder",
+    orgAndLocation: "Harding Labs, Fort Lauderdale, FL",
+    summary:
+      "Founded Harding Labs, a product studio focused on building and launching AI-native applications. First product is StageSnap, an AI-powered real estate photo staging platform that transforms empty or cluttered rooms into beautifully staged listings. Building from zero to paying customers.",
+    icon: faRobot,
+    iconStyle: { background: "#06b6d4", color: "#fff" },
+    contentStyle: { background: "#0e7490" },
+    contentArrowStyle: { borderRight: "7px solid #0e7490", color: "#60406a" },
+    date: "2025-11 => Present",
+    link: "https://hardinglabs.com"
+  },
+  {
+    id: 1,
     role: "Senior Software Engineer",
     orgAndLocation: "ApparelMagic, West Palm Beach, FL",
     summary:
@@ -37,7 +50,7 @@ export const timelineData: TimelineElement[] = [
     link: "https://apparelmagic.com/"
   },
   {
-    id: 1,
+    id: 2,
     role: "Full Stack Developer",
     orgAndLocation: "Palm Tree NFT, Palm Beach, FL",
     summary:
@@ -50,7 +63,7 @@ export const timelineData: TimelineElement[] = [
     link: "https://www.palmtreenft.com/"
   },
   {
-    id: 2,
+    id: 3,
     role: "Full Stack Web Developer",
     orgAndLocation: "Davin Harding, Fort Lauderdale, FL",
     summary:
@@ -63,7 +76,7 @@ export const timelineData: TimelineElement[] = [
     link: "https://davin.io"
   },
   {
-    id: 3,
+    id: 4,
     role: "Eat The Blocks - Blockchain Developer Course",
     orgAndLocation: "Remote",
     summary:
@@ -76,7 +89,7 @@ export const timelineData: TimelineElement[] = [
     link: "https://eattheblocks.com/course/"
   },
   {
-    id: 4,
+    id: 5,
     role: "Software Consultant",
     orgAndLocation: "Maryville Consulting Group, St. Louis, MO",
     summary:
@@ -89,7 +102,7 @@ export const timelineData: TimelineElement[] = [
     link: "https://maryville.com/"
   },
   {
-    id: 5,
+    id: 6,
     role: "Full Stack Web Developer Bootcamp",
     orgAndLocation: "Wyncode Academy - Miami, Fl",
     summary:
@@ -102,7 +115,7 @@ export const timelineData: TimelineElement[] = [
     link: "https://brainstation.io/miami"
   },
   {
-    id: 6,
+    id: 7,
     date: "2018",
     icon: faPlay,
     iconStyle: { background: "#60a658", color: "#fff" },
