@@ -13,11 +13,11 @@ import DavinPortfolioProjects from "/public/projectScreenshots/davin_portfolio_p
 import AIDesigner1 from "/public/projectScreenshots/ai_designer_1.png";
 import AIDesigner2 from "/public/projectScreenshots/ai_designer_2.png";
 import AIDesigner3 from "/public/projectScreenshots/ai_designer_3.png";
-import StageSnapLanding from "/public/projectScreenshots/stagesnap_landing.jpg";
-import StageSnapDashboard from "/public/projectScreenshots/stagesnap_dashboard.jpg";
-import StageSnapWorkspace from "/public/projectScreenshots/stagesnap_workspace.jpg";
-import StageSnapPricing from "/public/projectScreenshots/stagesnap_pricing.jpg";
-import StageSnapBilling from "/public/projectScreenshots/stagesnap_billing.jpg";
+import StageSnapLanding from "/public/projectScreenshots/stagesnap_landing.png";
+import StageSnapDashboard from "/public/projectScreenshots/stagesnap_dashboard.png";
+import StageSnapWorkspace from "/public/projectScreenshots/stagesnap_workspace.png";
+import StageSnapPricing from "/public/projectScreenshots/stagesnap_pricing.png";
+import StageSnapBilling from "/public/projectScreenshots/stagesnap_billing.png";
 
 import TypeScriptLogo from "/public/logos/Typescript_logo.png";
 import NodejsLogo from "/public/logos/nodejs_logo.png";
