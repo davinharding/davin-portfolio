@@ -32,7 +32,7 @@ const MainContent: React.FC = () => {
               products.
             </p>
             <p className="text-body mb-6 md:mb-8">
-              With over 6 years of experience building web-based software, I&apos;m currently focused on building AI products that delightfully solve real business problems. Let&apos;s have a chat if that interests you. 🚀
+              With over 8 years of experience building web-based software, I&apos;m currently focused on building AI products that delightfully solve real business problems. Let&apos;s have a chat if that interests you. 🚀
             </p>
 
             {/* CTA Buttons */}
