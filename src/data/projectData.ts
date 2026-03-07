@@ -106,9 +106,9 @@ const projectTags: { [key: string]: ProjectTag } = {
 export const projects: Project[] = [
   {
     image: StageSnapLanding,
-    image2: StageSnapDashboard,
-    image3: StageSnapWorkspace,
-    image4: StageSnapPricing,
+    image2: StageSnapPricing,
+    image3: StageSnapDashboard,
+    image4: StageSnapWorkspace,
     image5: StageSnapBilling,
     title: "StageSnap",
     name: "StageSnap",
