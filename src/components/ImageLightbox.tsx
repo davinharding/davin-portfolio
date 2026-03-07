@@ -209,10 +209,18 @@ export function ImageLightbox({
           navigationPrev: {
             color: "hsl(217.2 91.2% 59.8%)",
             filter: "drop-shadow(0 0 8px rgba(59, 130, 246, 0.3))",
+            transform: "none",
+            transition: "background-color 0.2s ease",
+            borderRadius: "12px",
+            padding: "8px",
           },
           navigationNext: {
             color: "hsl(217.2 91.2% 59.8%)",
             filter: "drop-shadow(0 0 8px rgba(59, 130, 246, 0.3))",
+            transform: "none",
+            transition: "background-color 0.2s ease",
+            borderRadius: "12px",
+            padding: "8px",
           },
         }}
         controller={{
