@@ -2,6 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Loading overlay: visible from first CSS paint, no JS needed */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: hsl(222.2 84% 4.9%);
+  pointer-events: none;
+  animation: body-overlay-fade 2.8s ease forwards;
+}
+
+/* Skip overlay for repeat visits (class added by inline script) */
+body.loader-skip::before,
+.loader-done body::before {
+  display: none !important;
+}
+
+@keyframes body-overlay-fade {
+  0%, 75% { opacity: 1; }
+  100% { opacity: 0; visibility: hidden; }
+}
+
 @layer base {
   :root {
     --background: 222.2 84% 4.9%;

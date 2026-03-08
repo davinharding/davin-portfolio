@@ -20,6 +20,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{if(sessionStorage.getItem('davinLoaderShown')==='true'){document.documentElement.classList.add('loader-done')}}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body className={inter.className}>
         <ThemeProvider>
           <LoadingAnimation />
