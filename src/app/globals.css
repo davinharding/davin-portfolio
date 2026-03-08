@@ -101,6 +101,106 @@
   @apply py-16 md:py-24;
 }
 
+/* Loading animation */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at top, rgba(30, 41, 59, 0.98), rgba(2, 6, 23, 0.98));
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+
+.loading-overlay--animate {
+  animation: loaderFadeOut 0.45s ease forwards;
+  animation-delay: 1.35s;
+}
+
+.loading-mark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+}
+
+.loading-monogram {
+  width: clamp(96px, 16vw, 140px);
+  height: clamp(96px, 16vw, 140px);
+  filter: drop-shadow(0 0 18px rgba(59, 130, 246, 0.25));
+}
+
+.loading-stroke {
+  fill: none;
+  stroke: hsl(var(--primary));
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 320;
+  stroke-dashoffset: 320;
+}
+
+.loading-overlay--animate .loading-stroke--d {
+  animation: strokeDraw 0.75s ease forwards;
+}
+
+.loading-overlay--animate .loading-stroke--h {
+  animation: strokeDraw 0.75s ease forwards;
+  animation-delay: 0.2s;
+}
+
+.loading-name {
+  font-size: 0.75rem;
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: hsl(var(--muted-foreground));
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.loading-overlay--animate .loading-name {
+  animation: nameReveal 0.4s ease forwards;
+  animation-delay: 0.9s;
+}
+
+@keyframes strokeDraw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes nameReveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes loaderFadeOut {
+  to {
+    opacity: 0;
+    transform: scale(1.02);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-overlay--animate {
+    animation-duration: 0.2s;
+    animation-delay: 0.2s;
+  }
+
+  .loading-overlay--animate .loading-stroke--d,
+  .loading-overlay--animate .loading-stroke--h,
+  .loading-overlay--animate .loading-name {
+    animation-duration: 0.2s;
+    animation-delay: 0s;
+  }
+}
+
 /* Lightbox custom styles */
 .yarl__root {
   --yarl__slide_captions_container_background: rgba(2, 6, 23, 0.8);
