@@ -2,7 +2,7 @@ import { StaticImageData } from "next/image";
 import TypeScriptLogo from "../../public/logos/Typescript_logo.png";
 import NodejsLogo from "../../public/logos/nodejs_logo.png";
 import NextjsLogo from "../../public/logos/nextjs_logo.png";
-import EtherjsLogo from "../../public/logos/ethersjs_logo.png";
+import EthersjsLogo from "../../public/logos/ethersjs_logo.png";
 import HardhatLogo from "../../public/logos/hardhat_logo.png";
 import ReactLogo from "../../public/logos/react_logo.png";
 import TailwindLogo from "../../public/logos/tailwind_logo.png";
@@ -11,7 +11,6 @@ import AWSLogo from "../../public/logos/aws_logo.png";
 import NPMLogo from "../../public/logos/npm_logo.png";
 import ArweaveLogo from "../../public/logos/arweave_logo.png";
 import IPFSLogo from "../../public/logos/ipfs_logo.png";
-import AWSAmplifyLogo from "../../public/logos/aws_amplify_logo.png";
 import Web3jsLogo from "../../public/logos/web3js_logo.png";
 import ExpressLogo from "../../public/logos/express_logo.png";
 import PostgresLogo from "../../public/logos/postgres_logo.png";
@@ -24,10 +23,14 @@ import JavaScriptLogo from "../../public/logos/JavaScript_logo.png";
 import SolidityLogo from "../../public/logos/solidity_logo.png";
 import ShopifyLogo from "../../public/logos/shopify_logo.png";
 import StripeLogo from "../../public/logos/stripe_logo.png";
-import LangChainLogo from "../../public/logos/langchain_logo.svg?url";
-import AnthropicLogo from "../../public/logos/anthropic_logo.svg?url";
-import OpenAILogo from "../../public/logos/openai_logo.svg?url";
-import SupabaseLogo from "../../public/logos/supabase_logo.svg?url";
+import LangChainLogo from "../../public/logos/langchain_logo.svg";
+import AnthropicLogo from "../../public/logos/anthropic_logo.svg";
+import OpenAILogo from "../../public/logos/openai_logo.svg";
+import SupabaseLogo from "../../public/logos/supabase_logo.svg";
+import ClerkLogo from "../../public/logos/clerk_logo.svg";
+import ReplicateLogo from "../../public/logos/replicate_logo.svg";
+import SentryLogo from "../../public/logos/sentry_logo.svg";
+import GeminiLogo from "../../public/logos/gemini_logo.svg";
 
 export type SkillData = {
   name: string;
@@ -61,7 +64,7 @@ export const skillBadgeData: SkillData[] = [
     image: VercelLogo,
     link: "https://vercel.com/",
   },
-  { name: "React", image: ReactLogo, link: "hhttps://react.dev/" },
+  { name: "React", image: ReactLogo, link: "https://react.dev/" },
   {
     name: "TailwindCSS",
     image: TailwindLogo,
@@ -85,7 +88,7 @@ export const skillBadgeData: SkillData[] = [
   },
   {
     name: "Ethers.js",
-    image: EtherjsLogo,
+    image: EthersjsLogo,
     link: "https://docs.ethers.org/v6/",
   },
   {
@@ -99,7 +102,6 @@ export const skillBadgeData: SkillData[] = [
     link: "https://www.arweave.org/",
   },
   { name: "IPFS", image: IPFSLogo, link: "https://www.ipfs.com/" },
-  //   { name: "AWS Amplify", image: AWSAmplifyLogo },
   {
     name: "web3js",
     image: Web3jsLogo,
@@ -160,5 +162,25 @@ export const skillBadgeData: SkillData[] = [
     name: 'Supabase',
     image: SupabaseLogo,
     link: 'https://supabase.com/'
+  },
+  {
+    name: 'Replicate',
+    image: ReplicateLogo,
+    link: 'https://replicate.com/'
+  },
+  {
+    name: 'Clerk',
+    image: ClerkLogo,
+    link: 'https://clerk.com/'
+  },
+  {
+    name: 'Sentry',
+    image: SentryLogo,
+    link: 'https://sentry.io/'
+  },
+  {
+    name: 'Gemini',
+    image: GeminiLogo,
+    link: 'https://deepmind.google/technologies/gemini/'
   }
 ];

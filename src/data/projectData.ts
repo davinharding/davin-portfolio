@@ -1,53 +1,61 @@
 import { StaticImageData } from "next/image";
-import Mintly from "/public/projectScreenshots/mintly.png";
-import MintlyProjectList from "/public/projectScreenshots/mintly_project_list.png";
-import MintlyTeamPage from "/public/projectScreenshots/mintly_team_page.png";
-import MintlyProjectOptions from "/public/projectScreenshots/mintly_project_options.png";
-import MintlyArtGen from "/public/projectScreenshots/mintly_art_gen.png";
+import Mintly from "../../public/projectScreenshots/mintly.png";
+import MintlyProjectList from "../../public/projectScreenshots/mintly_project_list.png";
+import MintlyTeamPage from "../../public/projectScreenshots/mintly_team_page.png";
+import MintlyProjectOptions from "../../public/projectScreenshots/mintly_project_options.png";
+import MintlyArtGen from "../../public/projectScreenshots/mintly_art_gen.png";
 
-import ThetaVibes from "/public/projectScreenshots/theta_vibes.png";
-import Tunies from "/public/projectScreenshots/tunies.png";
-import MetaverseHospitality from "/public/projectScreenshots/metaverse_hospitality.png";
-import DavinPortfolioHome from "/public/projectScreenshots/davin_portfolio_home.png";
-import DavinPortfolioProjects from "/public/projectScreenshots/davin_portfolio_projects.png";
-import AIDesigner1 from "/public/projectScreenshots/ai_designer_1.png";
-import AIDesigner2 from "/public/projectScreenshots/ai_designer_2.png";
-import AIDesigner3 from "/public/projectScreenshots/ai_designer_3.png";
-import StageSnapLanding from "/public/projectScreenshots/stagesnap_landing.png";
-import StageSnapDashboard from "/public/projectScreenshots/stagesnap_dashboard.png";
-import StageSnapWorkspace from "/public/projectScreenshots/stagesnap_workspace.png";
-import StageSnapPricing from "/public/projectScreenshots/stagesnap_pricing.png";
-import StageSnapBilling from "/public/projectScreenshots/stagesnap_billing.png";
+import ThetaVibes from "../../public/projectScreenshots/theta_vibes.png";
+import Tunies from "../../public/projectScreenshots/tunies.png";
+import MetaverseHospitality from "../../public/projectScreenshots/metaverse_hospitality.png";
+import DavinPortfolioHome from "../../public/projectScreenshots/davin_portfolio_home.png";
+import DavinPortfolioProjects from "../../public/projectScreenshots/davin_portfolio_projects.png";
+import AIDesigner1 from "../../public/projectScreenshots/ai_designer_1.png";
+import AIDesigner2 from "../../public/projectScreenshots/ai_designer_2.png";
+import AIDesigner3 from "../../public/projectScreenshots/ai_designer_3.png";
+import StageSnapLanding from "../../public/projectScreenshots/stagesnap_landing.png";
+import StageSnapDashboard from "../../public/projectScreenshots/stagesnap_dashboard.png";
+import StageSnapWorkspace from "../../public/projectScreenshots/stagesnap_workspace.png";
+import StageSnapPricing from "../../public/projectScreenshots/stagesnap_pricing.png";
+import StageSnapBilling from "../../public/projectScreenshots/stagesnap_billing.png";
 
-import TypeScriptLogo from "/public/logos/Typescript_logo.png";
-import NodejsLogo from "/public/logos/nodejs_logo.png";
-import NextjsLogo from "/public/logos/nextjs_logo.png";
-import EthersjsLogo from "/public/logos/ethersjs_logo.png";
-import HardhatLogo from "/public/logos/hardhat_logo.png";
-import ReactLogo from "/public/logos/react_logo.png";
-import TailwindLogo from "/public/logos/tailwind_logo.png";
-import VercelLogo from "/public/logos/vercel_logo.png";
-import AWSLogo from "/public/logos/aws_logo.png";
-import NPMLogo from "/public/logos/npm_logo.png";
-import ArweaveLogo from "/public/logos/arweave_logo.png";
-import IPFSLogo from "/public/logos/ipfs_logo.png";
-import AWSAmplifyLogo from "/public/logos/aws_amplify_logo.png";
-import Web3jsLogo from "/public/logos/web3js_logo.png";
-import ExpressLogo from "/public/logos/express_logo.png";
-import PostgresLogo from "/public/logos/postgres_logo.png";
-import ServerlessLogo from "/public/logos/serverless_logo.png";
-import DynamodbLogo from "/public/logos/dynamodb_logo.png";
-import JestLogo from "/public/logos/jest_logo.png";
-import FirebaseLogo from "/public/logos/firebase_logo.png";
-import MaterialUILogo from "/public/logos/materialuilogo.png";
-import JavaScriptLogo from "/public/logos/JavaScript_logo.png";
-import SolidityLogo from "/public/logos/solidity_logo.png";
-import ShopifyLogo from "/public/logos/shopify_logo.png";
-import StripeLogo from "/public/logos/stripe_logo.png";
-import LangChainLogo from "/public/logos/langchain_logo.svg?url";
-import AnthropicLogo from "/public/logos/anthropic_logo.svg?url";
-import OpenAILogo from "/public/logos/openai_logo.svg?url";
-import SupabaseLogo from "/public/logos/supabase_logo.svg?url";
+import TypeScriptLogo from "../../public/logos/Typescript_logo.png";
+import NodejsLogo from "../../public/logos/nodejs_logo.png";
+import NextjsLogo from "../../public/logos/nextjs_logo.png";
+import EthersjsLogo from "../../public/logos/ethersjs_logo.png";
+import HardhatLogo from "../../public/logos/hardhat_logo.png";
+import ReactLogo from "../../public/logos/react_logo.png";
+import TailwindLogo from "../../public/logos/tailwind_logo.png";
+import VercelLogo from "../../public/logos/vercel_logo.png";
+import AWSLogo from "../../public/logos/aws_logo.png";
+import NPMLogo from "../../public/logos/npm_logo.png";
+import ArweaveLogo from "../../public/logos/arweave_logo.png";
+import IPFSLogo from "../../public/logos/ipfs_logo.png";
+import AWSAmplifyLogo from "../../public/logos/aws_amplify_logo.png";
+import Web3jsLogo from "../../public/logos/web3js_logo.png";
+import ExpressLogo from "../../public/logos/express_logo.png";
+import PostgresLogo from "../../public/logos/postgres_logo.png";
+import ServerlessLogo from "../../public/logos/serverless_logo.png";
+import DynamodbLogo from "../../public/logos/dynamodb_logo.png";
+import JestLogo from "../../public/logos/jest_logo.png";
+import FirebaseLogo from "../../public/logos/firebase_logo.png";
+import MaterialUILogo from "../../public/logos/materialuilogo.png";
+import JavaScriptLogo from "../../public/logos/JavaScript_logo.png";
+import SolidityLogo from "../../public/logos/solidity_logo.png";
+import ShopifyLogo from "../../public/logos/shopify_logo.png";
+import StripeLogo from "../../public/logos/stripe_logo.png";
+import LangChainLogo from "../../public/logos/langchain_logo.svg?url";
+import AnthropicLogo from "../../public/logos/anthropic_logo.svg?url";
+import OpenAILogo from "../../public/logos/openai_logo.svg?url";
+import SupabaseLogo from "../../public/logos/supabase_logo.svg?url";
+import ClerkLogo from "../../public/logos/clerk_logo.svg?url";
+import ReplicateLogo from "../../public/logos/replicate_logo.svg?url";
+import SentryLogo from "../../public/logos/sentry_logo.svg?url";
+import GeminiLogo from "../../public/logos/gemini_logo.svg?url";
+import NestjsLogo from "../../public/logos/nestjs_logo.svg?url";
+import RedisLogo from "../../public/logos/redis_logo.svg?url";
+import MailgunLogo from "../../public/logos/mailgun_logo.svg?url";
+import LangGraphLogo from "../../public/logos/langgraph_logo.svg?url";
 
 export type ProjectTag = {
   title: string;
@@ -55,7 +63,7 @@ export type ProjectTag = {
 };
 
 export type Project = {
-  image: StaticImageData;
+  image?: StaticImageData;
   image2?: StaticImageData;
   image3?: StaticImageData;
   image4?: StaticImageData;
@@ -69,6 +77,14 @@ export type Project = {
   liveLink?: string;
   smartContractLink?: string;
   name: string;
+  /**
+   * When true, the project is treated as a work-in-progress and is hidden from
+   * public listings (home page, /portfolio, sitemap) and excluded from the
+   * static-params build. The detail page route still resolves so the project
+   * can be previewed by direct URL during iteration. Flip to `false` (or
+   * remove the field) to publish.
+   */
+  draft?: boolean;
 };
 
 const projectTags: { [key: string]: ProjectTag } = {
@@ -101,7 +117,25 @@ const projectTags: { [key: string]: ProjectTag } = {
   Anthropic: { title: "Anthropic", icon: AnthropicLogo },
   OpenAI: { title: "OpenAI", icon: OpenAILogo },
   Supabase: { title: "Supabase", icon: SupabaseLogo },
+  Clerk: { title: "Clerk", icon: ClerkLogo },
+  Replicate: { title: "Replicate", icon: ReplicateLogo },
+  Sentry: { title: "Sentry", icon: SentryLogo },
+  Gemini: { title: "Gemini", icon: GeminiLogo },
+  NestJS: { title: "NestJS", icon: NestjsLogo },
+  Redis: { title: "Redis", icon: RedisLogo },
+  Mailgun: { title: "Mailgun", icon: MailgunLogo },
+  LangGraph: { title: "LangGraph", icon: LangGraphLogo },
 };
+
+/**
+ * Returns every project that should be visible publicly (i.e. not flagged as
+ * a `draft`). Use this anywhere projects are listed in navigation, the
+ * sitemap, OG metadata, etc. The full `projects` array remains the source of
+ * truth for direct-URL access so drafts can still be previewed by visiting
+ * their detail route.
+ */
+export const getPublishedProjects = (): Project[] =>
+  projects.filter((project) => !project.draft);
 
 export const projects: Project[] = [
   {
@@ -113,29 +147,66 @@ export const projects: Project[] = [
     title: "StageSnap",
     name: "StageSnap",
     previewDescription:
-      "AI-powered real estate photo staging that transforms empty or cluttered rooms into beautifully furnished listings in ~30 seconds. Currently in private preview.",
+      "AI-powered real estate photo staging that transforms empty or cluttered rooms into beautifully furnished listings in ~30 seconds.",
     description:
       `StageSnap is the flagship product from Harding Labs, my own product studio focused on building and shipping AI-native applications.
       |
       The core problem: traditional home staging costs $2,000–$5,000 per property and takes days to arrange. Virtual staging services exist but are slow, manual, and expensive. StageSnap uses generative AI to transform raw real estate photos into professionally staged listings in about 30 seconds.
       |
-      I built the full stack from scratch: a Next.js frontend with real-time before/after previews, a Node.js backend orchestrating multiple AI models for room detection, style selection, and high-fidelity image generation, plus Stripe integration for usage-based billing.
+      I built the full stack from scratch: a Next.js frontend with real-time before/after previews, a Node.js backend orchestrating multiple AI models for room detection, themed virtual staging, and high-fidelity image generation, plus Stripe integration for usage-based billing.
       |
-      The technical challenges were interesting: maintaining architectural accuracy while generating furniture, handling diverse room types and lighting conditions, and building a pipeline fast enough for real-time use. The system processes photos through detection, segmentation, style mapping, and generation stages, each optimized for speed without sacrificing quality.
+      The technical challenges were interesting: preserving architectural accuracy across three staging modes (declutter, empty room, and furnish across 16 design styles) while handling diverse room types and lighting. The pipeline runs room detection, mode-specific AI enhancement, and optional HD or 4K upscaling, with concurrent job processing and SSE streaming live progress to the client.
       |
-      StageSnap is currently in private preview with early users in the real estate space, with plans to scale to agents, photographers, and property managers.`,
+      StageSnap is live with early users in the real estate space, with plans to scale to homeowners, agents, and brokerages.`,
     projectTags: [
       projectTags.TypeScript,
       projectTags.React,
       projectTags.Nextjs,
       projectTags.Nodejs,
       projectTags.OpenAI,
+      projectTags.Replicate,
       projectTags.Tailwind,
       projectTags.Supabase,
+      projectTags.Clerk,
       projectTags.Stripe,
+      projectTags.Sentry,
       projectTags.Vercel,
     ],
     liveLink: "https://stagesnap.xyz",
+  },
+  {
+    draft: true,
+    title: "AI Agent Platform",
+    name: "AI Agent Platform",
+    previewDescription:
+      "A multi-tenant agentic system built into ApparelMagic's enterprise ERP — domain-specialized AI Agents that run on schedules, process inbound emails, and chat with users via a tool-calling LangGraph orchestration layer.",
+    description:
+      `The AI Agent Platform is a multi-tenant agentic system I built into ApparelMagic's enterprise SaaS — every customer gets a roster of domain-specialized AI Agents (Sales, Inventory, Finance, Product Development, plus fully custom agents) alongside a general-purpose Copilot with read access to the full platform.
+      |
+      The thesis was simple: ERP users don't want another dashboard, they want delegation.  Each agent runs on a schedule via BullMQ-driven cron jobs, processes inbound emails sent to its own slug.subdomain@domain.ai address through Mailgun webhooks, and chats in an inbox-style UI with real-time SSE streaming — all while operating under a CASL-enforced user-group permission model that mirrors the platform's existing human RBAC.
+      |
+      The most interesting engineering problem was the orchestration layer.  I built the core on LangGraph, modeling each interaction as a state machine: prompt assembly with agent-specific building blocks → tier-based model selection (Fast / Default / Premium) → tool-calling loop with streamed progress → history compaction once conversations outgrow the context window.  Tools are decorated with @ToolPermission and check the agent's abilities before executing, which keeps a Sales agent from ever touching cost data and a Finance agent from sending customer-facing emails by accident.
+      |
+      Multi-tenancy was the other hard problem.  Every request — HTTP, queue job, or email webhook — acquires a tenant-bound TypeORM QueryRunner stored in CLS, and the base data service throws if a tenant is set without a runner attached.  That single invariant turned out to be the most valuable safety rail in the system: it makes cross-tenant data leaks structurally impossible rather than something you have to remember to check.
+      |
+      On the frontend, the inbox-style React/Next.js SPA uses React Query for server state, SSE for token streaming, and URL-as-source-of-truth for navigation so deep links and refreshes always work.  The platform is currently shipping into Professional, Enterprise, and Ultimate ApparelMagic tiers and is the foundation for a broader push into agentic workflows in the apparel and fashion industry — moving the product from a system of record toward a system of action.
+      `,
+    projectTags: [
+      projectTags.TypeScript,
+      projectTags.Nodejs,
+      projectTags.NestJS,
+      projectTags.React,
+      projectTags.Nextjs,
+      projectTags.LangChain,
+      projectTags.LangGraph,
+      projectTags.OpenAI,
+      projectTags.Anthropic,
+      projectTags.Postgres,
+      projectTags.Redis,
+      projectTags.Mailgun,
+      projectTags.Sentry,
+      projectTags.AWS,
+    ],
   },
   {
     image: AIDesigner1,
@@ -171,7 +242,6 @@ export const projects: Project[] = [
     image3: MintlyProjectList,
     image4: MintlyTeamPage,
     image5: MintlyArtGen,
-    // image5: Mintly,
     title: "Mintly",
     name: "Mintly",
     previewDescription:
