@@ -44,39 +44,59 @@ const Header: React.FC<IHeaderProps> = () => {
     }
   };
 
+  const isPortfolio = pathName?.startsWith("/portfolio") ?? false;
+  const isCall = pathName === "/call";
+
   return (
     <header className="fixed top-0 w-full z-50 bg-background/90 backdrop-blur-sm border-b border-border">
-      <div className="container-narrow flex justify-between items-center h-16">
-        <Link href="/" className="transition-opacity hover:opacity-80">
-          <Image 
-            src={theme === "dark" ? "/logo.svg" : "/logo-light.svg"} 
-            alt="logo" 
-            width={40} 
-            height={40} 
+      <nav
+        aria-label="Primary"
+        className="container-narrow flex justify-between items-center h-16"
+      >
+        <Link
+          href="/"
+          aria-label="Davin Harding — Home"
+          aria-current={pathName === "/" ? "page" : undefined}
+          className="transition-opacity hover:opacity-80"
+          prefetch
+        >
+          <Image
+            src={theme === "dark" ? "/logo.svg" : "/logo-light.svg"}
+            alt=""
+            width={40}
+            height={40}
+            priority
+            unoptimized
           />
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-1">
+        <div className="hidden md:flex items-center gap-1">
           {/* Portfolio Dropdown */}
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
+                aria-current={isPortfolio ? "page" : undefined}
                 className={`text-sm ${
-                  pathName?.startsWith("/portfolio")
-                    ? "text-primary"
-                    : "text-muted-foreground"
+                  isPortfolio ? "text-primary" : "text-muted-foreground"
                 }`}
               >
                 Portfolio
-                <ChevronDown className="ml-1 h-4 w-4" />
+                <ChevronDown className="ml-1 h-4 w-4" aria-hidden="true" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              {projects.map((project, idx) => (
-                <DropdownMenuItem key={idx} asChild>
-                  <Link href={`/portfolio/${encodeURI(project.name)}`}>
+              {projects.map((project) => (
+                <DropdownMenuItem
+                  key={project.name}
+                  asChild
+                  className="cursor-pointer"
+                >
+                  <Link
+                    href={`/portfolio/${encodeURI(project.name)}`}
+                    prefetch
+                  >
                     {project.name}
                   </Link>
                 </DropdownMenuItem>
@@ -84,61 +104,53 @@ const Header: React.FC<IHeaderProps> = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Experience */}
           <Button
             variant="ghost"
             className="text-sm text-muted-foreground"
             onClick={scrollToExperience}
           >
-            <Briefcase className="mr-1 h-4 w-4" />
+            <Briefcase className="mr-1 h-4 w-4" aria-hidden="true" />
             Experience
           </Button>
 
-          {/* Book a Call */}
-          <Button
-            variant="ghost"
-            asChild
-            className="text-sm text-muted-foreground"
-          >
-            <Link href="/call">
-              <Calendar className="mr-1 h-4 w-4" />
+          <Button variant="ghost" asChild className="text-sm text-muted-foreground">
+            <Link
+              href="/call"
+              aria-current={isCall ? "page" : undefined}
+            >
+              <Calendar className="mr-1 h-4 w-4" aria-hidden="true" />
               Book a Call
             </Link>
           </Button>
 
-          {/* Email */}
-          <Button
-                variant="ghost"
-                asChild
-            className="text-sm text-muted-foreground"
-          >
+          <Button variant="ghost" asChild className="text-sm text-muted-foreground">
             <Link href="mailto:davinlharding+dev@gmail.com">
-              <Mail className="mr-1 h-4 w-4" />
+              <Mail className="mr-1 h-4 w-4" aria-hidden="true" />
               Email
             </Link>
           </Button>
 
-          {/* Theme Toggle */}
           <Button
             variant="ghost"
             size="icon"
             onClick={toggleTheme}
+            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
             className="text-muted-foreground"
           >
             {theme === "dark" ? (
-              <Sun className="h-4 w-4" />
+              <Sun className="h-4 w-4" aria-hidden="true" />
             ) : (
-              <Moon className="h-4 w-4" />
+              <Moon className="h-4 w-4" aria-hidden="true" />
             )}
             <span className="sr-only">Toggle theme</span>
           </Button>
-        </nav>
+        </div>
 
         {/* Mobile Navigation */}
         <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
           <SheetTrigger asChild className="md:hidden">
-            <Button variant="ghost" size="icon">
-              <Menu className="h-5 w-5" />
+            <Button variant="ghost" size="icon" aria-label="Open navigation menu">
+              <Menu className="h-5 w-5" aria-hidden="true" />
               <span className="sr-only">Toggle menu</span>
             </Button>
           </SheetTrigger>
@@ -146,16 +158,15 @@ const Header: React.FC<IHeaderProps> = () => {
             <SheetHeader>
               <SheetTitle>Navigation</SheetTitle>
             </SheetHeader>
-            <nav className="flex flex-col gap-4 mt-8">
-              {/* Portfolio Section */}
+            <div className="flex flex-col gap-4 mt-8">
               <div className="space-y-2">
                 <p className="text-sm font-medium text-muted-foreground px-2">
                   Portfolio
                 </p>
                 <div className="space-y-1">
-                  {projects.map((project, idx) => (
+                  {projects.map((project) => (
                     <Button
-                      key={idx}
+                      key={project.name}
                       variant="ghost"
                       asChild
                       className="w-full justify-start"
@@ -169,7 +180,6 @@ const Header: React.FC<IHeaderProps> = () => {
                 </div>
               </div>
 
-              {/* Experience */}
               <div className="space-y-1 pt-4 border-t border-border">
                 <Button
                   variant="ghost"
@@ -179,12 +189,33 @@ const Header: React.FC<IHeaderProps> = () => {
                     scrollToExperience();
                   }}
                 >
-                  <Briefcase className="mr-2 h-4 w-4" />
+                  <Briefcase className="mr-2 h-4 w-4" aria-hidden="true" />
                   Experience
+                </Button>
+                <Button
+                  variant="ghost"
+                  asChild
+                  className="w-full justify-start"
+                  onClick={() => setSheetOpen(false)}
+                >
+                  <Link href="/call">
+                    <Calendar className="mr-2 h-4 w-4" aria-hidden="true" />
+                    Book a Call
+                  </Link>
+                </Button>
+                <Button
+                  variant="ghost"
+                  asChild
+                  className="w-full justify-start"
+                  onClick={() => setSheetOpen(false)}
+                >
+                  <Link href="mailto:davinlharding+dev@gmail.com">
+                    <Mail className="mr-2 h-4 w-4" aria-hidden="true" />
+                    Email
+                  </Link>
                 </Button>
               </div>
 
-              {/* Theme Toggle */}
               <div className="space-y-1 pt-4 border-t border-border">
                 <Button
                   variant="ghost"
@@ -193,21 +224,21 @@ const Header: React.FC<IHeaderProps> = () => {
                 >
                   {theme === "dark" ? (
                     <>
-                      <Sun className="mr-2 h-4 w-4" />
+                      <Sun className="mr-2 h-4 w-4" aria-hidden="true" />
                       Light Mode
                     </>
                   ) : (
                     <>
-                      <Moon className="mr-2 h-4 w-4" />
+                      <Moon className="mr-2 h-4 w-4" aria-hidden="true" />
                       Dark Mode
                     </>
                   )}
                 </Button>
               </div>
-            </nav>
+            </div>
           </SheetContent>
         </Sheet>
-      </div>
+      </nav>
     </header>
   );
 };

@@ -1,20 +1,10 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Github, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+
+const currentYear = new Date().getFullYear();
 
 const Footer: React.FC = () => {
-  const [currentYear, setCurrentYear] = useState<number>(
-    new Date().getFullYear()
-  );
-
-  useEffect(() => {
-    setCurrentYear(new Date().getFullYear());
-  }, []);
-
   return (
     <footer className="bg-background border-t border-border">
       <div className="container-narrow py-8">
@@ -27,9 +17,10 @@ const Footer: React.FC = () => {
               <Link
                 href="https://www.linkedin.com/in/davinharding/"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
+                aria-label="Davin Harding on LinkedIn (opens in new tab)"
               >
-                <Linkedin className="h-5 w-5" />
+                <Linkedin className="h-5 w-5" aria-hidden="true" />
                 <span className="sr-only">LinkedIn</span>
               </Link>
             </Button>
@@ -37,9 +28,10 @@ const Footer: React.FC = () => {
               <Link
                 href="https://github.com/davinharding"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
+                aria-label="Davin Harding on GitHub (opens in new tab)"
               >
-                <Github className="h-5 w-5" />
+                <Github className="h-5 w-5" aria-hidden="true" />
                 <span className="sr-only">GitHub</span>
               </Link>
             </Button>

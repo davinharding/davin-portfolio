@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -25,7 +23,7 @@ const skillCategories: { title: string; skills: string[] }[] = [
   },
   {
     title: "AI & LLMs",
-    skills: ["OpenAI", "Anthropic", "LangChain"],
+    skills: ["OpenAI", "Anthropic", "Gemini", "LangChain", "Replicate"],
   },
   {
     title: "Cloud & DevOps",
@@ -34,6 +32,8 @@ const skillCategories: { title: string; skills: string[] }[] = [
       "Firebase",
       "Vercel",
       "Supabase",
+      "Clerk",
+      "Sentry",
       "Serverless",
       "Postgres",
       "Dynamodb",
@@ -56,9 +56,14 @@ const getSkillByName = (name: string): SkillData | undefined => {
 
 const SkillBadgeSection: React.FC = () => {
   return (
-    <div className="section-spacing" id="skills">
+    <section
+      className="section-spacing"
+      id="skills"
+      aria-labelledby="skills-heading"
+    >
       <div className="container-narrow">
         <SectionHeading
+          id="skills-heading"
           title="Technologies"
           subTitle="Tools and services I work with"
         />
@@ -80,6 +85,7 @@ const SkillBadgeSection: React.FC = () => {
                         key={skillName}
                         href={skill.link}
                         target="_blank"
+                        rel="noopener noreferrer"
                       >
                         <Badge
                           variant="secondary"
@@ -89,7 +95,9 @@ const SkillBadgeSection: React.FC = () => {
                             <Image
                               src={skill.image}
                               alt={skill.name}
-                              fill={true}
+                              fill
+                              sizes="16px"
+                              loading="lazy"
                               className="object-contain"
                             />
                           </div>
@@ -104,7 +112,7 @@ const SkillBadgeSection: React.FC = () => {
           ))}
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

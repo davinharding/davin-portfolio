@@ -1,10 +1,7 @@
-"use client";
-
 import Image from "next/image";
 import { Project } from "@/data/projectData";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { ExternalLink, Github, FileCode } from "lucide-react";
+import { ExternalLink, Github, FileCode, Sparkles } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -18,30 +15,57 @@ import { Button } from "@/components/ui/button";
 
 type IProjectCardProps = {
   project: Project;
+  index?: number;
 };
 
-const ProjectCard: React.FC<IProjectCardProps> = ({ project }) => {
-  const router = useRouter();
+const ProjectCard: React.FC<IProjectCardProps> = ({ project, index = 0 }) => {
+  const detailHref = `/portfolio/${encodeURI(project.name)}`;
+  // First row (lg:grid-cols-3) is above-the-fold on most viewports.
+  const isAboveTheFold = index < 3;
 
   return (
     <Card className="flex flex-col h-full transition-all duration-200 hover:-translate-y-1 hover:border-primary/50">
       {/* Image */}
-      <div
-        onClick={() => router.push("/portfolio/" + project.name)}
-        className="relative w-full h-48 rounded-t-xl overflow-hidden cursor-pointer group"
+      <Link
+        href={detailHref}
+        prefetch
+        aria-label={`View details for ${project.title}`}
+        className="relative block w-full h-48 rounded-t-xl overflow-hidden cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
       >
-        <Image
-          src={project.image}
-          alt={project.title}
-          fill={true}
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
-        />
-        <div className="absolute inset-0 bg-background/0 group-hover:bg-background/60 transition-all duration-300 flex items-center justify-center">
-          <span className="text-sm font-medium text-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        {project.image ? (
+          <Image
+            src={project.image}
+            alt={`${project.title} screenshot`}
+            fill
+            placeholder="blur"
+            priority={isAboveTheFold}
+            loading={isAboveTheFold ? undefined : "lazy"}
+            className="object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/15 via-secondary/30 to-secondary/50">
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 bg-[radial-gradient(circle_at_center,hsl(var(--primary)/0.18),transparent_70%)]"
+            />
+            <div className="relative flex flex-col items-center gap-2 text-muted-foreground transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100">
+              <Sparkles className="h-8 w-8 text-primary" aria-hidden="true" />
+              <span className="text-[0.65rem] font-medium uppercase tracking-[0.2em]">
+                Preview Coming Soon
+              </span>
+            </div>
+          </div>
+        )}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-background/0 group-hover:bg-background/60 group-focus-visible:bg-background/60 transition-all duration-300 flex items-center justify-center"
+        >
+          <span className="text-sm font-medium text-foreground opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-300">
             View Details →
           </span>
         </div>
-      </div>
+      </Link>
 
       <CardHeader className="pb-2">
         <CardTitle className="text-lg">{project.title}</CardTitle>
@@ -71,9 +95,10 @@ const ProjectCard: React.FC<IProjectCardProps> = ({ project }) => {
             <Link
               href={project.liveLink}
               target="_blank"
-              onClick={(e) => e.stopPropagation()}
+              rel="noopener noreferrer"
+              aria-label={`Open ${project.title} live site (opens in new tab)`}
             >
-              <ExternalLink className="mr-1 h-3 w-3" />
+              <ExternalLink className="mr-1 h-3 w-3" aria-hidden="true" />
               Live
             </Link>
           </Button>
@@ -83,9 +108,10 @@ const ProjectCard: React.FC<IProjectCardProps> = ({ project }) => {
             <Link
               href={project.githubLink}
               target="_blank"
-              onClick={(e) => e.stopPropagation()}
+              rel="noopener noreferrer"
+              aria-label={`Open ${project.title} GitHub repository (opens in new tab)`}
             >
-              <Github className="mr-1 h-3 w-3" />
+              <Github className="mr-1 h-3 w-3" aria-hidden="true" />
               Code
             </Link>
           </Button>
@@ -95,9 +121,10 @@ const ProjectCard: React.FC<IProjectCardProps> = ({ project }) => {
             <Link
               href={project.smartContractLink}
               target="_blank"
-              onClick={(e) => e.stopPropagation()}
+              rel="noopener noreferrer"
+              aria-label={`Open ${project.title} smart contract on Etherscan (opens in new tab)`}
             >
-              <FileCode className="mr-1 h-3 w-3" />
+              <FileCode className="mr-1 h-3 w-3" aria-hidden="true" />
               Contract
             </Link>
           </Button>
