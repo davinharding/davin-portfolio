@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getPublishedProjects } from "@/data/projectData";
+import { getPublishedProjects, projectPath } from "@/data/projectData";
 
 const SITE_URL = "https://www.davin.io";
 
@@ -7,7 +7,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
   const projectRoutes: MetadataRoute.Sitemap = getPublishedProjects().map(
     (project) => ({
-      url: `${SITE_URL}/portfolio/${encodeURI(project.name)}`,
+      url: `${SITE_URL}${projectPath(project.name)}`,
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.7,

@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { Menu, ChevronDown, Mail, Briefcase, Sun, Moon, Calendar } from "lucide-react";
-import { getPublishedProjects } from "@/data/projectData";
+import { getPublishedProjects, projectPath } from "@/data/projectData";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/ThemeProvider";
 import {
@@ -95,10 +95,7 @@ const Header: React.FC<IHeaderProps> = () => {
                   asChild
                   className="cursor-pointer"
                 >
-                  <Link
-                    href={`/portfolio/${encodeURI(project.name)}`}
-                    prefetch
-                  >
+                  <Link href={projectPath(project.name)} prefetch>
                     {project.name}
                   </Link>
                 </DropdownMenuItem>
@@ -174,7 +171,7 @@ const Header: React.FC<IHeaderProps> = () => {
                       className="w-full justify-start"
                       onClick={() => setSheetOpen(false)}
                     >
-                      <Link href={`/portfolio/${encodeURI(project.name)}`}>
+                      <Link href={projectPath(project.name)}>
                         {project.name}
                       </Link>
                     </Button>

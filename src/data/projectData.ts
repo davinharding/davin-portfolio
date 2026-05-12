@@ -137,6 +137,18 @@ const projectTags: { [key: string]: ProjectTag } = {
 export const getPublishedProjects = (): Project[] =>
   projects.filter((project) => !project.draft);
 
+/**
+ * Canonical path for a project's detail page. Centralized so the URL scheme
+ * (and its encoding) lives in one place — the dynamic route, sitemap, header
+ * dropdown, project cards, and metadata all consume this.
+ *
+ * `encodeURIComponent` is required because project names can contain spaces
+ * and reserved characters; `encodeURI` would leave `&`, `?`, `#`, `+`, etc.
+ * unescaped and break routing.
+ */
+export const projectPath = (name: string): string =>
+  `/portfolio/${encodeURIComponent(name)}`;
+
 export const projects: Project[] = [
   {
     image: StageSnapLanding,

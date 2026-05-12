@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Project } from "@/data/projectData";
+import { Project, projectPath } from "@/data/projectData";
 import Link from "next/link";
 import { ExternalLink, Github, FileCode, Sparkles } from "lucide-react";
 import {
@@ -19,7 +19,7 @@ type IProjectCardProps = {
 };
 
 const ProjectCard: React.FC<IProjectCardProps> = ({ project, index = 0 }) => {
-  const detailHref = `/portfolio/${encodeURI(project.name)}`;
+  const detailHref = projectPath(project.name);
   // First row (lg:grid-cols-3) is above-the-fold on most viewports.
   const isAboveTheFold = index < 3;
 

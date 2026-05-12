@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
   getPublishedProjects,
+  projectPath,
   projects,
   type Project,
 } from "@/data/projectData";
@@ -24,8 +25,11 @@ type RouteParamsPromise = Promise<RouteParams>;
 // Draft projects are skipped here (and are absent from listings/sitemap), but
 // their detail route still resolves so they can be previewed by direct URL.
 export function generateStaticParams(): RouteParams[] {
+  // Return raw (decoded) names — Next.js URL-encodes segments when building
+  // static paths. Pre-encoding here causes double-encoding (e.g. "AI Designer"
+  // → "AI%2520Designer") so client navigations to the single-encoded URL 404.
   return getPublishedProjects().map((project) => ({
-    name: encodeURI(project.name),
+    name: project.name,
   }));
 }
 
@@ -38,11 +42,11 @@ export async function generateMetadata({
   const project = findProject(name);
   if (!project) return { title: "Project Not Found" };
   const ogImage = project.image?.src;
-  const slug = encodeURI(project.name);
+  const path = projectPath(project.name);
   return {
     title: project.title,
     description: project.previewDescription,
-    alternates: { canonical: `/portfolio/${slug}` },
+    alternates: { canonical: path },
     // Draft projects are accessible by direct URL for preview but should
     // never be indexed or followed by crawlers.
     ...(project.draft && {
@@ -52,7 +56,7 @@ export async function generateMetadata({
       type: "article",
       title: project.title,
       description: project.previewDescription,
-      url: `/portfolio/${slug}`,
+      url: path,
       ...(ogImage && { images: [{ url: ogImage, alt: project.title }] }),
     },
     twitter: {
@@ -65,7 +69,15 @@ export async function generateMetadata({
 }
 
 function findProject(rawName: string): Project | undefined {
-  return projects.find((p) => p.name === decodeURI(rawName));
+  // Next.js auto-decodes route params, but decode defensively in case a request
+  // arrives with a still-encoded segment (e.g. middleware, custom proxy).
+  let decoded = rawName;
+  try {
+    decoded = decodeURIComponent(rawName);
+  } catch {
+    // Malformed escape — fall back to the raw value.
+  }
+  return projects.find((p) => p.name === decoded);
 }
 
 const PortfolioProjectDetail = async ({
