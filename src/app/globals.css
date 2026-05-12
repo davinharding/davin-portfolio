@@ -11,23 +11,32 @@ body::before {
   z-index: 10000;
   background: hsl(222.2 84% 4.9%);
   pointer-events: none;
-  animation: body-overlay-fade 2.8s ease forwards;
+  animation: body-overlay-fade 1.1s ease forwards;
 }
 
-/* Skip overlay for repeat visits (class added by inline script) */
-body.loader-skip::before,
-.loader-done body::before {
+/* Skip overlay for repeat visits (class added by inline script in <head>) */
+html.loader-done body::before {
   display: none !important;
 }
 
 @keyframes body-overlay-fade {
-  0%, 75% { opacity: 1; }
+  0%, 60% { opacity: 1; }
   100% { opacity: 0; visibility: hidden; }
 }
 
+/* Honor reduced motion: hide the splash overlay almost immediately */
+@media (prefers-reduced-motion: reduce) {
+  body::before {
+    animation-duration: 0.15s;
+  }
+}
+
 @layer base {
-  *, *::before, *::after {
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  /* Smoothly transition only theme-affected surfaces, not every node in the DOM */
+  html.theme-transition,
+  html.theme-transition body,
+  html.theme-transition .theme-surface {
+    transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
   }
 
   :root {
@@ -85,6 +94,26 @@ body.loader-skip::before,
   }
   body {
     @apply bg-background text-foreground;
+  }
+  /* Respect users who prefer reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+  /* Visible focus ring for keyboard users on every interactive element */
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+    border-radius: 2px;
   }
 }
 
