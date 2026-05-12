@@ -383,9 +383,11 @@ html.loader-done body::before {
   animation: lightboxFadeIn 0.3s ease-out;
 }
 
-/* Calendly embed styles - hide internal scrollbar */
+/* Calendly embed: hide internal scrollbar and remove the inline-iframe baseline gap */
 .calendly-wrapper {
   overflow: hidden;
+  font-size: 0;
+  line-height: 0;
 }
 
 .calendly-wrapper .calendly-inline-widget,
@@ -393,6 +395,8 @@ html.loader-done body::before {
   overflow: hidden !important;
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
+  display: block !important;
+  vertical-align: top;
 }
 
 .calendly-wrapper .calendly-inline-widget::-webkit-scrollbar,
