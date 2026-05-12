@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { Menu, ChevronDown, Mail, Briefcase, Sun, Moon, Calendar } from "lucide-react";
-import { projects } from "@/data/projectData";
+import { getPublishedProjects } from "@/data/projectData";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/ThemeProvider";
 import {
@@ -26,6 +26,8 @@ type IHeaderProps = {
   page?: string;
   mobile?: boolean;
 };
+
+const navProjects = getPublishedProjects();
 
 const Header: React.FC<IHeaderProps> = () => {
   const pathName = usePathname();
@@ -87,7 +89,7 @@ const Header: React.FC<IHeaderProps> = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              {projects.map((project) => (
+              {navProjects.map((project) => (
                 <DropdownMenuItem
                   key={project.name}
                   asChild
@@ -164,7 +166,7 @@ const Header: React.FC<IHeaderProps> = () => {
                   Portfolio
                 </p>
                 <div className="space-y-1">
-                  {projects.map((project) => (
+                  {navProjects.map((project) => (
                     <Button
                       key={project.name}
                       variant="ghost"
