@@ -25,6 +25,165 @@ body.loader-skip::before,
   100% { opacity: 0; visibility: hidden; }
 }
 
+.dh-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 42%, hsl(var(--primary) / 0.2), transparent 34%),
+    radial-gradient(circle at 35% 64%, rgba(167, 139, 250, 0.12), transparent 30%),
+    hsl(222.2 84% 4.9%);
+  pointer-events: none;
+  animation-name: dh-loader-exit;
+  animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+  animation-fill-mode: forwards;
+}
+
+.dh-loader__stage {
+  display: grid;
+  width: clamp(144px, 32vw, 220px);
+  min-height: clamp(176px, 38vw, 268px);
+  place-items: center;
+  gap: 18px;
+  text-align: center;
+}
+
+.dh-loader__stage svg {
+  display: block;
+  width: clamp(128px, 24vw, 176px);
+  height: clamp(128px, 24vw, 176px);
+  overflow: visible;
+  filter: drop-shadow(0 0 22px rgba(74, 144, 217, 0.32));
+}
+
+.dh-loader__stage span {
+  color: hsl(var(--muted-foreground));
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.34em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: dh-loader-name 0.48s ease forwards 1.02s;
+}
+
+.dh-loader__orbit path,
+.dh-loader__data path,
+.dh-loader__stroke {
+  fill: none;
+  stroke: url("#dh-loader-stroke");
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dh-loader__orbit {
+  opacity: 0.5;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: dh-loader-orbit 2.1s ease-in-out infinite 0.55s;
+}
+
+.dh-loader__orbit path {
+  stroke-width: 1.5;
+  stroke-dasharray: 340;
+  stroke-dashoffset: 340;
+  animation: dh-loader-draw 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards 0.2s;
+}
+
+.dh-loader__orbit circle {
+  fill: #bfdbfe;
+  opacity: 0;
+  transform: scale(0.65);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: dh-loader-dot 0.38s ease forwards;
+}
+
+.dh-loader__orbit circle:nth-of-type(1) {
+  animation-delay: 0.58s;
+}
+
+.dh-loader__orbit circle:nth-of-type(2) {
+  animation-delay: 0.7s;
+}
+
+.dh-loader__orbit circle:nth-of-type(3) {
+  animation-delay: 0.82s;
+}
+
+.dh-loader__data {
+  opacity: 0.36;
+}
+
+.dh-loader__data path {
+  stroke-width: 2;
+  stroke-dasharray: 120;
+  stroke-dashoffset: 120;
+  animation: dh-loader-draw 0.62s ease forwards 0.84s;
+}
+
+.dh-loader__stroke {
+  stroke-width: 7;
+  stroke-dasharray: 420;
+  stroke-dashoffset: 420;
+}
+
+.dh-loader__stroke--d {
+  animation: dh-loader-draw 0.78s cubic-bezier(0.22, 1, 0.36, 1) forwards 0.14s;
+}
+
+.dh-loader__stroke--h {
+  animation: dh-loader-draw 0.78s cubic-bezier(0.22, 1, 0.36, 1) forwards 0.38s;
+}
+
+@keyframes dh-loader-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes dh-loader-dot {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes dh-loader-name {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes dh-loader-orbit {
+  0%,
+  100% {
+    opacity: 0.42;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.76;
+    transform: scale(1.035);
+  }
+}
+
+@keyframes dh-loader-exit {
+  0%,
+  72% {
+    opacity: 1;
+    visibility: visible;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
 @layer base {
   *, *::before, *::after {
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
@@ -215,6 +374,38 @@ body.loader-skip::before,
 }
 
 @media (prefers-reduced-motion: reduce) {
+  body::before {
+    animation-duration: 0.2s;
+  }
+
+  .dh-loader {
+    animation-duration: 0.2s !important;
+  }
+
+  .dh-loader__orbit,
+  .dh-loader__orbit path,
+  .dh-loader__orbit circle,
+  .dh-loader__data path,
+  .dh-loader__stroke,
+  .dh-loader__stage span {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  .dh-loader__orbit path,
+  .dh-loader__data path,
+  .dh-loader__stroke {
+    stroke-dashoffset: 0;
+  }
+
+  .dh-loader__orbit,
+  .dh-loader__orbit circle,
+  .dh-loader__stage span {
+    opacity: 1;
+    transform: none;
+  }
+
   .loading-overlay--animate {
     animation-duration: 0.2s;
     animation-delay: 0.2s;
