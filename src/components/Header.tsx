@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, ChevronDown, Mail, Briefcase, Sun, Moon, Calendar } from "lucide-react";
+import { Menu, ChevronDown, Mail, Briefcase, Sun, Moon, Calendar, PenLine } from "lucide-react";
 import { getPublishedProjects, projectPath } from "@/data/projectData";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/ThemeProvider";
@@ -47,6 +47,7 @@ const Header: React.FC<IHeaderProps> = () => {
   };
 
   const isPortfolio = pathName?.startsWith("/portfolio") ?? false;
+  const isBlog = pathName?.startsWith("/blog") ?? false;
   const isCall = pathName === "/call";
 
   return (
@@ -102,6 +103,17 @@ const Header: React.FC<IHeaderProps> = () => {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
+
+          <Button
+            variant="ghost"
+            asChild
+            className={`text-sm ${isBlog ? "text-primary" : "text-muted-foreground"}`}
+          >
+            <Link href="/blog" aria-current={isBlog ? "page" : undefined}>
+              <PenLine className="mr-1 h-4 w-4" aria-hidden="true" />
+              Writing
+            </Link>
+          </Button>
 
           <Button
             variant="ghost"
@@ -180,6 +192,17 @@ const Header: React.FC<IHeaderProps> = () => {
               </div>
 
               <div className="space-y-1 pt-4 border-t border-border">
+                <Button
+                  variant="ghost"
+                  asChild
+                  className="w-full justify-start"
+                  onClick={() => setSheetOpen(false)}
+                >
+                  <Link href="/blog">
+                    <PenLine className="mr-2 h-4 w-4" aria-hidden="true" />
+                    Writing
+                  </Link>
+                </Button>
                 <Button
                   variant="ghost"
                   className="w-full justify-start"
