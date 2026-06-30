@@ -24,7 +24,7 @@ const MainContent: React.FC = () => {
               id="hero-title"
               className="heading-hero mb-4 md:mb-6"
             >
-              Hi, I&apos;m Davin.
+              Hi, I&apos;m Devin.
             </h1>
             <p className="text-lg md:text-xl lg:text-2xl mb-3 md:mb-4 text-foreground/90">
               I design, build, and ship production-grade AI and SaaS products.
