@@ -62,9 +62,35 @@ const config: Config = {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
+  		},
+  		typography: {
+  			DEFAULT: {
+  				css: {
+  					// Drive every prose color from the same HSL theme tokens used
+  					// across the site so a single `prose` class adapts to both the
+  					// dark (default) and `.light` themes without `prose-invert`.
+  					'--tw-prose-body': 'hsl(var(--foreground) / 0.86)',
+  					'--tw-prose-headings': 'hsl(var(--foreground))',
+  					'--tw-prose-lead': 'hsl(var(--muted-foreground))',
+  					'--tw-prose-links': 'hsl(var(--primary))',
+  					'--tw-prose-bold': 'hsl(var(--foreground))',
+  					'--tw-prose-counters': 'hsl(var(--muted-foreground))',
+  					'--tw-prose-bullets': 'hsl(var(--border))',
+  					'--tw-prose-hr': 'hsl(var(--border))',
+  					'--tw-prose-quotes': 'hsl(var(--foreground))',
+  					'--tw-prose-quote-borders': 'hsl(var(--primary))',
+  					'--tw-prose-captions': 'hsl(var(--muted-foreground))',
+  					'--tw-prose-code': 'hsl(var(--foreground))',
+  					'--tw-prose-pre-code': '#adbac7',
+  					'--tw-prose-pre-bg': '#22272e',
+  					'--tw-prose-th-borders': 'hsl(var(--border))',
+  					'--tw-prose-td-borders': 'hsl(var(--border))',
+  					maxWidth: 'none',
+  				}
+  			}
   		}
   	}
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
 };
 export default config;

@@ -117,6 +117,77 @@ html.loader-done body::before {
   }
 }
 
+/* Article prose: refinements on top of @tailwindcss/typography */
+.article-prose :where(h1, h2, h3, h4, h5, h6) {
+  scroll-margin-top: 6rem; /* clear the fixed header when jumping to anchors */
+}
+
+/* Heading anchor links (rehype-autolink-headings, behavior: "wrap").
+   Headings are wrapped in an <a>; keep them looking like headings. */
+.article-prose :where(h1, h2, h3, h4) a.heading-anchor {
+  color: inherit;
+  font-weight: inherit;
+  text-decoration: none;
+}
+
+.article-prose :where(h1, h2, h3, h4) a.heading-anchor:hover {
+  text-decoration: none;
+}
+
+/* Subtle "#" affordance that appears on heading hover */
+.article-prose :where(h2, h3, h4) a.heading-anchor::after {
+  content: "#";
+  margin-left: 0.4em;
+  color: hsl(var(--primary));
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.article-prose :where(h2, h3, h4):hover a.heading-anchor::after {
+  opacity: 0.6;
+}
+
+/* Inline code: drop the default backticks, add a soft chip */
+.article-prose :where(code):not(pre code)::before,
+.article-prose :where(code):not(pre code)::after {
+  content: none;
+}
+
+.article-prose :where(code):not(pre code) {
+  background: hsl(var(--muted));
+  padding: 0.15em 0.4em;
+  border-radius: 0.3rem;
+  font-size: 0.875em;
+  font-weight: 500;
+}
+
+/* Code blocks (rehype-pretty-code + shiki) keep their own dark theme in both
+   light and dark site modes; round the corners and let them breathe. */
+.article-prose :where(pre) {
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  padding: 1rem 1.15rem;
+  overflow-x: auto;
+}
+
+.article-prose :where(pre code) {
+  background: transparent;
+  padding: 0;
+  font-weight: 400;
+  counter-reset: line;
+}
+
+.article-prose fig[data-rehype-pretty-code-figure] {
+  margin: 1.75rem 0;
+}
+
+/* Code block language/title caption */
+.article-prose [data-rehype-pretty-code-title] {
+  font-size: 0.8rem;
+  color: hsl(var(--muted-foreground));
+  margin-bottom: 0.5rem;
+}
+
 /* Mobile viewport height fix - accounts for browser UI */
 @supports (height: 100dvh) {
   .min-h-screen-mobile {
