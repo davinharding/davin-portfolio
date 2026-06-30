@@ -4,10 +4,11 @@
 
 **Developer portfolio for Davin Harding**
 
-A modern, responsive portfolio showcasing 8+ years of full-stack development, from AI-powered products to Web3 applications.
+A modern, responsive portfolio showcasing 8+ years of full-stack work, now focused on shipping production-grade AI and SaaS products.
 
-[![Live Site](https://img.shields.io/badge/Live-davin.io-4A90D9?style=for-the-badge&logo=vercel&logoColor=white)](https://davin.io)
-[![Next.js](https://img.shields.io/badge/Next.js_15-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org)
+[![Live Site](https://img.shields.io/badge/Live-davin.io-4A90D9?style=for-the-badge&logo=vercel&logoColor=white)](https://www.davin.io)
+[![Next.js](https://img.shields.io/badge/Next.js_16-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org)
+[![React](https://img.shields.io/badge/React_18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://typescriptlang.org)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 
@@ -15,53 +16,74 @@ A modern, responsive portfolio showcasing 8+ years of full-stack development, fr
 
 ---
 
-## ✨ Features
+## Features
 
-- **Branded loading animation** with stroke-drawn DH monogram
-- **Dark/light theme** with smooth transitions
+- **Splash loading overlay** that paints before first JS and is skipped for repeat visits (no FOUC)
+- **Dark/light theme** with a no-flash boot script and smooth, scoped transitions
 - **Project showcase** with full-screen image lightbox and gallery navigation
-- **Interactive experience timeline** spanning software engineering, Web3, and AI
+- **Draft projects** that stay hidden from nav, listings, and the sitemap but remain previewable by direct URL
+- **Experience timeline** spanning AI product work, Web3, and traditional software engineering
 - **Calendly integration** for booking calls directly from the site
-- **GitHub contribution calendar** pulled live from the API
-- **Particle network background** for a dynamic, polished feel
+- **Animated canvas background** (floating gradient orbs) that pauses off-screen, on hidden tabs, and respects reduced motion
+- **SEO baked in**: per-route metadata, Open Graph/Twitter cards, JSON-LD `Person` schema, dynamic `sitemap.ts` and `robots.ts`
 - **Fully responsive** across desktop, tablet, and mobile
-- **Vercel Analytics** for traffic insights
+- **Analytics**: Vercel Analytics, with optional Google Analytics gated behind an env var
 
-## 🛠 Tech Stack
+## Tech Stack
 
 | Layer | Tech |
 |-------|------|
-| Framework | Next.js 15 (App Router) |
-| Language | TypeScript |
-| Styling | Tailwind CSS, Radix UI primitives |
-| Animations | CSS keyframes, react-awesome-reveal |
-| Icons | Lucide, Font Awesome Pro |
+| Framework | Next.js 16 (App Router) |
+| Runtime | React 18 |
+| Language | TypeScript 5 |
+| Styling | Tailwind CSS 3, CSS variables |
+| UI primitives | shadcn/ui (new-york style) on Radix UI |
+| Icons | Lucide |
 | Image lightbox | yet-another-react-lightbox |
-| Timeline | react-vertical-timeline-component |
+| Background FX | Custom HTML canvas (`WaveParticlesAlt`) |
 | Scheduling | react-calendly |
 | Deployment | Vercel |
-| Analytics | @vercel/analytics |
+| Analytics | @vercel/analytics (+ optional Google Analytics) |
 
-## 📁 Project Structure
+> The full, exact dependency versions live in [`package.json`](./package.json).
+
+## Project Structure
 
 ```
 src/
 ├── app/
-│   ├── page.tsx            # Home: hero, projects grid, experience timeline
-│   ├── portfolio/[name]/   # Dynamic project detail pages
-│   ├── call/               # Book a Call (Calendly embed)
-│   └── about/              # About page
+│   ├── layout.tsx            # Root layout: metadata, JSON-LD, theme boot script, analytics
+│   ├── page.tsx              # Home: hero, projects, skills, experience timeline
+│   ├── globals.css           # Tailwind layers, theme tokens, splash overlay
+│   ├── robots.ts             # Generated robots.txt
+│   ├── sitemap.ts            # Generated sitemap (published projects only)
+│   ├── portfolio/
+│   │   ├── page.tsx          # Projects index
+│   │   └── [name]/           # Dynamic project detail pages + gallery/lightbox
+│   └── call/                 # Book a Call (Calendly embed)
 ├── components/
-│   ├── Header.tsx           # Fixed nav with theme toggle
-│   ├── LoadingAnimation.tsx # DH monogram intro animation
-│   ├── ImageLightbox.tsx    # Full-screen gallery viewer
-│   ├── ThemeProvider.tsx    # Dark/light mode context
-│   └── ui/                  # Radix-based UI primitives
-└── data/
-    └── projectData.ts       # Project metadata, screenshots, tech stacks
+│   ├── Header.tsx            # Fixed nav: portfolio dropdown, theme toggle, mobile sheet
+│   ├── Footer.tsx
+│   ├── HeaderFooter.tsx      # Page shell (header + main + footer)
+│   ├── MainContent.tsx       # Hero section
+│   ├── ProjectsSection.tsx / ProjectCard.tsx
+│   ├── SkillBadgeSection.tsx
+│   ├── Timeline.tsx
+│   ├── ThemeProvider.tsx     # Dark/light context
+│   ├── LoadingAnimation.tsx  # Splash sequence
+│   ├── WaveParticlesAlt.tsx  # Canvas background
+│   └── ui/                   # shadcn/ui primitives (button, card, badge, sheet, ...)
+├── data/
+│   ├── projectData.ts        # Projects, tags, draft flag, path helpers
+│   ├── skillBadgeData.ts     # Skill badges + logos
+│   └── timelineData.ts       # Work history
+├── lib/
+│   └── utils.ts              # cn() class merge helper
+└── types/
+    └── svg.d.ts              # SVG import typing
 ```
 
-## 🚀 Getting Started
+## Getting Started
 
 ```bash
 # Clone
@@ -75,17 +97,33 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+Open [http://localhost:3000](http://localhost:3000).
 
-## 🌐 Deployment
+### Scripts
+
+| Command | What it does |
+|---------|--------------|
+| `npm run dev` | Start the local dev server |
+| `npm run build` | Production build |
+| `npm run start` | Serve the production build |
+| `npm run lint` | ESLint (`--max-warnings=0`) |
+| `npm run typecheck` | `tsc --noEmit` |
+
+### Environment Variables
+
+| Variable | Required | Purpose |
+|----------|----------|---------|
+| `NEXT_PUBLIC_GOOGLE_ANALYTICS` | No | Google Analytics measurement ID. When unset, the GA script is not rendered. |
+
+## Deployment
 
 Deployed on **Vercel** with automatic deploys on push to `main`.
 
-## 📬 Contact
+## Contact
 
-- **Portfolio**: [davin.io](https://davin.io)
+- **Portfolio**: [davin.io](https://www.davin.io)
 - **GitHub**: [@davinharding](https://github.com/davinharding)
-- **Instagram**: [@hi_im_davin](https://instagram.com/hi_im_davin)
+- **LinkedIn**: [davinharding](https://www.linkedin.com/in/davinharding/)
 
 ---
 
