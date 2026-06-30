@@ -20,6 +20,7 @@ A modern, responsive portfolio showcasing 8+ years of full-stack development, fr
 - **Branded loading animation** with stroke-drawn DH monogram
 - **Dark/light theme** with smooth transitions
 - **Project showcase** with full-screen image lightbox and gallery navigation
+- **Writing / blog** — Git-native, type-safe Markdown posts (Velite) with an editorial layout, tag filtering, RSS feed, and a hand-written voice corpus (see [`BLOG.md`](./BLOG.md))
 - **Interactive experience timeline** spanning software engineering, Web3, and AI
 - **Calendly integration** for booking calls directly from the site
 - **GitHub contribution calendar** pulled live from the API
@@ -47,19 +48,31 @@ A modern, responsive portfolio showcasing 8+ years of full-stack development, fr
 ```
 src/
 ├── app/
-│   ├── page.tsx            # Home: hero, projects grid, experience timeline
+│   ├── page.tsx            # Home: hero, projects, writing, skills, timeline
 │   ├── portfolio/[name]/   # Dynamic project detail pages
+│   ├── blog/               # Writing index + /blog/[slug] article pages
+│   ├── feed.xml/           # RSS feed route
 │   ├── call/               # Book a Call (Calendly embed)
 │   └── about/              # About page
 ├── components/
 │   ├── Header.tsx           # Fixed nav with theme toggle
+│   ├── WritingSection.tsx   # Landing-page "Writing" block
+│   ├── blog/                # PostCard, FeaturedPost
 │   ├── LoadingAnimation.tsx # DH monogram intro animation
 │   ├── ImageLightbox.tsx    # Full-screen gallery viewer
 │   ├── ThemeProvider.tsx    # Dark/light mode context
 │   └── ui/                  # Radix-based UI primitives
+├── content/
+│   └── blog/                # Hand-written Markdown/MDX posts (the voice corpus)
+├── lib/
+│   └── blog.ts              # Typed queries over the Velite content layer
 └── data/
     └── projectData.ts       # Project metadata, screenshots, tech stacks
 ```
+
+Content is authored in `src/content/blog/` and compiled by [Velite](https://velite.js.org)
+into a type-safe data layer. See [`BLOG.md`](./BLOG.md) for the authoring
+workflow and the hand-written-only voice-corpus convention.
 
 ## 🚀 Getting Started
 
