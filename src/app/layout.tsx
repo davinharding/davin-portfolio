@@ -15,9 +15,9 @@ const inter = Inter({
 
 const SITE_URL = "https://www.davin.io";
 const SITE_NAME = "Davin Harding";
-const SITE_TITLE = "Davin Harding — Senior Full-Stack & AI Product Engineer";
+const SITE_TITLE = "Davin Harding — Senior Full-Stack AI Engineer";
 const SITE_DESCRIPTION =
-  "I design, build, and ship production-grade AI and SaaS products. 8+ years of full-stack experience across Next.js, TypeScript, AI integrations, and Web3.";
+  "I design, build, and ship production-grade AI and SaaS products. 8+ years of full-stack experience across agentic systems, Next.js, TypeScript, enterprise SaaS, and Web3.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -99,7 +99,7 @@ const personJsonLd = {
   name: "Davin Harding",
   url: SITE_URL,
   image: `${SITE_URL}/new_profile_pic.png`,
-  jobTitle: "Senior Full-Stack & AI Product Engineer",
+  jobTitle: "Senior Full-Stack AI Engineer",
   description: SITE_DESCRIPTION,
   worksFor: {
     "@type": "Organization",

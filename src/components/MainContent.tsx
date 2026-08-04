@@ -18,7 +18,7 @@ const MainContent: React.FC = () => {
           {/* Left: Text Content */}
           <div className="order-2 lg:order-1">
             <Badge variant="secondary" className="mb-3 md:mb-4">
-              Senior Full-Stack Engineer
+              Senior Full-Stack AI Engineer
             </Badge>
             <h1
               id="hero-title"

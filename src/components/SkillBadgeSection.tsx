@@ -9,6 +9,10 @@ import { Badge } from "@/components/ui/badge";
 // Organize skills into categories
 const skillCategories: { title: string; skills: string[] }[] = [
   {
+    title: "AI & Agentic Systems",
+    skills: ["OpenAI", "Anthropic", "Gemini", "LangChain", "Replicate"],
+  },
+  {
     title: "Core Stack",
     skills: [
       "TypeScript",
@@ -20,10 +24,6 @@ const skillCategories: { title: string; skills: string[] }[] = [
       "TailwindCSS",
       "MaterialUI",
     ],
-  },
-  {
-    title: "AI & LLMs",
-    skills: ["OpenAI", "Anthropic", "Gemini", "LangChain", "Replicate"],
   },
   {
     title: "Cloud & DevOps",
@@ -40,12 +40,12 @@ const skillCategories: { title: string; skills: string[] }[] = [
     ],
   },
   {
-    title: "Web3 & Blockchain",
-    skills: ["Solidity", "Ethers.js", "web3js", "Hardhat", "IPFS", "Arweave"],
-  },
-  {
     title: "Payments & Tools",
     skills: ["Stripe", "Shopify", "NPM", "Jest"],
+  },
+  {
+    title: "Web3 & Blockchain",
+    skills: ["Solidity", "Ethers.js", "web3js", "Hardhat", "IPFS", "Arweave"],
   },
 ];
 
