@@ -19,10 +19,10 @@ export const timelineData: TimelineElement[] = [
   },
   {
     id: 1,
-    role: "Senior Software Engineer",
+    role: "Senior Software Engineer — AI Platform & Full-Stack Product Systems",
     orgAndLocation: "ApparelMagic, West Palm Beach, FL",
     summary:
-      "Leading AI product development for fashion industry ERP platform. Shipped AI Designer enabling prompt-to-garment visualization with ERP integration. Currently architecting data-driven, independently deployable AI agents for enterprise automation.",
+      "Architected and led the build of ApparelMagic Intelligence, an embedded enterprise AI platform spanning configurable agents, Copilot, scheduled and asynchronous jobs, tool-driven ERP actions, permissions, approval controls, and operational workflows across inventory, sales, finance, and product development. Also architected AI Designer, a conversational product-design system that turns natural-language prompts into garment visualizations and draft ERP product data. Built collaboratively, with hardening and final engineering passes from the CEO/lead engineer.",
     date: "2024-06 => Present",
     link: "https://apparelmagic.com/",
   },
@@ -41,7 +41,7 @@ export const timelineData: TimelineElement[] = [
     orgAndLocation: "Davin Harding, Fort Lauderdale, FL",
     summary:
       "Provided comprehensive consultation and development services for NFT collections, encompassing web3 front ends, smart contract deployment, integrated e-commerce, and backend user data management.",
-    date: "2022-01 => Present",
+    date: "2022-01 => 2024-06",
     link: "https://davin.io",
   },
   {
@@ -58,7 +58,7 @@ export const timelineData: TimelineElement[] = [
     role: "Software Consultant",
     orgAndLocation: "Maryville Consulting Group, St. Louis, MO",
     summary:
-      "Led ITSM application projects for Fortune 500 clients as an Associate Consultant and played a pivotal role in modernizing data access for Canada's 2nd largest grain distributor as a Senior Associate. As an Independent Consultant, contributed to a data-driven application for a Fortune 50 health administration client and provided technical support to team members.",
+      "Led ITSM application projects for Fortune 500 clients as an Associate Consultant and played a key role in modernizing data access for Canada's 2nd largest grain distributor as a Senior Associate. As an Independent Consultant, contributed to a data-driven application for a health administration client that ranked within both the Fortune 40 and Fortune 50 during the relevant period, and provided technical support to team members.",
     date: "2019-01 => 2021-08",
     link: "https://maryville.com/",
   },
