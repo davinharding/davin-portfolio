@@ -18,6 +18,10 @@ import StageSnapDashboard from "../../public/projectScreenshots/stagesnap_dashbo
 import StageSnapWorkspace from "../../public/projectScreenshots/stagesnap_workspace.png";
 import StageSnapPricing from "../../public/projectScreenshots/stagesnap_pricing.png";
 import StageSnapBilling from "../../public/projectScreenshots/stagesnap_billing.png";
+import AmiDashboard from "../../public/projectScreenshots/ami_dashboard.png";
+import AmiAsk from "../../public/projectScreenshots/ami_ask.png";
+import AmiAct from "../../public/projectScreenshots/ami_act.png";
+import AmiMonitor from "../../public/projectScreenshots/ami_monitor.png";
 
 import TypeScriptLogo from "../../public/logos/Typescript_logo.png";
 import NodejsLogo from "../../public/logos/nodejs_logo.png";
@@ -45,21 +49,21 @@ import SolidityLogo from "../../public/logos/solidity_logo.png";
 import ShopifyLogo from "../../public/logos/shopify_logo.png";
 import StripeLogo from "../../public/logos/stripe_logo.png";
 import LangChainLogo from "../../public/logos/langchain_logo.svg?url";
-import AnthropicLogo from "../../public/logos/anthropic_logo.svg?url";
 import OpenAILogo from "../../public/logos/openai_logo.svg?url";
 import SupabaseLogo from "../../public/logos/supabase_logo.svg?url";
 import ClerkLogo from "../../public/logos/clerk_logo.svg?url";
 import ReplicateLogo from "../../public/logos/replicate_logo.svg?url";
 import SentryLogo from "../../public/logos/sentry_logo.svg?url";
-import GeminiLogo from "../../public/logos/gemini_logo.svg?url";
 import NestjsLogo from "../../public/logos/nestjs_logo.svg?url";
-import RedisLogo from "../../public/logos/redis_logo.svg?url";
-import MailgunLogo from "../../public/logos/mailgun_logo.svg?url";
-import LangGraphLogo from "../../public/logos/langgraph_logo.svg?url";
 
 export type ProjectTag = {
   title: string;
   icon: StaticImageData;
+};
+
+export type ProjectRelatedLink = {
+  label: string;
+  href: string;
 };
 
 export type Project = {
@@ -71,6 +75,8 @@ export type Project = {
   title: string;
   previewDescription: string;
   description?: string;
+  capabilities?: string[];
+  relatedLinks?: ProjectRelatedLink[];
   projectTags: ProjectTag[];
   githubLink?: string;
   demoLink?: string;
@@ -114,17 +120,12 @@ const projectTags: { [key: string]: ProjectTag } = {
   Shopify: { title: "Shopify", icon: ShopifyLogo },
   Stripe: { title: "Stripe", icon: StripeLogo },
   LangChain: { title: "LangChain", icon: LangChainLogo },
-  Anthropic: { title: "Anthropic", icon: AnthropicLogo },
   OpenAI: { title: "OpenAI", icon: OpenAILogo },
   Supabase: { title: "Supabase", icon: SupabaseLogo },
   Clerk: { title: "Clerk", icon: ClerkLogo },
   Replicate: { title: "Replicate", icon: ReplicateLogo },
   Sentry: { title: "Sentry", icon: SentryLogo },
-  Gemini: { title: "Gemini", icon: GeminiLogo },
   NestJS: { title: "NestJS", icon: NestjsLogo },
-  Redis: { title: "Redis", icon: RedisLogo },
-  Mailgun: { title: "Mailgun", icon: MailgunLogo },
-  LangGraph: { title: "LangGraph", icon: LangGraphLogo },
 };
 
 /**
@@ -150,6 +151,73 @@ export const projectPath = (name: string): string =>
   `/portfolio/${encodeURIComponent(name)}`;
 
 export const projects: Project[] = [
+  {
+    image: AmiDashboard,
+    image2: AmiMonitor,
+    image3: AmiAsk,
+    image4: AmiAct,
+    title: "ApparelMagic AI Agents",
+    name: "ApparelMagic AI Agents",
+    previewDescription:
+      "Domain-specialized AI agents embedded in ApparelMagic's ERP: scheduled jobs, tool-driven data access, insight generation, and approval-controlled actions across inventory, sales, finance, and product development.",
+    description:
+      `I architected and led the build of ApparelMagic's AI agent platform, working collaboratively with the team and incorporating hardening and final engineering passes from ApparelMagic's CEO/lead engineer. AI Designer is covered in its own case study; this one is about the agents.
+      |
+      The core problem was turning a system of record into something that could monitor operations and act on them. I built configurable agents with their own instructions and business context, then wired them to pre-built tools that read ApparelMagic data and return real operational insights: stock and backorders, customer and account risk, invoices and margins, product demand and assortment.
+      |
+      A lot of the hard learning was in the execution model. Agent jobs needed queue-based async execution so scheduled and long-running work could happen reliably without blocking the app. That meant designing for retries, concurrency, and progress that operators could actually trust when agents ran overnight or across large datasets.
+      |
+      Tool design mattered as much as the models. Rather than dumping raw ERP tables into prompts, agents called purpose-built tools against inventory, sales, finance, and product-development data, then reasoned over structured results. That kept answers grounded and made it possible to draft actions the business could review.
+      |
+      One of the more useful patterns was LLM digestion of those results into customer-facing work: data-aware bulk email drafts for sales and customer engagement, plus custom reporting that turned agent findings into something a human could send or act on. Permissions, approval gates, and auto-approval controls sat in front of anything that wrote back to the system.
+      |
+      Shipping this taught me how much agent quality depends on tool boundaries, job orchestration, and human-in-the-loop controls, not just prompt quality.`,
+    capabilities: [
+      "Configurable AI agents with instructions and business context",
+      "Queue-based async job execution for scheduled and long-running work",
+      "Pre-built agent tools over ApparelMagic ERP data",
+      "Inventory, sales, finance, and product-development workflows",
+      "LLM-digested insights and custom reporting",
+      "Data-aware bulk email drafts for sales and customer engagement",
+      "Tool-driven ERP record actions",
+      "Permission and approval controls",
+      "Evaluation, testing, and production hardening",
+    ],
+    relatedLinks: [
+      {
+        label: "Inventory Agent",
+        href: "https://apparelmagic.com/apparelmagic-intelligence/inventory-agent/",
+      },
+      {
+        label: "Sales Agent",
+        href: "https://apparelmagic.com/apparelmagic-intelligence/sales-agent/",
+      },
+      {
+        label: "Finance Agent",
+        href: "https://apparelmagic.com/apparelmagic-intelligence/finance-agent/",
+      },
+      {
+        label: "Product Dev Agent",
+        href: "https://apparelmagic.com/apparelmagic-intelligence/product-dev-agent/",
+      },
+      {
+        label: "Custom Agents",
+        href: "https://apparelmagic.com/apparelmagic-intelligence/custom-agents/",
+      },
+    ],
+    projectTags: [
+      projectTags.TypeScript,
+      projectTags.React,
+      projectTags.Nextjs,
+      projectTags.Nodejs,
+      projectTags.NestJS,
+      projectTags.Postgres,
+      projectTags.AWS,
+      projectTags.OpenAI,
+      projectTags.LangChain,
+    ],
+    liveLink: "https://apparelmagic.com/apparelmagic-intelligence/",
+  },
   {
     image: StageSnapLanding,
     image2: StageSnapPricing,
@@ -187,56 +255,21 @@ export const projects: Project[] = [
     liveLink: "https://stagesnap.xyz",
   },
   {
-    draft: true,
-    title: "AI Agent Platform",
-    name: "AI Agent Platform",
-    previewDescription:
-      "A multi-tenant agentic system built into ApparelMagic's enterprise ERP — domain-specialized AI Agents that run on schedules, process inbound emails, and chat with users via a tool-calling LangGraph orchestration layer.",
-    description:
-      `The AI Agent Platform is a multi-tenant agentic system I built into ApparelMagic's enterprise SaaS — every customer gets a roster of domain-specialized AI Agents (Sales, Inventory, Finance, Product Development, plus fully custom agents) alongside a general-purpose Copilot with read access to the full platform.
-      |
-      The thesis was simple: ERP users don't want another dashboard, they want delegation.  Each agent runs on a schedule via BullMQ-driven cron jobs, processes inbound emails sent to its own slug.subdomain@domain.ai address through Mailgun webhooks, and chats in an inbox-style UI with real-time SSE streaming — all while operating under a CASL-enforced user-group permission model that mirrors the platform's existing human RBAC.
-      |
-      The most interesting engineering problem was the orchestration layer.  I built the core on LangGraph, modeling each interaction as a state machine: prompt assembly with agent-specific building blocks → tier-based model selection (Fast / Default / Premium) → tool-calling loop with streamed progress → history compaction once conversations outgrow the context window.  Tools are decorated with @ToolPermission and check the agent's abilities before executing, which keeps a Sales agent from ever touching cost data and a Finance agent from sending customer-facing emails by accident.
-      |
-      Multi-tenancy was the other hard problem.  Every request — HTTP, queue job, or email webhook — acquires a tenant-bound TypeORM QueryRunner stored in CLS, and the base data service throws if a tenant is set without a runner attached.  That single invariant turned out to be the most valuable safety rail in the system: it makes cross-tenant data leaks structurally impossible rather than something you have to remember to check.
-      |
-      On the frontend, the inbox-style React/Next.js SPA uses React Query for server state, SSE for token streaming, and URL-as-source-of-truth for navigation so deep links and refreshes always work.  The platform is currently shipping into Professional, Enterprise, and Ultimate ApparelMagic tiers and is the foundation for a broader push into agentic workflows in the apparel and fashion industry — moving the product from a system of record toward a system of action.
-      `,
-    projectTags: [
-      projectTags.TypeScript,
-      projectTags.Nodejs,
-      projectTags.NestJS,
-      projectTags.React,
-      projectTags.Nextjs,
-      projectTags.LangChain,
-      projectTags.LangGraph,
-      projectTags.OpenAI,
-      projectTags.Anthropic,
-      projectTags.Postgres,
-      projectTags.Redis,
-      projectTags.Mailgun,
-      projectTags.Sentry,
-      projectTags.AWS,
-    ],
-  },
-  {
     image: AIDesigner1,
     image2: AIDesigner2,
     image3: AIDesigner3,
     title: "AI Designer",
     name: "AI Designer",
     previewDescription:
-      "A generative AI tool for fashion designers that transforms text prompts into photorealistic garment visualizations, fully integrated with ApparelMagic's ERP platform.",
+      "A conversational AI design system for fashion teams that turns natural-language prompts into garment visualizations, supports guided and advanced workflows, and connects approved designs to draft ERP catalog data.",
     description:
-      `AI Designer was my first major release at ApparelMagic and represents a significant pivot in my career into AI/ML product development.  The tool enables fashion designers to go from idea to photorealistic garment visualization in seconds using natural language prompts.
+      `AI Designer was my first major release at ApparelMagic and marked my pivot into AI product development. I architected a conversation-based design system that turns natural-language prompts into photorealistic garment visualizations for fashion teams.
       |
-      The technical challenge here was building a conversation-based design system that could understand fashion terminology and translate it into consistent, high-quality image generations.  I architected the system with two modes - a Basic Mode that guides users through garment creation with dynamic, targeted questions, and an Advanced Mode for experienced users who want direct prompt control.
+      The system supports two workflows. Basic Mode guides users through garment creation with dynamic, targeted questions. Advanced Mode gives experienced users direct prompt control when they already know what they want.
       |
-      One of the most satisfying aspects of this project was the deep ERP integration.  Generated designs automatically come with draft product metadata - style numbers, descriptions, and all the data needed to push directly into the ApparelMagic catalog or eCommerce storefronts with a single click.  This workflow eliminates the traditional sample development cycle, potentially saving brands up to 90% on prototyping costs.
+      Generated designs include draft product metadata such as style numbers and descriptions, so approved concepts can move into the ApparelMagic catalog or connected e-commerce workflows. Branding controls lock in approved models, poses, and studio lighting so renders stay on-brand across collections.
       |
-      The branding control features allow companies to lock in approved models, poses, and studio lighting so AI renders stay 100% on-brand across collections.  It's been exciting to see fashion brands adopt this tool for pre-order campaigns, trend response, and dramatically accelerated development cycles.
-      `,
+      ApparelMagic's marketing materials estimate up to 90% savings on prototyping costs versus traditional sample development. That is their marketing estimate, not a measured result from my work.`,
     projectTags: [
       projectTags.TypeScript,
       projectTags.React,
@@ -246,7 +279,7 @@ export const projects: Project[] = [
       projectTags.Postgres,
       projectTags.AWS,
     ],
-    liveLink: "https://apparelmagic.com/ai-product-designer/",
+    liveLink: "https://apparelmagic.com/apparelmagic-intelligence/ai-designer/",
   },
   {
     image: Mintly,
@@ -257,16 +290,13 @@ export const projects: Project[] = [
     title: "Mintly",
     name: "Mintly",
     previewDescription:
-      "A comprehensive toolset for NFT creators to build, deploy and maintain digital collectibles with multi tenet support for teams and agencies.",
+      "A multi-tenant NFT launch platform covering data collection, art generation, storage, one-click deployment, and post-deployment contract management. Reached 99% completion before stakeholders sunset it; never publicly released.",
     description:
-      `Mintly is the culmination of learnings from several technical implementations Palm Tree NFT has done for its various NFT clients.  It is an effort to build a tool that allows an NFT creator to accomplish all of the technical tasks of launching an NFT project through an efficient guided experience.
+      `Led Mintly, a multi-tenant NFT launch platform covering data collection, art generation, storage, one-click deployment, and post-deployment contract management. The platform reached 99% completion before stakeholders sunset it due to changing market conditions and was not publicly released.
       |
-      This includes data collection, art generation, storage, one-click deployment and post-deployment contract management.  Additionally, it is built with a multi-tenancy architecture making it perfect for teams to collaborate together.  This is also great for agencies allowing them to deploy and manage multiple projects for their clients.
+      Mintly grew out of technical implementations Palm Tree NFT had done for NFT clients. The goal was a guided tool that let creators complete the technical work of launching a project, with multi-tenancy for teams and agencies managing multiple collections.
       |
-      As the lead engineer on this project it was exciting and challenging to take on such an ambitious problem. Unfortunately, Mintly was sunsetted by stakeholders due to shifting market conditions and was never publicly released.  Despite bringing the platform to 99% completion, the decision was made before launch.  
-      |
-      It remains one of the most technically ambitious projects I've led and I'm proud of what we were able to build together.
-      `,
+      It remains one of the most technically ambitious projects I've led, even though it never shipped publicly.`,
     projectTags: [
       projectTags.TypeScript,
       projectTags.React,
@@ -281,7 +311,6 @@ export const projects: Project[] = [
       projectTags.Serverless,
       projectTags.Stripe,
     ],
-    liveLink: "https://mintlyapp.com/",
   },
   {
     image: DavinPortfolioHome,

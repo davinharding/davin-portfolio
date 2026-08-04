@@ -134,6 +134,23 @@ const PortfolioProjectDetail = async ({
           )}
         </div>
 
+        {project.relatedLinks?.length ? (
+          <div className="flex flex-wrap gap-2 mb-6">
+            {project.relatedLinks.map((relatedLink) => (
+              <Button key={relatedLink.href} variant="outline" asChild size="sm">
+                <Link
+                  href={relatedLink.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <ExternalLink className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
+                  {relatedLink.label}
+                </Link>
+              </Button>
+            ))}
+          </div>
+        ) : null}
+
         {/* Tech Stack */}
         <div className="flex flex-wrap gap-2 mb-8">
           {project.projectTags.map((tag, idx) => (
@@ -155,6 +172,22 @@ const PortfolioProjectDetail = async ({
             ))}
           </div>
         )}
+
+        {project.capabilities?.length ? (
+          <div className="mb-12">
+            <h2 className="text-lg font-semibold mb-4">Capabilities</h2>
+            <ul className="grid gap-2 sm:grid-cols-2 list-none pl-0">
+              {project.capabilities.map((capability) => (
+                <li
+                  key={capability}
+                  className="text-sm text-muted-foreground leading-relaxed before:content-['•'] before:mr-2 before:text-primary"
+                >
+                  {capability}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
 
         {/* Additional screenshots — hero already shows image #1 */}
         {project.image2 && <ProjectGallery project={project} skip={1} />}
