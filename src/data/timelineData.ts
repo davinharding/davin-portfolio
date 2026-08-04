@@ -13,7 +13,7 @@ export const timelineData: TimelineElement[] = [
     role: "Founder",
     orgAndLocation: "Harding Labs, Fort Lauderdale, FL",
     summary:
-      "Founded Harding Labs, a product studio focused on building and launching AI-native applications. First product is StageSnap, an AI-powered real estate photo staging platform that transforms empty or cluttered rooms into beautifully staged listings. Building from zero to paying customers.",
+      "Founded Harding Labs, a product studio focused on building and launching AI-native applications. Products include StageSnap (AI real estate photo staging) and Vibecation (Instagram Travel DNA trip planning). Building from zero to paying customers.",
     date: "2025-11 => Present",
     link: "https://hardinglabs.io",
   },

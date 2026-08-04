@@ -22,6 +22,11 @@ import AmiDashboard from "../../public/projectScreenshots/ami_dashboard.png";
 import AmiAsk from "../../public/projectScreenshots/ami_ask.png";
 import AmiAct from "../../public/projectScreenshots/ami_act.png";
 import AmiMonitor from "../../public/projectScreenshots/ami_monitor.png";
+import VibecationLanding from "../../public/projectScreenshots/vibecation_landing.png";
+import VibecationFlow from "../../public/projectScreenshots/vibecation_flow.png";
+import VibecationDestinations from "../../public/projectScreenshots/vibecation_destinations.png";
+import VibecationPricing from "../../public/projectScreenshots/vibecation_pricing.png";
+import VibecationQuiz from "../../public/projectScreenshots/vibecation_quiz.png";
 
 import TypeScriptLogo from "../../public/logos/Typescript_logo.png";
 import NodejsLogo from "../../public/logos/nodejs_logo.png";
@@ -50,6 +55,7 @@ import ShopifyLogo from "../../public/logos/shopify_logo.png";
 import StripeLogo from "../../public/logos/stripe_logo.png";
 import LangChainLogo from "../../public/logos/langchain_logo.svg?url";
 import OpenAILogo from "../../public/logos/openai_logo.svg?url";
+import AnthropicLogo from "../../public/logos/anthropic_logo.svg?url";
 import SupabaseLogo from "../../public/logos/supabase_logo.svg?url";
 import ClerkLogo from "../../public/logos/clerk_logo.svg?url";
 import ReplicateLogo from "../../public/logos/replicate_logo.svg?url";
@@ -121,6 +127,7 @@ const projectTags: { [key: string]: ProjectTag } = {
   Stripe: { title: "Stripe", icon: StripeLogo },
   LangChain: { title: "LangChain", icon: LangChainLogo },
   OpenAI: { title: "OpenAI", icon: OpenAILogo },
+  Anthropic: { title: "Anthropic", icon: AnthropicLogo },
   Supabase: { title: "Supabase", icon: SupabaseLogo },
   Clerk: { title: "Clerk", icon: ClerkLogo },
   Replicate: { title: "Replicate", icon: ReplicateLogo },
@@ -217,6 +224,48 @@ export const projects: Project[] = [
       projectTags.LangChain,
     ],
     liveLink: "https://apparelmagic.com/apparelmagic-intelligence/",
+  },
+  {
+    image: VibecationLanding,
+    image2: VibecationFlow,
+    image3: VibecationDestinations,
+    image4: VibecationPricing,
+    image5: VibecationQuiz,
+    title: "Vibecation",
+    name: "Vibecation",
+    previewDescription:
+      "Drop an Instagram @ and get your Travel DNA in ~30 seconds: traveler archetype, three matched destinations, and a $7 day-by-day trip you can refine with Polo.",
+    description:
+      `Vibecation is a Harding Labs product. Drop an Instagram handle, get a Travel DNA and a trip plan. No signup, no password, no subscription.
+      |
+      The core problem: travel planning defaults to generic top-10 lists that ignore how someone actually likes to move through a place. Instagram already encodes taste (scenery, food, pace, aesthetic), but Instagram OAuth for personal accounts is effectively dead after the Basic Display API shutdown. Vibecation reads public grids instead, so the demo is the funnel.
+      |
+      I built the full product from scratch. Enter an @ and a vision model analyzes the last ~30 public posts into a traveler archetype, vibe keywords, and three destination matches. That Travel DNA ships free as a 9:16 share card meant to be screenshot into Stories.
+      |
+      The paid unlock is a $7 day-by-day itinerary with a blurred teaser paywall, guest Stripe Checkout (Apple Pay and Google Pay), and Polo, a parrot travel agent that streams itinerary tweaks within a per-trip message budget. Private accounts or no Instagram fall back to a five-question taste quiz.
+      |
+      The harder engineering was the ownership model without accounts. httpOnly cookies, claim links, and optional email magic links cover resume across devices, while public DNA URLs stay shareable without leaking planned trips. Handle-level caching keeps free-user cost down. Stack is Next.js on Vercel, Anthropic Claude for vision, DNA, itineraries, and chat, HikerAPI for Instagram scraping, Supabase Postgres, Stripe, and Resend.`,
+    capabilities: [
+      "Instagram public-grid analysis into Travel DNA",
+      "Traveler archetype plus three destination matches",
+      "Story-ready 9:16 share cards",
+      "Five-question taste quiz fallback for private or missing Instagram",
+      "Blurred itinerary teaser with $7 per-trip Stripe unlock",
+      "Polo chat agent for itinerary refinements",
+      "Guest checkout with Apple Pay and Google Pay",
+      "Cookie, claim-link, and email magic-link ownership without accounts",
+    ],
+    projectTags: [
+      projectTags.TypeScript,
+      projectTags.React,
+      projectTags.Nextjs,
+      projectTags.Tailwind,
+      projectTags.Anthropic,
+      projectTags.Supabase,
+      projectTags.Stripe,
+      projectTags.Vercel,
+    ],
+    liveLink: "https://vibecation.xyz",
   },
   {
     image: StageSnapLanding,
