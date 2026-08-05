@@ -1,0 +1,73 @@
+---
+title: Formatting reference
+description: A kitchen-sink post that exercises every element the blog can render — headings, lists, quotes, code, and tables.
+date: 2026-06-29
+tags:
+  - meta
+  - reference
+sample: true
+---
+
+This is the second sample post. It exists to show how each Markdown element is
+styled so you can see the design before writing real content. Delete it when
+you're done looking.
+
+## Headings give the page its spine
+
+Use them in order. A page reads best when the hierarchy is honest.
+
+### A third-level heading
+
+Body text sits at a comfortable measure for long-form reading. Links like
+[this one](https://www.davin.io) pick up the accent color, and inline emphasis
+comes in both *italic* and **bold**.
+
+## Lists
+
+Unordered lists are good for loose collections:
+
+- A first point
+- A second point with a bit more detail to show how wrapping behaves
+- A third point
+
+Ordered lists imply sequence:
+
+1. Set up the content layer
+2. Write the post
+3. Ship it
+
+## Quotes
+
+> Design is not just what it looks like and feels like. Design is how it works.
+
+A blockquote is a nice way to pull a single idea out of the flow.
+
+## Code
+
+Inline code such as `npm run build` stays readable inside a sentence. Fenced
+blocks get syntax highlighting:
+
+```ts
+type Post = {
+  title: string;
+  date: string;
+  tags: string[];
+};
+
+function isRecent(post: Post): boolean {
+  const aMonthAgo = Date.now() - 1000 * 60 * 60 * 24 * 30;
+  return new Date(post.date).getTime() > aMonthAgo;
+}
+```
+
+## Tables
+
+| Element     | Purpose                          |
+| ----------- | -------------------------------- |
+| Heading     | Structure and navigation         |
+| Blockquote  | Emphasis on a single idea        |
+| Code block  | Show, don't tell                 |
+
+---
+
+That's the full set. If it looks right here, it'll look right everywhere.

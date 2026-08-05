@@ -1,0 +1,56 @@
+---
+title: Welcome to the writing section
+description: A quick note on what this space is for, how posts are stored, and why everything here is written by hand.
+date: 2026-06-30
+tags:
+  - meta
+  - writing
+sample: true
+featured: true
+---
+
+This is a sample post. It ships with the blog so the layout has something to
+render — delete it (and the other sample) once your own writing lives here.
+
+## What this space is for
+
+This is a place for long-form notes: things I've figured out, opinions I've
+changed my mind on, and the occasional deep dive. Everything here is written
+by hand, start to finish. No drafts generated for me, no "polish this up"
+passes. The point is to keep an honest record of how I actually think and
+write.
+
+Over time that record becomes useful in a second way: it's a reference for my
+voice. When I hand a tool a pile of my own words, it has something real to
+learn from instead of guessing.
+
+## How posts are stored
+
+Each post is a single Markdown file in `src/content/blog/`. That's the whole
+storage layer — plain text, versioned in git, no database and no external
+service to log into. A post is just frontmatter and prose:
+
+```mdx
+---
+title: A good title
+description: One sentence that sells the read.
+date: 2026-07-01
+tags:
+  - engineering
+---
+
+Then you just write.
+```
+
+The frontmatter is validated at build time, so a missing title or a malformed
+date fails loudly instead of shipping broken.
+
+## Why it's built this way
+
+A few things mattered more than anything else:
+
+- **I own it.** The words sit in my repository, not someone else's dashboard.
+- **It's durable.** Plain Markdown will still open in twenty years.
+- **It's reviewable.** Every edit is a diff with full history.
+
+That's the entire philosophy. Now, the writing.

@@ -41,7 +41,12 @@ export const metadata: Metadata = {
     "SaaS",
     "Portfolio",
   ],
-  alternates: { canonical: "/" },
+  alternates: {
+    canonical: "/",
+    types: {
+      "application/rss+xml": [{ url: "/feed.xml", title: "Davin Harding — Writing" }],
+    },
+  },
   openGraph: {
     type: "website",
     url: SITE_URL,
