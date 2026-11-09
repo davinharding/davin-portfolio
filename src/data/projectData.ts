@@ -27,6 +27,11 @@ import VibecationFlow from "../../public/projectScreenshots/vibecation_flow.png"
 import VibecationDestinations from "../../public/projectScreenshots/vibecation_destinations.png";
 import VibecationPricing from "../../public/projectScreenshots/vibecation_pricing.png";
 import VibecationQuiz from "../../public/projectScreenshots/vibecation_quiz.png";
+import OpenClawArchitecture from "../../public/projectScreenshots/openclaw_architecture.png";
+import MissionControlBoard from "../../public/projectScreenshots/mission_control_board.png";
+import MissionControlTask from "../../public/projectScreenshots/mission_control_task.png";
+import FileExplorerCode from "../../public/projectScreenshots/file_explorer_code.png";
+import FileExplorerTree from "../../public/projectScreenshots/file_explorer_tree.png";
 
 import TypeScriptLogo from "../../public/logos/Typescript_logo.png";
 import NodejsLogo from "../../public/logos/nodejs_logo.png";
@@ -304,6 +309,61 @@ export const projects: Project[] = [
     liveLink: "https://stagesnap.xyz",
   },
   {
+    image: OpenClawArchitecture,
+    image2: MissionControlBoard,
+    image3: FileExplorerCode,
+    title: "OpenClaw Multi-Agent Ops",
+    name: "OpenClaw Multi-Agent Ops",
+    previewDescription:
+      "A self-hosted team of AI agents I run on OpenClaw: a main orchestrator plus specialists for engineering, QA, research, outreach, content, and personal ops, coordinated through Telegram, Discord, cron, and a task board the agents use themselves.",
+    description:
+      `This is the personal AI ops system I run day to day. It is built on OpenClaw, an open-source agent gateway, deployed in Docker on an Ubuntu VPS. I did not build OpenClaw itself. I designed and operate everything on top of it: the agent team, their instructions and memory, the scheduling, the internal tools, and the ops scripts that keep it running.
+      |
+      The shape is one main agent and a bench of specialists. Clawvin is the orchestrator: I talk to it over Telegram (text or voice notes) and Discord, and it either answers or delegates. Specialists cover engineering (Patch), QA (Cypress), business development (Scout), research (Alpha), outreach (Iris), content (Nova), plus finance, health, and training agents for personal ops. Each one gets its own workspace with versioned AGENTS, SOUL, TOOLS, HEARTBEAT, and MEMORY files, so instructions, persona, tool rules, and durable memory are files I can diff and review, not hidden state.
+      |
+      Delegation runs through a task board instead of agent-to-agent chatter. Clawvin files a task in Mission Control, a specialist claims it on its next heartbeat, posts progress as comments, and moves it through the columns. Cypress verifies claims against artifacts before work counts as done. Roughly two dozen cron jobs handle the recurring work: briefings, data pulls, reports, backups, and health checks. Mission Control and File Explorer, both covered in their own entries, are the operator UIs I built on top.
+      |
+      The interesting engineering was keeping a system of autonomous agents boring to operate. The gateway moves between pinned upstream release tags through an updater that refuses a dirty tree, rebuilds, health-checks, and rolls back automatically on failure. Restarts go through a script that waits for in-flight turns to finish, validates config, backs it up, and rolls back if the gateway does not come up healthy. A watchdog reaps leaked model processes that used to push the container into OOM, and cron schedules are staggered against a concurrency cap.
+      |
+      Model routing taught me to treat fallbacks as a cost and correctness problem. Agents run on OpenAI models with OpenAI fallbacks. A paid secondary provider is kept out of the chain entirely and only gets added by a gate that confirms a real provider outage. Auth lapses and config errors raise an alert instead, so a broken login cannot quietly route traffic to a metered backup.
+      |
+      Security got real attention. Secrets live only in gitignored env files, config uses placeholders, and gitleaks runs on every push to the config repo. When a self-propagating npm supply-chain worm hit packages that sat in the agent stack's dependency tree, I audited every install on the host (none of the compromised versions were present), pinned the affected dependency, blocked the compromised scopes so any install fails loudly, and added a scanner that runs after every upgrade. Agent-driven installs moved to frozen lockfiles. Commands run against an exec allowlist, and an audit script scans every agent prompt for instructions that would fall outside it and page me for approval.
+      |
+      The biggest lesson: prompts are production code. After one migration, stale URLs and retired workflows lingered in agent instructions and cron prompts and caused drift that took a dedicated recovery pass to untangle. Now there is one documented source of truth per system, corrections have to be written down in a file (and the agent has to say which file), and the whole home directory is a git repo with a written disaster-recovery path.`,
+    capabilities: [
+      "Main orchestrator plus around ten specialist agents",
+      "Per-agent workspaces with versioned instructions and memory",
+      "Telegram and Discord channels, including voice notes",
+      "Task-board delegation through an authenticated agent API",
+      "Scheduled jobs for briefings, data pulls, reports, and backups",
+      "Release-tag updates with health check and auto-rollback",
+      "Idle-aware safe restarts with config validation and backup",
+      "Outage-gated model fallbacks with alerting",
+      "Secret scanning, supply-chain scanning, and exec allowlisting",
+      "Git-backed config with a written disaster-recovery runbook",
+    ],
+    relatedLinks: [
+      {
+        label: "OpenClaw (upstream)",
+        href: "https://github.com/openclaw/openclaw",
+      },
+      {
+        label: "Mission Control repo",
+        href: "https://github.com/davinharding/clawvins-mission-control",
+      },
+      {
+        label: "File Explorer repo",
+        href: "https://github.com/davinharding/clawvins-file-explorer",
+      },
+    ],
+    projectTags: [
+      projectTags.OpenAI,
+      projectTags.TypeScript,
+      projectTags.Nodejs,
+      projectTags.React,
+    ],
+  },
+  {
     image: AIDesigner1,
     image2: AIDesigner2,
     image3: AIDesigner3,
@@ -329,6 +389,74 @@ export const projects: Project[] = [
       projectTags.AWS,
     ],
     liveLink: "https://apparelmagic.com/apparelmagic-intelligence/ai-designer/",
+  },
+  {
+    image: MissionControlBoard,
+    image2: MissionControlTask,
+    title: "Clawvin's Mission Control",
+    name: "Clawvin Mission Control",
+    previewDescription:
+      "A self-hosted Kanban board and live event feed for orchestrating a team of AI agents. Agents create, claim, and update their own tasks through an authenticated REST API, and most of the code was written by the agents themselves.",
+    description:
+      `Mission Control is the task board for my OpenClaw agent team (see the OpenClaw Multi-Agent Ops case study). I built it because agents handing work to each other in chat was hard to follow and impossible to audit. I wanted a shared board where every piece of delegated work had an owner, a status, and a comment trail.
+      |
+      It is a five-column Kanban (Backlog, Todo, In Progress, Testing, Done) with drag-and-drop, priorities, tags, per-task comment threads, an archive with auto-archiving of finished work, and a live feed of agent events. An agent sidebar shows each agent's role and online, busy, or offline status, with filters by team.
+      |
+      The important part is the Agent API. Agents authenticate with their own keys and use REST endpoints to create tasks, list the ones assigned to them, move them between columns, and post comments. The main agent delegates by filing tasks; specialists pick them up on their heartbeat. Every change is pushed to connected clients over WebSockets, so the board updates live as agents work.
+      |
+      It is also an experiment in AI-native development. The feature work in the public repo was committed by agent accounts (clawvin-bot and the Harding Labs GitHub App), working from specs I wrote and reviewed. My job was product direction, specs, review, and fixing the integration seams.
+      |
+      Honest status: this was an internal tool, and some of what it does is now covered by OpenClaw's built-in dashboard. The public repo is a snapshot from March 2026. It still shows the patterns I care about: agent orchestration, real-time systems, and humans and agents sharing one source of truth.
+      |
+      Stack: React 19, TypeScript, Vite, Tailwind, Radix and shadcn/ui primitives, dnd-kit, Express, SQLite via better-sqlite3, JWT auth, and Socket.IO. Screenshots use demo data, not my real board.`,
+    capabilities: [
+      "Five-column Kanban with drag-and-drop",
+      "Authenticated Agent REST API for tasks and comments",
+      "Real-time WebSocket push to every connected client",
+      "Live agent event feed with detail views",
+      "Agent roster with status and team filters",
+      "Per-task comment threads and auto-archiving",
+      "JWT auth for humans, API keys for agents",
+      "Built almost entirely by AI agents from human-written specs",
+    ],
+    projectTags: [
+      projectTags.TypeScript,
+      projectTags.React,
+      projectTags.Tailwind,
+      projectTags.Nodejs,
+      projectTags.Express,
+    ],
+    githubLink: "https://github.com/davinharding/clawvins-mission-control",
+  },
+  {
+    image: FileExplorerCode,
+    image2: FileExplorerTree,
+    title: "Clawvin File Explorer",
+    name: "Clawvin File Explorer",
+    previewDescription:
+      "A dark-themed browser for my AI agents' workspace files: lazy-loaded tree, syntax highlighting, markdown preview, search, and a switcher across six agent workspaces.",
+    description:
+      `Each agent in my OpenClaw setup works out of its own workspace: instruction files, memory logs, research notes, scripts, and generated output. Checking what an agent had actually written meant SSHing into the server and digging through directories. File Explorer replaced that with a read-only web view that sits next to Mission Control.
+      |
+      It has a lazy-loaded file tree, breadcrumbs, file search, syntax-highlighted code, GitHub-flavored markdown preview, and copy-path and download actions. A workspace switcher jumps between six agent workspaces (Clawvin, Patch, Scout, Vitals, Ledger, Atlas), which made it quick to audit what each agent knew and had produced.
+      |
+      Like Mission Control, it was built by the agents themselves from my specs, and the feature commits come from agent accounts. It is a small, focused internal tool and is now partly superseded, but it was the piece that made agent memory inspectable instead of a black box.
+      |
+      Stack: React 18, TypeScript, Vite, Tailwind, Radix primitives, react-markdown with remark-gfm, and react-syntax-highlighter. Screenshots use a demo workspace, not real agent files.`,
+    capabilities: [
+      "Lazy-loaded file tree with breadcrumbs",
+      "Workspace switcher across six agents",
+      "Syntax highlighting for code and config",
+      "GitHub-flavored markdown preview",
+      "File search, copy path, and download",
+      "Built by AI agents from human-written specs",
+    ],
+    projectTags: [
+      projectTags.TypeScript,
+      projectTags.React,
+      projectTags.Tailwind,
+    ],
+    githubLink: "https://github.com/davinharding/clawvins-file-explorer",
   },
   {
     image: Mintly,
