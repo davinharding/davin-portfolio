@@ -434,20 +434,20 @@ export const projects: Project[] = [
     title: "Clawvin File Explorer",
     name: "Clawvin File Explorer",
     previewDescription:
-      "A dark-themed browser for my AI agents' workspace files: lazy-loaded tree, syntax highlighting, markdown preview, search, and a switcher across six agent workspaces.",
+      "A dark-themed web viewer for the documents my AI agents create on my VPS: workout plans, business strategy docs, financial summaries, reports, and checklists. Lazy-loaded tree, markdown preview, search, and a switcher across six agent workspaces.",
     description:
-      `Each agent in my OpenClaw setup works out of its own workspace: instruction files, memory logs, research notes, scripts, and generated output. Checking what an agent had actually written meant SSHing into the server and digging through directories. File Explorer replaced that with a read-only web view that sits next to Mission Control.
+      `My OpenClaw agents produce a steady stream of finished work: workout plans, business strategy documents, financial summaries, reports, checklists, and research notes. All of it lands in each agent's workspace on the VPS, and reading it meant SSHing into the server and digging through directories. File Explorer replaced that with a read-only web view that sits next to Mission Control, so the things the agents make for me are easy to open and read.
       |
-      It has a lazy-loaded file tree, breadcrumbs, file search, syntax-highlighted code, GitHub-flavored markdown preview, and copy-path and download actions. A workspace switcher jumps between six agent workspaces (Clawvin, Patch, Scout, Vitals, Ledger, Atlas), which made it quick to audit what each agent knew and had produced.
+      It has a lazy-loaded file tree, breadcrumbs, file search, GitHub-flavored markdown preview, syntax-highlighted code, and copy-path and download actions. A workspace switcher jumps between six agent workspaces (Clawvin, Patch, Scout, Vitals, Ledger, Atlas). Because the workspaces also hold instruction files, memory logs, and config, it doubles as a way to audit what each agent knows, but the main job is viewing the artifacts they create.
       |
-      Like Mission Control, it was built by the agents themselves from my specs, and the feature commits come from agent accounts. It is a small, focused internal tool and is now partly superseded, but it was the piece that made agent memory inspectable instead of a black box.
+      Like Mission Control, it was built by the agents themselves from my specs, and the feature commits come from agent accounts. It is a small, focused internal tool and is now partly superseded, but it was the piece that made agent output easy to read and agent memory inspectable instead of a black box.
       |
       Stack: React 18, TypeScript, Vite, Tailwind, Radix primitives, react-markdown with remark-gfm, and react-syntax-highlighter. Screenshots use a demo workspace, not real agent files.`,
     capabilities: [
       "Lazy-loaded file tree with breadcrumbs",
       "Workspace switcher across six agents",
+      "GitHub-flavored markdown preview for plans, reports, and docs",
       "Syntax highlighting for code and config",
-      "GitHub-flavored markdown preview",
       "File search, copy path, and download",
       "Built by AI agents from human-written specs",
     ],
