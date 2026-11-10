@@ -17,7 +17,7 @@ A modern, responsive portfolio showcasing 8+ years of full-stack development, fr
 
 ## ✨ Features
 
-- **Branded loading animation** with stroke-drawn DH monogram
+- **Branded intro animation** that draws the `<D>` logo and docks it into the header
 - **Dark/light theme** with smooth transitions
 - **Project showcase** with full-screen image lightbox and gallery navigation
 - **Interactive experience timeline** spanning software engineering, Web3, and AI
@@ -53,7 +53,7 @@ src/
 │   └── about/              # About page
 ├── components/
 │   ├── Header.tsx           # Fixed nav with theme toggle
-│   ├── LoadingAnimation.tsx # DH monogram intro animation
+│   ├── LoadingAnimation.tsx # Logo intro animation
 │   ├── ImageLightbox.tsx    # Full-screen gallery viewer
 │   ├── ThemeProvider.tsx    # Dark/light mode context
 │   └── ui/                  # Radix-based UI primitives

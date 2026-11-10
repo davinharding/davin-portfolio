@@ -69,6 +69,7 @@ const Header: React.FC<IHeaderProps> = () => {
             height={40}
             priority
             unoptimized
+            data-splash-target
           />
         </Link>
 
