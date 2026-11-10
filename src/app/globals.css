@@ -11,6 +11,8 @@
   --splash-ink: #f8fafc;
   --splash-caret: #60a5fa;
   --splash-bracket: #3b82f6;
+  /* Extra time the cursor blinks on its own before the D starts drawing */
+  --splash-lead: 0.7s;
   position: fixed;
   inset: 0;
   z-index: 10000;
@@ -18,7 +20,7 @@
   place-items: center;
   pointer-events: none;
   /* Failsafe: reveal the page even if the script never runs */
-  animation: splash-failsafe 0.4s ease 3s forwards;
+  animation: splash-failsafe 0.4s ease 3.6s forwards;
 }
 
 /* Mirrors public/logo-light.svg */
@@ -71,7 +73,7 @@ html.loader-done .splash {
     transparent 46vmin
   );
   opacity: 0;
-  animation: splash-glow 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 0.75s forwards;
+  animation: splash-glow 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) calc(0.75s + var(--splash-lead)) forwards;
 }
 
 .splash__stage {
@@ -94,7 +96,7 @@ html.loader-done .splash {
 
 .splash__caret {
   fill: var(--splash-caret);
-  animation: splash-caret 1.4s step-end forwards;
+  animation: splash-caret calc(0.3s + var(--splash-lead)) step-end forwards;
 }
 
 .splash__stroke {
@@ -109,13 +111,13 @@ html.loader-done .splash {
   stroke: var(--splash-ink);
   stroke-width: 2.5;
   stroke-dasharray: 1;
-  animation: splash-draw 0.55s cubic-bezier(0.65, 0, 0.35, 1) 0.3s forwards;
+  animation: splash-draw 0.55s cubic-bezier(0.65, 0, 0.35, 1) calc(0.3s + var(--splash-lead)) forwards;
 }
 
 .splash__bracket {
   stroke: var(--splash-bracket);
   stroke-width: 2;
-  animation: splash-bracket 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.75s forwards;
+  animation: splash-bracket 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) calc(0.75s + var(--splash-lead)) forwards;
 }
 
 .splash__bracket--left {
@@ -141,7 +143,7 @@ html.loader-done .splash {
   color: hsl(var(--muted-foreground));
   clip-path: inset(0 50%);
   transition: opacity 0.2s ease;
-  animation: splash-name 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) 0.9s forwards;
+  animation: splash-name 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) calc(0.9s + var(--splash-lead)) forwards;
 }
 
 /* Docking: the mark flies to the header logo (offsets measured in
@@ -179,8 +181,8 @@ html.loader-done .splash {
 }
 
 @keyframes splash-caret {
-  0%, 22%, 84% { opacity: 1; }
-  12%, 72% { opacity: 0; }
+  0%, 50%, 100% { opacity: 1; }
+  25%, 75% { opacity: 0; }
 }
 
 @keyframes splash-draw {
