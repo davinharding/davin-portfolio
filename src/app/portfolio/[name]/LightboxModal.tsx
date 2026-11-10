@@ -2,7 +2,11 @@
 
 import { CSSProperties } from "react";
 import Image from "next/image";
-import Lightbox, { SlideImage } from "yet-another-react-lightbox";
+import Lightbox, {
+  isImageSlide,
+  RenderSlideProps,
+  SlideImage,
+} from "yet-another-react-lightbox";
 import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import Counter from "yet-another-react-lightbox/plugins/counter";
 import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
@@ -16,14 +20,19 @@ type LightboxCSSProperties = CSSProperties & {
   [key: `--yarl__${string}`]: string;
 };
 
-interface NextJsImageProps {
-  slide: SlideImage;
-  rect: { width: number; height: number };
-}
+// The Zoom plugin derives its max zoom from slide.width/height, so slides
+// without dimensions fall back to the built-in renderer, which measures them.
+function NextJsImage({ slide, offset, rect, zoom = 1 }: RenderSlideProps) {
+  if (!isImageSlide(slide) || !slide.width || !slide.height) return undefined;
 
-function NextJsImage({ slide, rect }: NextJsImageProps) {
-  const { width, height } = rect;
   const cover = slide.imageFit === "cover";
+  const width = cover
+    ? rect.width
+    : Math.round(Math.min(rect.width, (rect.height / slide.height) * slide.width));
+  const height = cover
+    ? rect.height
+    : Math.round(Math.min(rect.height, (rect.width / slide.width) * slide.height));
+  const renderedWidth = offset === 0 ? width * zoom : width;
 
   return (
     <div style={{ position: "relative", width, height }}>
@@ -34,7 +43,7 @@ function NextJsImage({ slide, rect }: NextJsImageProps) {
         loading="eager"
         draggable={false}
         style={{ objectFit: cover ? "cover" : "contain" }}
-        sizes={`${Math.ceil((width / window.innerWidth) * 100)}vw`}
+        sizes={`${Math.ceil((renderedWidth / window.innerWidth) * 100)}vw`}
       />
     </div>
   );
@@ -54,7 +63,9 @@ export function LightboxModal({
   showThumbnails = true,
 }: LightboxModalProps) {
   const slides: SlideImage[] = images.map((img) => ({
-    src: typeof img.src === "string" ? img.src : img.src.src,
+    ...(typeof img.src === "string"
+      ? { src: img.src }
+      : { src: img.src.src, width: img.src.width, height: img.src.height }),
     alt: img.alt || "",
     title: img.title,
   }));
