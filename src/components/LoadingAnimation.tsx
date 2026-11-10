@@ -1,94 +1,106 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 
 const STORAGE_KEY = "davinLoaderShown";
-// Keep splash short — research shows 800-1200ms is the sweet spot for a
-// branded intro before users start to perceive it as latency.
-const TOTAL_MS = 1100;
+const DONE_CLASS = "loader-done";
 
-function prefersReducedMotion(): boolean {
-  if (typeof window === "undefined" || !window.matchMedia) return false;
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function animationsFinished(el: Element, skip?: Animation) {
+  return Promise.all(
+    el
+      .getAnimations({ subtree: true })
+      .filter((animation) => animation !== skip)
+      .map((animation) => animation.finished)
+  );
+}
+
+// A delayed animation reports no progress until its delay has elapsed.
+function hasStarted(animation: Animation): boolean {
+  return animation.effect?.getComputedTiming().progress != null;
+}
+
+// The motion lives in globals.css. This only measures where the mark has to
+// land so it ends up exactly on top of the header logo.
+function dockOntoHeaderLogo(splash: HTMLElement, mark: Element | null) {
+  const logo = document.querySelector("[data-splash-target]");
+  if (mark && logo) {
+    const from = mark.getBoundingClientRect();
+    const to = logo.getBoundingClientRect();
+    const dx = to.left + to.width / 2 - (from.left + from.width / 2);
+    const dy = to.top + to.height / 2 - (from.top + from.height / 2);
+    splash.style.setProperty("--dock-x", `${dx}px`);
+    splash.style.setProperty("--dock-y", `${dy}px`);
+    splash.style.setProperty("--dock-scale", String(to.width / from.width));
+  }
+  splash.classList.add("splash--docking");
+  return animationsFinished(splash);
 }
 
 export default function LoadingAnimation() {
-  // Start as `false` on both server and first client render so hydration matches.
-  // The CSS overlay in globals.css covers the splash visually until the React
-  // SVG mounts a tick later, so users still see a continuous splash.
-  const [visible, setVisible] = useState(false);
+  const splashRef = useRef<HTMLDivElement>(null);
+  const markRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
-    const alreadyShown = sessionStorage.getItem(STORAGE_KEY) === "true";
-    if (alreadyShown || prefersReducedMotion()) {
-      document.documentElement.classList.add("loader-done");
-      return;
-    }
+    const splash = splashRef.current;
+    const [failsafe] = splash?.getAnimations() ?? [];
+    // No failsafe animation means CSS is hiding the splash: a repeat visit in
+    // this session, or the visitor prefers reduced motion.
+    if (!splash || !failsafe) return;
+
     sessionStorage.setItem(STORAGE_KEY, "true");
-    setVisible(true);
-    const timer = setTimeout(() => {
-      setVisible(false);
-      document.documentElement.classList.add("loader-done");
-    }, TOTAL_MS);
-    return () => clearTimeout(timer);
+    let active = true;
+
+    const finishIntro = async () => {
+      await animationsFinished(splash, failsafe);
+      if (!active) return;
+      // If hydration was slow enough that the CSS failsafe is already fading
+      // the splash out, let it finish instead of restarting with a dock.
+      if (hasStarted(failsafe)) await failsafe.finished;
+      else await dockOntoHeaderLogo(splash, markRef.current);
+      if (active) document.documentElement.classList.add(DONE_CLASS);
+    };
+    void finishIntro();
+
+    return () => {
+      active = false;
+    };
   }, []);
 
-  if (!visible) return null;
-
   return (
-    <div
-      role="status"
-      aria-label="Loading"
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 10001,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        pointerEvents: "none",
-        animation: `dh-mono-fade ${TOTAL_MS}ms ease forwards`,
-      }}
-    >
-      <style>{`
-        @keyframes dh-stroke{to{stroke-dashoffset:0}}
-        @keyframes dh-fill{to{fill:rgba(74,144,217,1)}}
-        @keyframes dh-glow{0%,60%{filter:drop-shadow(0 0 0 rgba(74,144,217,0))}72%{filter:drop-shadow(0 0 16px rgba(74,144,217,.8))}100%{filter:drop-shadow(0 0 0 rgba(74,144,217,0))}}
-        @keyframes dh-mono-fade{0%,70%{opacity:1}100%{opacity:0}}
-      `}</style>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 140, height: 140 }}>
-        <svg viewBox="0 0 120 120" role="img" aria-label="Davin Harding" style={{ width: "100%", height: "100%" }}>
-          <g style={{ filter: "drop-shadow(0 0 0 rgba(74,144,217,0))", animation: "dh-glow 0.9s ease forwards" }}>
-            <path
-              d="M32 22 H58 C74 22 84 34 84 60 C84 86 74 98 58 98 H32 Z"
-              style={{
-                fill: "rgba(74,144,217,0)",
-                stroke: "#4A90D9",
-                strokeWidth: 6,
-                strokeLinecap: "round",
-                strokeLinejoin: "round",
-                strokeDasharray: 320,
-                strokeDashoffset: 320,
-                animation: "dh-stroke 0.55s ease forwards, dh-fill 0.25s ease forwards 0.5s",
-              }}
-            />
-            <path
-              d="M70 22 V98 M70 60 H98 M98 22 V98"
-              style={{
-                fill: "rgba(74,144,217,0)",
-                stroke: "#4A90D9",
-                strokeWidth: 6,
-                strokeLinecap: "round",
-                strokeLinejoin: "round",
-                strokeDasharray: 320,
-                strokeDashoffset: 320,
-                animation: "dh-stroke 0.55s ease forwards 50ms, dh-fill 0.25s ease forwards 0.5s",
-              }}
-            />
-          </g>
+    <div ref={splashRef} className="splash" aria-hidden="true">
+      <div className="splash__backdrop" />
+      <div className="splash__stage">
+        <svg ref={markRef} className="splash__mark" viewBox="0 0 40 40">
+          <rect className="splash__tile" width="40" height="40" rx="8" />
+          <path
+            className="splash__stroke splash__bracket splash__bracket--left"
+            d="M10 14L4 20L10 26"
+          />
+          <path
+            className="splash__stroke splash__bracket splash__bracket--right"
+            d="M30 14L36 20L30 26"
+          />
+          <path
+            className="splash__stroke splash__letter"
+            pathLength={1}
+            d="M14 12V28"
+          />
+          <path
+            className="splash__stroke splash__letter"
+            pathLength={1}
+            d="M14 12H20.5C23.5376 12 26 14.9101 26 18.5V21.5C26 25.0899 23.5376 28 20.5 28H14"
+          />
+          <rect
+            className="splash__caret"
+            x="17"
+            y="18"
+            width="2"
+            height="4"
+            rx="0.5"
+          />
         </svg>
+        <p className="splash__name">Davin Harding</p>
       </div>
-      <span className="sr-only">Loading</span>
     </div>
   );
 }
