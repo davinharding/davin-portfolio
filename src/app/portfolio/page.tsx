@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function Portfolio() {
   return (
-    <ContainerLayout pageTitle="Portfolio">
+    <ContainerLayout pageTitle="Portfolio" backHref="/work" backLabel="Back to Work">
       <p className="text-muted-foreground mb-12 max-w-2xl">
         Production AI and agentic systems, full-stack SaaS products, enterprise
         integrations, and earlier Web3 work.

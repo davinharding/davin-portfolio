@@ -17,6 +17,7 @@ A modern, responsive portfolio showcasing 8+ years of full-stack development, fr
 
 ## ✨ Features
 
+- **Thirty Seconds homepage**: enter a company's website and watch a live agent run read the site, profile the business, and draft a shareable blueprint of the AI agents I would build for it (`/b/<slug>`)
 - **Branded intro animation** that draws the `<D>` logo and docks it into the header
 - **Dark/light theme** with smooth transitions
 - **Project showcase** with full-screen image lightbox and gallery navigation
@@ -47,19 +48,38 @@ A modern, responsive portfolio showcasing 8+ years of full-stack development, fr
 ```
 src/
 ├── app/
-│   ├── page.tsx            # Home: hero, projects grid, experience timeline
-│   ├── portfolio/[name]/   # Dynamic project detail pages
-│   ├── call/               # Book a Call (Calendly embed)
-│   └── about/              # About page
+│   ├── page.tsx              # Home: one sentence and the blueprint launcher
+│   ├── work/                 # The previous homepage: hero, projects, skills, timeline
+│   ├── b/[slug]/             # Blueprint pages (examples from JSON, runs from Redis)
+│   ├── sorry/[code]/         # Error landing for no-JavaScript form posts
+│   ├── api/blueprint/        # POST: starts or resolves a run, streams NDJSON
+│   ├── portfolio/[name]/     # Project detail pages
+│   └── call/                 # Book a Call (Calendly embed)
 ├── components/
-│   ├── Header.tsx           # Fixed nav with theme toggle
-│   ├── LoadingAnimation.tsx # Logo intro animation
-│   ├── ImageLightbox.tsx    # Full-screen gallery viewer
-│   ├── ThemeProvider.tsx    # Dark/light mode context
-│   └── ui/                  # Radix-based UI primitives
-└── data/
-    └── projectData.ts       # Project metadata, screenshots, tech stacks
+│   ├── thirty/               # Launcher, run console, blueprint view
+│   └── ui/                   # Radix-based UI primitives
+├── data/
+│   ├── blueprints/           # Committed example blueprints
+│   └── projectData.ts        # Project metadata, screenshots, tech stacks
+└── lib/thirty/               # Pipeline, SSRF-guarded fetch, prompts, limits, budget, store
 ```
+
+## 🧪 Thirty Seconds
+
+The full spec is in `docs/specs/thirty-seconds.md`. Configuration lives in `.env.example`.
+
+```bash
+# Every flow without an API key or Redis (in-memory store, fixture output)
+THIRTY_MOCK=1 npm run dev
+# `<code>.test` hosts trigger outcomes: timeout.test, quality.test, not-a-company.test,
+# unreachable.test, upstream.test, rate-limited.test, slow.test, fallback.test, drop.test
+
+npm test                          # unit tests (no network, no credentials)
+npm run thirty:examples           # regenerate examples via the live pipeline (needs ANTHROPIC_API_KEY)
+npm run thirty:admin -- stats     # get <slug> | delete <slug> | stats (needs Redis env)
+```
+
+Live runs need `ANTHROPIC_API_KEY`, Upstash Redis (`KV_REST_API_URL`, `KV_REST_API_TOKEN`), and in production `THIRTY_IP_SALT`. `THIRTY_LIVE=off` is the kill switch; spend is capped at `THIRTY_MONTHLY_BUDGET_USD` (default $10/month).
 
 ## 🚀 Getting Started
 

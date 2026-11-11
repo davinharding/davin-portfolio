@@ -55,6 +55,8 @@ This is a **personal developer portfolio website** for Davin Harding, a full-sta
 
 ## Site Structure
 
+> **Current structure (Thirty Seconds).** `/` is now one sentence and a URL field: a visitor enters their company's website, watches a live agent run, and lands on a shareable blueprint at `/b/<slug>` of the agents Davin would build for them. Everything that used to be on the homepage (hero, projects, skills, experience timeline) lives at `/work`. Other routes: `/sorry/<code>` (no-JavaScript error landing), `POST /api/blueprint` (the run), and the unchanged `/portfolio`, `/portfolio/[name]`, and `/call`. Spec: `docs/specs/thirty-seconds.md`. The outline below describes the older site and is kept for history.
+
 ```
 / (Home)
 ├── Hero Section

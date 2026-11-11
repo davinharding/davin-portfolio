@@ -285,6 +285,128 @@ html.loader-done .splash {
   }
 }
 
+/* Thirty Seconds homepage: a restrained accent glow that moves with the run.
+   BlueprintLauncher sets data-step on the stage; only custom properties change. */
+@property --stage-glow-x {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 50%;
+}
+@property --stage-glow-y {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 30%;
+}
+@property --stage-glow-alpha {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0.08;
+}
+
+.thirty-stage {
+  --stage-glow-x: 50%;
+  --stage-glow-y: 30%;
+  --stage-glow-alpha: 0.08;
+  background-image: radial-gradient(
+    ellipse 60% 50% at var(--stage-glow-x) var(--stage-glow-y),
+    hsl(var(--primary) / var(--stage-glow-alpha)),
+    transparent 70%
+  );
+  transition: --stage-glow-x 1.2s ease, --stage-glow-y 1.2s ease, --stage-glow-alpha 1.2s ease;
+}
+.light .thirty-stage {
+  --stage-glow-alpha: 0.06;
+}
+.thirty-stage[data-step="validate"] { --stage-glow-x: 30%; --stage-glow-alpha: 0.1; }
+.thirty-stage[data-step="read"] { --stage-glow-x: 25%; --stage-glow-y: 45%; --stage-glow-alpha: 0.12; }
+.thirty-stage[data-step="research"] { --stage-glow-x: 45%; --stage-glow-y: 55%; --stage-glow-alpha: 0.14; }
+.thirty-stage[data-step="design"] { --stage-glow-x: 65%; --stage-glow-y: 50%; --stage-glow-alpha: 0.17; }
+.thirty-stage[data-step="check"] { --stage-glow-x: 75%; --stage-glow-y: 40%; --stage-glow-alpha: 0.18; }
+.thirty-stage[data-step="done"] { --stage-glow-x: 50%; --stage-glow-y: 40%; --stage-glow-alpha: 0.22; }
+
+@media (prefers-reduced-motion: reduce) {
+  .thirty-stage,
+  .thirty-stage[data-step] {
+    --stage-glow-x: 50%;
+    --stage-glow-y: 30%;
+    --stage-glow-alpha: 0.08;
+    transition: none;
+  }
+}
+
+/* Blueprint org chart: a vertical rail on narrow screens, a tree from md up. */
+.org-chart__agents {
+  --org-gap: 0.75rem;
+  position: relative;
+  display: grid;
+  gap: var(--org-gap);
+  padding-left: 1.5rem;
+  list-style: none;
+}
+.org-chart__agents::before {
+  content: "";
+  position: absolute;
+  left: 0.5rem;
+  top: calc(var(--org-gap) * -1);
+  bottom: 1.4rem;
+  width: 1px;
+  background: hsl(var(--border));
+}
+.org-chart__agent {
+  position: relative;
+}
+.org-chart__agent::before {
+  content: "";
+  position: absolute;
+  left: -1rem;
+  top: 1.4rem;
+  width: 1rem;
+  height: 1px;
+  background: hsl(var(--border));
+}
+.org-chart__gate {
+  position: absolute;
+  left: -1.35rem;
+  top: 0.9rem;
+  z-index: 1;
+}
+.org-chart__stem {
+  display: none;
+}
+@media (min-width: 768px) {
+  .org-chart__agents {
+    grid-template-columns: repeat(var(--org-cols), minmax(0, 1fr));
+    padding-left: 0;
+    padding-top: 1.75rem;
+  }
+  .org-chart__agents::before {
+    top: 0;
+    bottom: auto;
+    height: 1px;
+    width: auto;
+    left: calc((100% - (var(--org-cols) - 1) * var(--org-gap)) / var(--org-cols) / 2);
+    right: calc((100% - (var(--org-cols) - 1) * var(--org-gap)) / var(--org-cols) / 2);
+  }
+  .org-chart__agent::before {
+    left: 50%;
+    top: -1.75rem;
+    width: 1px;
+    height: 1.75rem;
+  }
+  .org-chart__gate {
+    left: 50%;
+    top: -1.35rem;
+    transform: translateX(-50%);
+  }
+  .org-chart__stem {
+    display: block;
+    width: 1px;
+    height: 1.25rem;
+    margin: 0 auto;
+    background: hsl(var(--border));
+  }
+}
+
 /* Mobile viewport height fix - accounts for browser UI */
 @supports (height: 100dvh) {
   .min-h-screen-mobile {

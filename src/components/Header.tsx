@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, ChevronDown, Mail, Briefcase, Sun, Moon, Calendar } from "lucide-react";
+import { Menu, ChevronDown, Mail, Briefcase, Sun, Moon, Calendar, LayoutGrid } from "lucide-react";
 import { getPublishedProjects, projectPath } from "@/data/projectData";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/ThemeProvider";
@@ -36,18 +36,19 @@ const Header: React.FC<IHeaderProps> = () => {
   const { theme, toggleTheme } = useTheme();
 
   const scrollToExperience = () => {
-    if (pathName === "/") {
+    if (pathName === "/work") {
       const element = document.getElementById("experience");
       if (element) {
         element.scrollIntoView({ behavior: "smooth" });
       }
     } else {
-      router.push("/#experience");
+      router.push("/work#experience");
     }
   };
 
   const isPortfolio = pathName?.startsWith("/portfolio") ?? false;
   const isCall = pathName === "/call";
+  const isWork = pathName === "/work";
 
   return (
     <header className="fixed top-0 w-full z-50 bg-background/90 backdrop-blur-sm border-b border-border">
@@ -75,6 +76,17 @@ const Header: React.FC<IHeaderProps> = () => {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-1">
+          <Button
+            variant="ghost"
+            asChild
+            className={`text-sm ${isWork ? "text-primary" : "text-muted-foreground"}`}
+          >
+            <Link href="/work" aria-current={isWork ? "page" : undefined} prefetch>
+              <LayoutGrid className="mr-1 h-4 w-4" aria-hidden="true" />
+              Work
+            </Link>
+          </Button>
+
           {/* Portfolio Dropdown */}
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
@@ -159,6 +171,17 @@ const Header: React.FC<IHeaderProps> = () => {
               <SheetTitle>Navigation</SheetTitle>
             </SheetHeader>
             <div className="flex flex-col gap-4 mt-8">
+              <Button
+                variant="ghost"
+                asChild
+                className={`w-full justify-start ${isWork ? "text-primary" : ""}`}
+                onClick={() => setSheetOpen(false)}
+              >
+                <Link href="/work" aria-current={isWork ? "page" : undefined}>
+                  <LayoutGrid className="mr-2 h-4 w-4" aria-hidden="true" />
+                  Work
+                </Link>
+              </Button>
               <div className="space-y-2">
                 <p className="text-sm font-medium text-muted-foreground px-2">
                   Portfolio

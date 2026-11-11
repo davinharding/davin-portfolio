@@ -8,20 +8,24 @@ type ContainerLayoutProps = {
   children: React.ReactNode;
   pageTitle: string;
   mobile?: boolean;
+  backHref?: string;
+  backLabel?: string;
 };
 
 const ContainerLayout: React.FC<ContainerLayoutProps> = ({
   children,
   pageTitle,
   mobile,
+  backHref = "/",
+  backLabel = "Back to Home",
 }) => (
   <HeaderFooter page="container" mobile={mobile}>
     <div className="bg-background min-h-screen">
       <div className="container-narrow pt-24 pb-16">
         <Button variant="ghost" asChild className="mb-8 -ml-4">
-          <Link href="/">
+          <Link href={backHref}>
             <ArrowLeft className="mr-2 h-4 w-4" aria-hidden="true" />
-            Back to Home
+            {backLabel}
           </Link>
         </Button>
         <h1 className="heading-hero mb-8">{pageTitle}</h1>

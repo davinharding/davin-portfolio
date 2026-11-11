@@ -13,6 +13,9 @@ const Footer: React.FC = () => {
             © {currentYear} Davin Harding
           </p>
           <div className="flex items-center gap-2">
+            <Button variant="ghost" asChild className="text-sm text-muted-foreground">
+              <Link href="/work">Work</Link>
+            </Button>
             <Button variant="ghost" size="icon" asChild>
               <Link
                 href="https://www.linkedin.com/in/davinharding/"
