@@ -18,6 +18,7 @@ import StageSnapDashboard from "../../public/projectScreenshots/stagesnap_dashbo
 import StageSnapWorkspace from "../../public/projectScreenshots/stagesnap_workspace.png";
 import StageSnapPricing from "../../public/projectScreenshots/stagesnap_pricing.png";
 import StageSnapBilling from "../../public/projectScreenshots/stagesnap_billing.png";
+import AmiArchitecture from "../../public/projectScreenshots/ami_architecture.png";
 import AmiDashboard from "../../public/projectScreenshots/ami_dashboard.png";
 import AmiAsk from "../../public/projectScreenshots/ami_ask.png";
 import AmiAct from "../../public/projectScreenshots/ami_act.png";
@@ -166,10 +167,11 @@ export const projectPath = (name: string): string =>
 
 export const projects: Project[] = [
   {
-    image: AmiDashboard,
-    image2: AmiMonitor,
-    image3: AmiAsk,
-    image4: AmiAct,
+    image: AmiArchitecture,
+    image2: AmiDashboard,
+    image3: AmiMonitor,
+    image4: AmiAsk,
+    image5: AmiAct,
     title: "ApparelMagic AI Agents",
     name: "ApparelMagic AI Agents",
     previewDescription:
