@@ -371,7 +371,7 @@ export const projects: Project[] = [
     title: "Vitals: AI Health Agent",
     name: "Vitals Health Agent",
     previewDescription:
-      "My personal AI health coach. Vitals pulls Oura Ring and Withings scale data on a schedule, logs meals from text and voice notes, and checks me against macro, activity, and recovery targets every day. A sibling agent, Susan, extends the same system to a second household member through Apple Watch.",
+      "My personal AI health coach. Vitals pulls Oura Ring and Withings scale data on a schedule, logs meals from text and voice notes, and checks me against macro, activity, and recovery targets every day. A sibling agent, Susan, coaches my wife through her Apple Watch, and the two agents share recipes and macros, pass requests to each other, and work alongside us in a four-person group chat.",
     description:
       `Vitals is the health agent in my OpenClaw setup (see the OpenClaw Multi-Agent Ops case study) and the one I use most. It started as a meal-logging bot and grew into a coach that has kept a daily health log for me since February 2026, roughly 245 days and counting.
       |
@@ -387,9 +387,13 @@ export const projects: Project[] = [
       |
       Data honesty was the hardest engineering problem. Oura's cloud often has not published today's activity by evening, and early versions quietly reported yesterday's steps. The steps sync now checks the record date, finds the latest cloud sync, retries with bounded backoff, and returns a distinct "upstream stale" exit code so the agent says the data is missing instead of guessing. The same rule applies to the agent itself: Vitals cannot say it logged or sent something unless the tool result confirms it. The pullers ship with shell test suites over fixture payloads covering section upserts, empty pulls, API errors, and stale data.
       |
-      Susan is a second health agent I built for another member of my household on the same architecture, with its own Telegram bot, workspace, and targets. That person wears an Apple Watch rather than an Oura Ring, so I built an Apple Health ingest path: an iOS Shortcut posts the day's steps, energy, exercise minutes, sleep stages, resting heart rate, and HRV to a small Node receiver on the VPS. It listens on loopback only behind Tailscale Funnel, checks a hashed bearer token with a constant-time compare, caps request size, and rate-limits.
+      Susan is the other half of the system: a health agent I built for my wife on the same architecture, with its own Telegram bot, workspace, and targets. She wears an Apple Watch rather than an Oura Ring, so I built an Apple Health ingest path: an iOS Shortcut on her phone posts the day's steps, energy, exercise minutes, sleep stages, resting heart rate, and HRV to a small Node receiver on the VPS. It listens on loopback only behind Tailscale Funnel, checks a hashed bearer token with a constant-time compare, caps request size, and rate-limits.
       |
-      Both agents sit in a shared accountability group, and each one reports only on its own person. Isolation is enforced in config, not prompts: separate workspaces, workspace-only file access, and shell and session tools denied where they are not needed. An end-to-end test plan uses synthetic tags to prove neither agent can read the other's data. The only shared file is a household recipe list, so a dish both people eat gets the same macros. Telegram bots cannot see each other's messages, so cross-agent asks go through one scoped relay tool.
+      The most interesting part is how the two agents work together. The four of us share one Telegram group: me, my wife, Vitals, and Susan. Ask "how are we both doing?" and each agent posts an update on its own person. Address one by name and only that one answers. It turns two private trackers into shared accountability for the household.
+      |
+      We eat a lot of the same meals, so the agents share a household recipe file with per-serving macros. When either of us logs a dish we both ate, the agent writes or updates the recipe first, and the other agent pulls the same numbers instead of estimating from scratch. The agents also talk to each other directly. Ask Vitals to send Susan a recipe or a macro breakdown, or to ask how my wife's day is going, and Vitals hands it off. Susan can do the same in the other direction. Telegram does not deliver one bot's messages to another bot, so the handoff goes through a scoped agent-to-agent relay, and the receiving agent confirms in the group.
+      |
+      Sharing has hard edges. Each agent can summarize its own person's goals and metrics in the group, but private DMs stay private, neither agent compares bodies or speaks for the other person, and the recipe file is the only shared path. That is enforced in config, not prompts: separate workspaces, workspace-only file access, and shell and session tools denied where they are not needed. An end-to-end test plan uses synthetic tags to prove neither agent can read the other's private data.
       |
       The lesson: a useful health agent is mostly a data-plumbing and trust problem. The model is the easy part. Getting clean, dated, correctly attributed data into one place, and making the agent admit when it is missing, is what made it worth using every day.
       |
@@ -404,7 +408,10 @@ export const projects: Project[] = [
       "Scheduled morning, evening, nightly, and weekly coaching check-ins",
       "Stale-data detection that never substitutes yesterday's numbers",
       "Voice replies with local transcription and text-to-speech",
-      "Two isolated agents with config-enforced privacy and E2E tests",
+      "Two collaborating agents for me and my wife in a shared group chat",
+      "Shared household recipes and macros across both agents",
+      "Agent-to-agent relay for recipes, macros, and check-ins",
+      "Config-enforced privacy between agents, verified with E2E tests",
       "Fixture-based test suites for every data puller",
     ],
     relatedLinks: [
