@@ -1,0 +1,143 @@
+{
+  "v": 1,
+  "slug": "example-allbirds",
+  "createdAt": "2026-11-11T12:00:00.000Z",
+  "kind": "example",
+  "source": {
+    "host": "allbirds.com",
+    "inputUrl": "allbirds.com",
+    "finalUrl": "https://www.allbirds.com/",
+    "method": "curated",
+    "pages": [
+      { "url": "https://www.allbirds.com/", "title": "Allbirds homepage" },
+      { "url": "https://www.allbirds.com/pages/our-materials", "title": "Our Materials" }
+    ]
+  },
+  "company": {
+    "name": "Allbirds",
+    "oneLiner": "Allbirds sells shoes, socks, and apparel made from wool, tree fiber, and sugarcane, mainly direct to consumers online.",
+    "offerings": [
+      "Tree Runner NZ",
+      "Runner NZ Slip On",
+      "Cruiser",
+      "Canvas Cruiser",
+      "Tree Breezer",
+      "Wool Cruiser Waterproof",
+      "Terralux Collection",
+      "M0.0NSHOT Zero",
+      "Socks"
+    ],
+    "customers": "Men and women buying everyday sneakers, slip-ons, flats, and sandals online, plus shoppers who buy through other retailers."
+  },
+  "blueprint": {
+    "headline": "Allbirds sells the same silhouettes in several materials under a strict return policy, so the agents to build first turn returns and eligibility questions into decisions merchandising and support can act on.",
+    "agents": [
+      {
+        "name": "Return Reason Analyst",
+        "role": "Groups every return by style, size, and material and tells merchandising which fit or material problem is driving it.",
+        "trigger": "Every Monday at 07:00, covering returns logged in the previous week",
+        "does": [
+          "Reads return reasons and free-text comments for each style, such as Tree Runner NZ versus Cruiser",
+          "Separates size complaints from material complaints by comparing the same silhouette across wool, tree, and canvas",
+          "Writes a one-page internal brief with the three biggest movers and the example comments behind each"
+        ],
+        "tools": [
+          { "name": "Return records and reasons", "access": "read", "system": "Returns and order management system" },
+          { "name": "Product catalog by style and material", "access": "read", "system": "E-commerce catalog" },
+          { "name": "Weekly brief", "access": "write", "system": "Internal docs workspace" }
+        ],
+        "humanGate": {
+          "required": false,
+          "detail": "It only reads return data and writes an internal brief. It changes no product, price, or customer record."
+        },
+        "evidence": "The site sells one silhouette in several materials (Cruiser, Canvas Cruiser, Wool Cruiser Waterproof) and runs a 30-day return window for unworn items.",
+        "impact": "Merchandising sees within a week whether a new colorway or material has a fit problem, instead of finding out from end-of-season return totals.",
+        "relatedProject": "apparelmagic-agents"
+      },
+      {
+        "name": "Return Eligibility Desk",
+        "role": "Answers return and refund questions by checking the order against the published policy and drafting the reply.",
+        "trigger": "When a support conversation is tagged as a return or refund question",
+        "does": [
+          "Looks up the order: purchase date, country, whether return coverage was bought, and whether any item was Final Sale",
+          "Flags purchases made through another retailer, which must go back to that retailer",
+          "Drafts a reply that states the outcome and the exact policy condition it rests on"
+        ],
+        "tools": [
+          { "name": "Order lookup", "access": "read", "system": "Order management system" },
+          { "name": "Return policy text", "access": "read", "system": "Help center" },
+          { "name": "Reply draft", "access": "write", "system": "Help desk" },
+          { "name": "Return label request", "access": "write", "system": "Returns platform" }
+        ],
+        "humanGate": {
+          "required": true,
+          "detail": "Every customer reply is sent by an agent after review. Any exception to policy (outside 30 days, Final Sale, worn items) needs a team lead."
+        },
+        "evidence": "The policy has several conditions that decide each case: 30 days, unworn with tags, Final Sale excluded, optional return coverage, refunds only in the country of purchase.",
+        "impact": "Most return questions become a reviewed one-click reply, and exceptions are decided by the people allowed to make them.",
+        "relatedProject": "apparelmagic-agents"
+      },
+      {
+        "name": "Material Claims Checker",
+        "role": "Checks new product pages and campaign copy for material and climate claims before they publish.",
+        "trigger": "When a product page or campaign draft moves to ready for review",
+        "does": [
+          "Finds every material or climate claim in the draft, such as plant-based, regenerative wool, or net zero carbon",
+          "Matches each claim against an approved claims register and the substantiation behind it",
+          "Returns the draft with unsupported or changed wording highlighted and the approved phrasing beside it"
+        ],
+        "tools": [
+          { "name": "Draft product and campaign copy", "access": "read", "system": "CMS" },
+          { "name": "Approved claims register", "access": "read", "system": "Internal claims database" },
+          { "name": "Review comments", "access": "write", "system": "CMS" }
+        ],
+        "humanGate": {
+          "required": true,
+          "detail": "Nothing publishes on the agent's say-so. A sustainability or legal reviewer approves every page that contains a flagged claim."
+        },
+        "evidence": "The site leans on material claims across the catalog: wool, tree fiber, sugarcane, Terralux described as plant-based, and M0.0NSHOT Zero described as a net zero carbon shoe.",
+        "impact": "Claims stay consistent across hundreds of pages and launches, and reviewers spend their time on genuinely new wording.",
+        "relatedProject": "none"
+      },
+      {
+        "name": "Holiday Markdown Watcher",
+        "role": "Tracks sell-through by style and size during sales and proposes which markdowns to deepen, hold, or end.",
+        "trigger": "Daily at 06:00 while a sale such as the Black Friday Early Access event is live",
+        "does": [
+          "Reads sell-through and remaining stock for every discounted style and size",
+          "Flags sizes that will sell out before the sale ends and styles that are not moving at the current discount",
+          "Drafts a markdown change list with the reason for each line"
+        ],
+        "tools": [
+          { "name": "Sales and inventory by size", "access": "read", "system": "Inventory system" },
+          { "name": "Current sale prices", "access": "read", "system": "E-commerce catalog" },
+          { "name": "Proposed price changes", "access": "write", "system": "E-commerce catalog (draft price list)" }
+        ],
+        "humanGate": {
+          "required": true,
+          "detail": "Every price change goes to a draft price list. A merchandiser approves the list before any price changes on the site."
+        },
+        "evidence": "The site runs a Holiday Sale with Black Friday Early Access at up to 70 percent off select styles.",
+        "impact": "Markdowns follow what is actually selling by size, so popular sizes are not discounted into stockouts and slow styles do not wait for the next review.",
+        "relatedProject": "apparelmagic-agents"
+      }
+    ],
+    "firstBuild": {
+      "agentName": "Return Reason Analyst",
+      "why": "It is read-only, the data already exists in the returns system, and its first weekly brief shows whether the other agents are worth building.",
+      "scope": [
+        "Pull 90 days of returns with reason codes and comments",
+        "Group by style, size, and material, comparing the same silhouette across materials",
+        "Write a weekly brief to one merchandising channel",
+        "Review the first four briefs with merchandising and tune the groupings"
+      ]
+    },
+    "nonObvious": "Because Allbirds makes the same silhouette in wool, tree fiber, canvas, and Terralux, its returns can separate a sizing problem from a material problem: if the Cruiser is returned for fit in every material, it is the last; if only one material, it is the fabric. Single-material brands cannot run that comparison.",
+    "caveats": [
+      "Curated by hand from the public site, not produced by a live run.",
+      "Return volumes, support tools, and order systems are not visible on the site; tools are named by category.",
+      "Wholesale and retail-partner operations were not visible beyond the note that third-party purchases return to that retailer."
+    ]
+  },
+  "receipt": null
+}

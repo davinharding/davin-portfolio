@@ -1,0 +1,141 @@
+{
+  "v": 1,
+  "slug": "example-sweetgreen",
+  "createdAt": "2026-11-11T12:00:00.000Z",
+  "kind": "example",
+  "source": {
+    "host": "sweetgreen.com",
+    "inputUrl": "sweetgreen.com",
+    "finalUrl": "https://www.sweetgreen.com/",
+    "method": "curated",
+    "pages": [
+      { "url": "https://www.sweetgreen.com/", "title": "sweetgreen homepage" },
+      { "url": "https://www.sweetgreen.com/catering", "title": "Catering" }
+    ]
+  },
+  "company": {
+    "name": "sweetgreen",
+    "oneLiner": "sweetgreen runs restaurants serving salads, warm bowls, and plates, with ordering through its app, office batch delivery, and catering.",
+    "offerings": [
+      "Harvest Bowl",
+      "Kale Caesar",
+      "Miso Glazed Salmon",
+      "Outpost",
+      "Catering",
+      "Sweetgreen Bar",
+      "SG Rewards",
+      "Gift Cards"
+    ],
+    "customers": "Individual diners ordering in store, in the app, and online; office teams through Outpost; and groups from 10 to 10,000+ people through catering."
+  },
+  "blueprint": {
+    "headline": "sweetgreen's Outpost and catering orders arrive with a cutoff or 24 hours of notice, so the agents to build first turn that known demand into prep, dispatch, and quotes before the lunch rush.",
+    "agents": [
+      {
+        "name": "Outpost Batch Planner",
+        "role": "Forecasts each office's daily Outpost batch and turns it into prep and dispatch plans for the restaurant that serves it.",
+        "trigger": "Daily, 90 minutes before each office's Outpost cutoff, then again at cutoff",
+        "does": [
+          "Projects the batch size for each Outpost office from orders so far and that office's history",
+          "Adds the projected batch to the serving restaurant's prep plan by menu item",
+          "Groups offices into drop routes that meet each agreed delivery time"
+        ],
+        "tools": [
+          { "name": "Outpost orders by office", "access": "read", "system": "sweetgreen ordering platform" },
+          { "name": "Prep plan", "access": "write", "system": "Kitchen prep system" },
+          { "name": "Delivery schedule", "access": "write", "system": "Dispatch and courier system" }
+        ],
+        "humanGate": {
+          "required": true,
+          "detail": "Prep adjustments apply automatically within 15 percent of the usual batch. Larger changes, and any change to an office's delivery time, need the general manager."
+        },
+        "evidence": "Outpost is described as a daily batch delivery to the office with a cutoff set per office, and orders arrive through the app or online ordering.",
+        "impact": "Outpost batches are prepped from a forecast instead of a last-minute scramble at cutoff, and drops arrive at the agreed time.",
+        "relatedProject": "apparelmagic-agents"
+      },
+      {
+        "name": "Catering Quote Desk",
+        "role": "Turns catering inquiries into complete, priced quotes that follow the published catering rules.",
+        "trigger": "When a Start Catering Inquiry form or catering email arrives",
+        "does": [
+          "Extracts headcount, date, address, and format: individually packaged or the Sweetgreen Bar",
+          "Checks the $50 minimum, the 24-hour notice rule, the 20-mile delivery radius, and whether the Sweetgreen Bar is offered at that location",
+          "Drafts a quote with the 10 percent delivery fee (minimum $30) and the nearest catering location"
+        ],
+        "tools": [
+          { "name": "Inquiry form and catering inbox", "access": "read", "system": "Website forms and email" },
+          { "name": "Catering menus by location", "access": "read", "system": "Menu management system" },
+          { "name": "Quote draft", "access": "write", "system": "Catering order system and ezCater" }
+        ],
+        "humanGate": {
+          "required": true,
+          "detail": "A catering coordinator approves every quote before it is sent. Orders over 500 people, or inside 24 hours, go to the catering manager."
+        },
+        "evidence": "The catering page sets a $50 minimum, 24 hours notice, delivery within 20 miles at a 10 percent fee starting at $30, and offers the Sweetgreen Bar only at select locations.",
+        "impact": "Inquiries get an accurate quote quickly, and coordinators review instead of looking up radius, minimums, and location menus by hand.",
+        "relatedProject": "apparelmagic-agents"
+      },
+      {
+        "name": "Allergen Guide Checker",
+        "role": "Checks that the Nutrition and Allergens Guide matches the current recipes before a menu change goes live at any location.",
+        "trigger": "When a recipe or seasonal menu change is scheduled",
+        "does": [
+          "Compares each changed recipe's ingredients against the published allergen and nutrition entries",
+          "Lists every location whose menu includes the changed item",
+          "Blocks the change in the menu system until the guide is updated or a reviewer clears it"
+        ],
+        "tools": [
+          { "name": "Recipe and ingredient specs", "access": "read", "system": "Recipe management system" },
+          { "name": "Nutrition and Allergens Guide", "access": "read", "system": "Website CMS" },
+          { "name": "Menu change hold", "access": "write", "system": "Menu management system" }
+        ],
+        "humanGate": {
+          "required": true,
+          "detail": "Only the food safety lead can release a held menu change. The agent can hold a change; it can never publish one."
+        },
+        "evidence": "The site publishes a Nutrition and Allergens Guide while menus vary by location and feature changing items such as the Harvest Bowl and Miso Glazed Salmon.",
+        "impact": "Allergen information stays correct as recipes change across locations, which protects diners first and the brand second.",
+        "relatedProject": "none"
+      },
+      {
+        "name": "New Location Demand Digest",
+        "role": "Combines location requests and Outpost interest into a monthly demand map for the real estate team.",
+        "trigger": "First business day of each month",
+        "does": [
+          "Reads submissions to the Where should we open next form and new Outpost sign-up requests",
+          "Clusters them by neighborhood and office building, counting distinct companies and requests",
+          "Writes a ranked internal digest with the strongest unserved areas"
+        ],
+        "tools": [
+          { "name": "Location requests", "access": "read", "system": "Website forms" },
+          { "name": "Outpost sign-up requests", "access": "read", "system": "Outpost CRM" },
+          { "name": "Monthly digest", "access": "write", "system": "Internal docs workspace" }
+        ],
+        "humanGate": {
+          "required": false,
+          "detail": "It reads form submissions and writes an internal report. It contacts no one and commits to nothing."
+        },
+        "evidence": "The Locations page asks visitors where sweetgreen should open next, and Outpost has its own sign-up for offices that want the program.",
+        "impact": "Site selection gets a steady signal of where people already want sweetgreen, named down to the office building.",
+        "relatedProject": "none"
+      }
+    ],
+    "firstBuild": {
+      "agentName": "Catering Quote Desk",
+      "why": "Every quote is already reviewed by a coordinator, the rules are written down on the catering page, and each faster quote is revenue.",
+      "scope": [
+        "Read inquiries from the catering form and inbox",
+        "Check minimum, notice, radius, and Sweetgreen Bar availability by location",
+        "Draft priced quotes for coordinator approval",
+        "Track approval edits to find which rules the drafts get wrong"
+      ]
+    },
+    "nonObvious": "Outpost is the one sweetgreen channel where demand is committed before prep: orders close at a per-office cutoff and go out in one batch. That makes Outpost history the cleanest training data in the company, and a forecast calibrated on it can then correct prep for walk-in and app orders at the same restaurant.",
+    "caveats": [
+      "Curated by hand from the public site, not produced by a live run.",
+      "The catering page states both a 24-hour and a 12-hour notice window; the quote desk assumes 24 hours until the catering team confirms.",
+      "Kitchen, dispatch, and recipe systems are not visible on the site and are named by category."
+    ]
+  },
+  "receipt": null
+}
