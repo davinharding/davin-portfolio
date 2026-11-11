@@ -32,6 +32,8 @@ import MissionControlBoard from "../../public/projectScreenshots/mission_control
 import MissionControlTask from "../../public/projectScreenshots/mission_control_task.png";
 import FileExplorerCode from "../../public/projectScreenshots/file_explorer_code.png";
 import FileExplorerTree from "../../public/projectScreenshots/file_explorer_tree.png";
+import VitalsArchitecture from "../../public/projectScreenshots/vitals_arch.png";
+import VitalsReadout from "../../public/projectScreenshots/vitals_readout.png";
 
 import TypeScriptLogo from "../../public/logos/Typescript_logo.png";
 import NodejsLogo from "../../public/logos/nodejs_logo.png";
@@ -361,6 +363,68 @@ export const projects: Project[] = [
       projectTags.TypeScript,
       projectTags.Nodejs,
       projectTags.React,
+    ],
+  },
+  {
+    image: VitalsArchitecture,
+    image2: VitalsReadout,
+    title: "Vitals: AI Health Agent",
+    name: "Vitals Health Agent",
+    previewDescription:
+      "My personal AI health coach. Vitals pulls Oura Ring and Withings scale data on a schedule, logs meals from text and voice notes, and checks me against macro, activity, and recovery targets every day. A sibling agent, Susan, extends the same system to a second household member through Apple Watch.",
+    description:
+      `Vitals is the health agent in my OpenClaw setup (see the OpenClaw Multi-Agent Ops case study) and the one I use most. It started as a meal-logging bot and grew into a coach that has kept a daily health log for me since February 2026, roughly 245 days and counting.
+      |
+      The problem: every health app owns one slice. Oura knows sleep and recovery, Withings knows weight and body composition, a food tracker knows macros, and none of them talk to each other or tell me what to change today. I wanted one coach that sees all of it and talks to me where I already am, in Telegram and Discord.
+      |
+      The Oura Ring integration runs as host scripts against the Oura API v2. They pull daily sleep, readiness, activity, resilience, and detailed sleep sessions (durations, heart rate, HRV, bedtimes), save the raw JSON, and write a readable summary into that day's log. A late-morning pull covers last night's sleep and a 10 PM pull captures the day's activity.
+      |
+      The Withings integration uses OAuth2 with refresh-token rotation, with tokens stored outside any agent workspace. It pulls weight, body fat, fat-free mass, muscle, bone, and hydration from the measurement API. The scale is shared, so the puller keeps only my Withings user ID, and when a weigh-in arrives without one it falls back to a plausible weight band. A backup pull catches late weigh-ins, and failures alert me on Telegram instead of failing quietly.
+      |
+      Every day is one markdown file with sections for meals, totals, weigh-in, Oura sleep, Oura activity, and notes. Each puller upserts only its own section, so a re-run or an empty pull never wipes data. The agent rule is that if a meal is not written to the file, it did not happen. That rule came from the biggest early failure: Vitals worked out macros in chat, and the next morning's summary had nothing to read.
+      |
+      The coaching runs on cron. A 9 AM accountability check, a 7 PM guardrail that asks whether steps and protein are on pace, a 10:30 PM full readout, and a Monday weekly review. Readouts grade each macro against its target range, keep wearable burn separate from the food budget (energy balance is labeled as an estimate), recheck that meal subtotals add up before reporting, and flag planned items as unconfirmed. I can log by voice note. Notes are transcribed locally with whisper.cpp, and Vitals replies with a voice note, followed by the numbers as text.
+      |
+      Data honesty was the hardest engineering problem. Oura's cloud often has not published today's activity by evening, and early versions quietly reported yesterday's steps. The steps sync now checks the record date, finds the latest cloud sync, retries with bounded backoff, and returns a distinct "upstream stale" exit code so the agent says the data is missing instead of guessing. The same rule applies to the agent itself: Vitals cannot say it logged or sent something unless the tool result confirms it. The pullers ship with shell test suites over fixture payloads covering section upserts, empty pulls, API errors, and stale data.
+      |
+      Susan is a second health agent I built for another member of my household on the same architecture, with its own Telegram bot, workspace, and targets. That person wears an Apple Watch rather than an Oura Ring, so I built an Apple Health ingest path: an iOS Shortcut posts the day's steps, energy, exercise minutes, sleep stages, resting heart rate, and HRV to a small Node receiver on the VPS. It listens on loopback only behind Tailscale Funnel, checks a hashed bearer token with a constant-time compare, caps request size, and rate-limits.
+      |
+      Both agents sit in a shared accountability group, and each one reports only on its own person. Isolation is enforced in config, not prompts: separate workspaces, workspace-only file access, and shell and session tools denied where they are not needed. An end-to-end test plan uses synthetic tags to prove neither agent can read the other's data. The only shared file is a household recipe list, so a dish both people eat gets the same macros. Telegram bots cannot see each other's messages, so cross-agent asks go through one scoped relay tool.
+      |
+      The lesson: a useful health agent is mostly a data-plumbing and trust problem. The model is the easy part. Getting clean, dated, correctly attributed data into one place, and making the agent admit when it is missing, is what made it worth using every day.
+      |
+      Stack: Node.js and Bash host scripts, Oura API v2, Withings API with OAuth2, Apple Health via iOS Shortcuts, Tailscale Funnel, OpenClaw cron and channels (Telegram and Discord), whisper.cpp, Edge TTS, and OpenAI models. Screenshots use an architecture diagram and demo data, not my real logs.`,
+    capabilities: [
+      "Oura Ring API v2 pulls for sleep, readiness, activity, and HRV",
+      "Withings scale sync with OAuth2 refresh and per-user filtering",
+      "Apple Watch ingest through an iOS Shortcut and authenticated webhook",
+      "Daily markdown health log as the single source of truth",
+      "Idempotent per-section upserts from each data source",
+      "Meal logging from text and voice notes with running macro totals",
+      "Scheduled morning, evening, nightly, and weekly coaching check-ins",
+      "Stale-data detection that never substitutes yesterday's numbers",
+      "Voice replies with local transcription and text-to-speech",
+      "Two isolated agents with config-enforced privacy and E2E tests",
+      "Fixture-based test suites for every data puller",
+    ],
+    relatedLinks: [
+      {
+        label: "Oura API v2",
+        href: "https://cloud.ouraring.com/v2/docs",
+      },
+      {
+        label: "Withings API",
+        href: "https://developer.withings.com/",
+      },
+      {
+        label: "OpenClaw (upstream)",
+        href: "https://github.com/openclaw/openclaw",
+      },
+    ],
+    projectTags: [
+      projectTags.OpenAI,
+      projectTags.Nodejs,
+      projectTags.JavaScript,
     ],
   },
   {
