@@ -595,3 +595,255 @@ html.loader-done .splash {
   width: 0 !important;
   height: 0 !important;
 }
+
+/* ---------------------------------------------------------------------------
+   Theme chrome
+   --------------------------------------------------------------------------- */
+
+/* Header logo: both marks are in the DOM, the html class picks one */
+html.light .theme-logo-dark,
+html:not(.light) .theme-logo-light {
+  visibility: hidden;
+}
+
+/* Sun ⇄ crescent moon. Dark (default) shows the moon. */
+.theme-icon {
+  overflow: visible;
+}
+
+.theme-icon__body,
+.theme-icon__bite,
+.theme-icon__rays {
+  transform-origin: 12px 12px;
+  transition:
+    transform 0.6s cubic-bezier(0.68, -0.35, 0.32, 1.35),
+    opacity 0.35s ease;
+}
+
+.theme-icon__rays {
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.4);
+}
+
+html.light .theme-icon__body {
+  transform: scale(0.6);
+}
+
+html.light .theme-icon__bite {
+  transform: translate(9px, -9px);
+}
+
+html.light .theme-icon__rays {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Day/night reveal (driven by ThemeProvider.tsx + lib/themeFx.ts)
+   The new theme spreads out as a circle from the toggle, its edge lit like a
+   horizon: sunbeams flood in for day, stars wink on as night sweeps past.
+   --------------------------------------------------------------------------- */
+
+html[data-theme-transition]::view-transition-old(root),
+html[data-theme-transition]::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+html[data-theme-transition]::view-transition-new(root) {
+  animation: theme-reveal 0.9s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+@keyframes theme-reveal {
+  from {
+    clip-path: circle(0px at var(--theme-x) var(--theme-y));
+  }
+  to {
+    clip-path: circle(var(--theme-r) at var(--theme-x) var(--theme-y));
+  }
+}
+
+.theme-fx {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.theme-fx--day {
+  --fx-glow: 251 146 60; /* orange-400 */
+  --fx-glow-inner: 253 224 71; /* yellow-300 */
+}
+
+.theme-fx--night {
+  --fx-glow: 96 165 250; /* blue-400, the site's primary */
+  --fx-glow-inner: 139 92 246; /* violet-500 */
+}
+
+/* Glowing band riding the edge of the reveal, in lockstep with its clip-path */
+.theme-fx__horizon {
+  position: absolute;
+  left: calc(var(--fx-x) - var(--fx-r));
+  top: calc(var(--fx-y) - var(--fx-r));
+  width: calc(var(--fx-r) * 2);
+  height: calc(var(--fx-r) * 2);
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    transparent 72%,
+    rgb(var(--fx-glow-inner) / 0.12) 86%,
+    rgb(var(--fx-glow) / 0.55) 98%,
+    rgb(var(--fx-glow) / 0.9) 99.6%,
+    transparent 100%
+  );
+  transform: scale(0);
+  animation:
+    theme-fx-horizon 0.9s cubic-bezier(0.65, 0, 0.35, 1) forwards,
+    theme-fx-out 0.5s ease 0.75s forwards;
+}
+
+@keyframes theme-fx-horizon {
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes theme-fx-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* Day: a warm sun bloom at the toggle and slowly turning rays */
+.theme-fx__sun {
+  position: absolute;
+  left: var(--fx-x);
+  top: var(--fx-y);
+  width: 70vmin;
+  height: 70vmin;
+  margin: -35vmin 0 0 -35vmin;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    rgb(254 240 138 / 0.7),
+    rgb(251 191 36 / 0.35) 35%,
+    rgb(251 146 60 / 0.12) 65%,
+    transparent
+  );
+  opacity: 0;
+  animation: theme-fx-sun 1.7s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+}
+
+@keyframes theme-fx-sun {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+}
+
+@property --fx-beam-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.theme-fx__beams {
+  position: absolute;
+  inset: 0;
+  background: repeating-conic-gradient(
+    from var(--fx-beam-angle) at var(--fx-x) var(--fx-y),
+    rgb(251 191 36 / 0.16) 0deg 3deg,
+    transparent 3deg 14deg
+  );
+  mask-image: radial-gradient(
+    circle at var(--fx-x) var(--fx-y),
+    #000 8%,
+    transparent 75%
+  );
+  opacity: 0;
+  animation: theme-fx-beams 2s ease-out forwards;
+}
+
+@keyframes theme-fx-beams {
+  0% {
+    opacity: 0;
+    --fx-beam-angle: -10deg;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    --fx-beam-angle: 25deg;
+  }
+}
+
+/* Night: stars light up as the edge sweeps over them (delay set per star) */
+.theme-fx__star {
+  position: absolute;
+  width: var(--size);
+  height: var(--size);
+  margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
+  border-radius: 50%;
+  background: #e0f2fe;
+  box-shadow: 0 0 6px 1px rgb(96 165 250 / 0.7);
+  opacity: 0;
+  animation: theme-fx-star 1.3s ease-out var(--delay) forwards;
+}
+
+@keyframes theme-fx-star {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  18% {
+    opacity: var(--peak);
+    transform: scale(1.4);
+  }
+  40% {
+    opacity: calc(var(--peak) * 0.45);
+    transform: scale(1);
+  }
+  62% {
+    opacity: var(--peak);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+}
+
+.theme-fx__shooting-star {
+  position: absolute;
+  top: 16%;
+  left: 82%;
+  width: 150px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, rgb(147 197 253 / 0.6) 70%, #fff);
+  transform-origin: left center;
+  opacity: 0;
+  animation: theme-fx-shoot 0.85s cubic-bezier(0.3, 0, 0.2, 1) 0.6s forwards;
+}
+
+@keyframes theme-fx-shoot {
+  0% {
+    opacity: 0;
+    transform: rotate(152deg) translateX(0) scaleX(0.3);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(152deg) translateX(min(55vw, 520px)) scaleX(1);
+  }
+}

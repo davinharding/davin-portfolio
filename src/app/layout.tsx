@@ -6,6 +6,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import LoadingAnimation from "@/components/LoadingAnimation";
 import SilenceScriptWarning from "@/components/SilenceScriptWarning";
+import { THEME_COLORS, themeBootScript } from "@/lib/theme";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -85,8 +86,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#020617" },
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: THEME_COLORS.dark },
+    { media: "(prefers-color-scheme: light)", color: THEME_COLORS.light },
   ],
   width: "device-width",
   initialScale: 1,
@@ -112,10 +113,6 @@ const personJsonLd = {
   ],
 };
 
-// Inline boot script: applies the persisted theme + skips the splash overlay
-// for repeat visits BEFORE the first paint, so there is no FOUC and no flash.
-const themeBootScript = `(function(){try{var d=document.documentElement;var s=localStorage.getItem('theme');if(s==='light'){d.classList.add('light')}else{d.classList.remove('light')}if(sessionStorage.getItem('davinLoaderShown')==='true'){d.classList.add('loader-done')}}catch(e){}})();`;
-
 export default function RootLayout({
   children,
 }: {
@@ -124,7 +121,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={inter.variable}>
       <head>
-        {/* React 19 logs a dev-only "Encountered a script tag" warning for these,
+        {/* Applies the theme (saved choice, else the OS setting) and skips the
+            splash for repeat visits before first paint: no flash.
+            React 19 logs a dev-only "Encountered a script tag" warning for these,
             but the scripts execute correctly from the SSR HTML. The warning is
             filtered in dev by `SilenceScriptWarning` mounted below. */}
         <script
