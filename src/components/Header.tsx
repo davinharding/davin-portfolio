@@ -3,10 +3,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, ChevronDown, Mail, Briefcase, Sun, Moon, Calendar } from "lucide-react";
+import { Menu, ChevronDown, Mail, Briefcase, Calendar } from "lucide-react";
 import { getPublishedProjects, projectPath } from "@/data/projectData";
 import { Button } from "@/components/ui/button";
-import { useTheme } from "@/components/ThemeProvider";
+import { ThemeMenu, ThemeSegmented } from "@/components/ThemeToggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,7 +33,6 @@ const Header: React.FC<IHeaderProps> = () => {
   const pathName = usePathname();
   const router = useRouter();
   const [sheetOpen, setSheetOpen] = useState(false);
-  const { theme, toggleTheme } = useTheme();
 
   const scrollToExperience = () => {
     if (pathName === "/") {
@@ -62,15 +61,28 @@ const Header: React.FC<IHeaderProps> = () => {
           className="transition-opacity hover:opacity-80"
           prefetch
         >
-          <Image
-            src={theme === "dark" ? "/logo.svg" : "/logo-light.svg"}
-            alt=""
-            width={40}
-            height={40}
-            priority
-            unoptimized
-            data-splash-target
-          />
+          {/* Both marks are rendered and the html `light` class picks one, so
+              the right logo shows from first paint with no hydration swap. */}
+          <span data-splash-target className="relative block h-10 w-10">
+            <Image
+              src="/logo.svg"
+              alt=""
+              width={40}
+              height={40}
+              priority
+              unoptimized
+              className="theme-logo-dark"
+            />
+            <Image
+              src="/logo-light.svg"
+              alt=""
+              width={40}
+              height={40}
+              priority
+              unoptimized
+              className="theme-logo-light absolute inset-0"
+            />
+          </span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -130,20 +142,7 @@ const Header: React.FC<IHeaderProps> = () => {
             </Link>
           </Button>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleTheme}
-            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-            className="text-muted-foreground"
-          >
-            {theme === "dark" ? (
-              <Sun className="h-4 w-4" aria-hidden="true" />
-            ) : (
-              <Moon className="h-4 w-4" aria-hidden="true" />
-            )}
-            <span className="sr-only">Toggle theme</span>
-          </Button>
+          <ThemeMenu />
         </div>
 
         {/* Mobile Navigation */}
@@ -154,7 +153,7 @@ const Header: React.FC<IHeaderProps> = () => {
               <span className="sr-only">Toggle menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="right" className="w-72">
+          <SheetContent side="right" className="w-72 overflow-y-auto">
             <SheetHeader>
               <SheetTitle>Navigation</SheetTitle>
             </SheetHeader>
@@ -217,23 +216,10 @@ const Header: React.FC<IHeaderProps> = () => {
               </div>
 
               <div className="space-y-1 pt-4 border-t border-border">
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start"
-                  onClick={toggleTheme}
-                >
-                  {theme === "dark" ? (
-                    <>
-                      <Sun className="mr-2 h-4 w-4" aria-hidden="true" />
-                      Light Mode
-                    </>
-                  ) : (
-                    <>
-                      <Moon className="mr-2 h-4 w-4" aria-hidden="true" />
-                      Dark Mode
-                    </>
-                  )}
-                </Button>
+                <p className="text-sm font-medium text-muted-foreground px-2 pb-1">
+                  Theme
+                </p>
+                <ThemeSegmented />
               </div>
             </div>
           </SheetContent>
