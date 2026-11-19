@@ -1,7 +1,7 @@
 import type { ResolvedTheme } from "@/lib/theme";
 
 // Decorative layer for the day/night reveal: a glowing horizon on the edge of
-// the reveal, plus sunbeams for day or a field of stars for night. Styles are
+// the reveal, plus a field of stars for night. Styles are
 // in globals.css under "Day/night reveal"; this only builds the elements.
 
 const REVEAL_MS = 900;
@@ -58,11 +58,7 @@ export function playThemeFx(
   layer.setAttribute("aria-hidden", "true");
 
   layer.append(el("theme-fx__horizon"));
-  if (theme === "light") {
-    layer.append(el("theme-fx__beams"), el("theme-fx__sun"));
-  } else {
-    addStars(layer, origin, radius);
-  }
+  if (theme === "dark") addStars(layer, origin, radius);
 
   document.body.append(layer);
   active = layer;
