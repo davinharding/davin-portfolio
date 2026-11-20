@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { getConfig, isLiveEnabled, isMockMode, priceFor } from "../config";
-import { GuardedStore, MemoryStore, StoreError, type Store } from "../store";
+import { getStore, GuardedStore, MemoryStore, setStoreForTesting, StoreError, UpstashStore, type Store } from "../store";
 
 describe("MemoryStore", () => {
   it("supports NX and expiry", async () => {
@@ -85,5 +85,27 @@ describe("config", () => {
 
   it("prices unknown models at the Opus rate", () => {
     expect(priceFor("claude-unknown")).toEqual(priceFor("claude-opus-5-5"));
+  });
+});
+
+describe("getStore", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    setStoreForTesting(undefined);
+  });
+
+  it("uses the in-memory store in mock mode even when Redis is configured", async () => {
+    vi.stubEnv("VERCEL_ENV", "development");
+    vi.stubEnv("THIRTY_MOCK", "1");
+    vi.stubEnv("UPSTASH_REDIS_REST_URL", "https://example-redis.invalid");
+    vi.stubEnv("UPSTASH_REDIS_REST_TOKEN", "not-a-real-token");
+    const fromEnv = vi.spyOn(UpstashStore, "fromEnv");
+    setStoreForTesting(undefined);
+    const store = getStore();
+    expect(store).not.toBeNull();
+    expect(fromEnv).not.toHaveBeenCalled();
+    await store!.set("k", "v");
+    expect(await store!.get("k")).toBe("v");
+    fromEnv.mockRestore();
   });
 });

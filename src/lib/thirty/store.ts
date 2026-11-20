@@ -1,7 +1,7 @@
 // Server-only. One small key-value interface over Upstash Redis, with an
 // in-memory implementation for local development and tests.
 import { Redis } from "@upstash/redis";
-import { hasRedisEnv, isProduction, LIMITS } from "./config";
+import { hasRedisEnv, isMockMode, isProduction, LIMITS } from "./config";
 
 export type SetOptions = { ex?: number; nx?: boolean };
 
@@ -181,13 +181,15 @@ const globalForStore = globalThis as unknown as {
 };
 
 /**
- * Returns the configured store: Upstash when its env exists, the in-memory
- * store outside production, otherwise null (live runs are then disabled).
+ * Returns the configured store: the in-memory store in mock mode (so local mock
+ * runs never write fixtures or use up the daily cap in a shared Redis), Upstash
+ * when its env exists, the in-memory store outside production, otherwise null
+ * (live runs are then disabled).
  */
 export function getStore(): Store | null {
   if (globalForStore.__thirtyStore !== undefined) return globalForStore.__thirtyStore;
   let store: Store | null = null;
-  if (hasRedisEnv()) store = new GuardedStore(UpstashStore.fromEnv());
+  if (hasRedisEnv() && !isMockMode()) store = new GuardedStore(UpstashStore.fromEnv());
   else if (!isProduction()) {
     globalForStore.__thirtyMemoryMap ??= new Map();
     store = new GuardedStore(new MemoryStore(globalForStore.__thirtyMemoryMap));
