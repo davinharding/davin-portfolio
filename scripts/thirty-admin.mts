@@ -56,7 +56,7 @@ switch (command) {
       console.log(`Removed dom:${host}.`);
     }
     console.log(`Deleted ${slug}.`);
-    console.log("The cached page can linger for up to 5 minutes (revalidate = 300) before it returns 404.");
+    console.log("The page can keep showing for up to 5 minutes (the cached Redis read) before it returns 404.");
     break;
   }
   case "stats": {

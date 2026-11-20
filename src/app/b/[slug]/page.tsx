@@ -3,17 +3,14 @@ import { notFound } from "next/navigation";
 import HeaderFooter from "@/components/HeaderFooter";
 import { BlueprintView } from "@/components/thirty/BlueprintView";
 import { loadBlueprint } from "@/lib/thirty/blueprints";
-import { EXAMPLE_LINKS } from "@/lib/thirty/examples";
 import { isValidSlug } from "@/lib/thirty/slug";
 
 type Params = Promise<{ slug: string }>;
 
-// Blueprints are immutable; cache rendered pages so repeat views skip Redis.
-export const revalidate = 300;
-
-export function generateStaticParams() {
-  return EXAMPLE_LINKS.map((example) => ({ slug: example.slug }));
-}
+// Rendered per request so a store outage reaches error.tsx: an ISR page whose
+// first render throws is served as a bare 500 instead. Repeat views still skip
+// Redis, because loadBlueprint caches the stored value for 5 minutes.
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { slug } = await params;

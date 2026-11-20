@@ -190,7 +190,7 @@ States:
 - Not found: custom `not-found.tsx` ("That blueprint does not exist or was removed.") with the form link and examples.
 - Redis unreachable or stored JSON fails validation: `error.tsx` with "Blueprints are temporarily unavailable" and a retry. Log the cause.
 - Stored `v` older than current: run it through a `migrate()` function (identity for v1) so future schema changes have a home.
-- Caching: blueprints are immutable. Use ISR-style caching for the page (`revalidate` of 300 seconds is fine) so repeat views do not hit Redis. The admin delete command must note that a deleted page can linger for that window.
+- Caching: blueprints are immutable. Cache the stored Redis value for 300 seconds (`unstable_cache`) so repeat views do not hit Redis, and render the page per request. (An ISR page whose first render throws is served by Next as a bare 500, so the Redis-unreachable state above would never show.) The admin delete command must note that a deleted page can linger for that window.
 
 ### 4.6 `/sorry/[code]`
 

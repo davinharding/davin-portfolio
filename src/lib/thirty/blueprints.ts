@@ -14,11 +14,10 @@ export class BlueprintUnavailableError extends Error {
 }
 
 /**
- * The Upstash client fetches with `cache: "no-store"`. /b/[slug] is an ISR
- * page, and Next never resolves a no-store fetch while it statically renders
- * one, so a bare read hangs until the store timeout. Inside unstable_cache
- * the fetch runs normally. Blueprints are immutable, so caching the raw
- * value is safe; errors are not cached.
+ * Blueprints are immutable, so the raw stored value is cached for 5 minutes
+ * and repeat views of a page skip Redis. Errors are not cached. (This wrapper
+ * also lets the Upstash client's `cache: "no-store"` fetch resolve if the page
+ * is ever statically rendered again.)
  */
 const readStoredBlueprint = unstable_cache(
   async (slug: string) => getStore()?.get(keys.blueprint(slug)) ?? null,
