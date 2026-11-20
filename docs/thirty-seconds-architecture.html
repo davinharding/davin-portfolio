@@ -1,0 +1,497 @@
+<title>Thirty Seconds Architecture</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a single technical sheet. Header, a full-width layered system diagram, then a two-column
+   run/guardrails spread, a component table, and a compact stack + limits footer. */
+:root {
+  --bg: #f3f6fa;
+  --surface: #ffffff;
+  --ink: #132033;
+  --muted: #586579;
+  --line: #cbd4e0;
+  --accent: #2450b8;   /* app code running on Vercel */
+  --model: #9a5d08;    /* Anthropic model calls */
+  --data: #0d7566;     /* Redis */
+  --halo: #f3f6fa;
+  --font-display: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "IBM Plex Sans", -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d131c; --surface: #141c28; --ink: #e5ebf3; --muted: #93a0b3; --line: #2b3747;
+    --accent: #84a6f6; --model: #e2a84e; --data: #4cc4b0; --halo: #0d131c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d131c; --surface: #141c28; --ink: #e5ebf3; --muted: #93a0b3; --line: #2b3747;
+  --accent: #84a6f6; --model: #e2a84e; --data: #4cc4b0; --halo: #0d131c; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 40px 56px;
+}
+.sheet { max-width: 1120px; margin: 0 auto; display: grid; gap: 40px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+h1 { font-size: clamp(30px, 4.4vw, 42px); font-weight: 700; line-height: 1.1; }
+h2 { font-size: 20px; font-weight: 600; }
+h3 { font-size: 15px; font-weight: 600; }
+p { margin: 0; }
+code, .mono { font-family: var(--font-mono); font-size: 0.86em; }
+code { background: color-mix(in srgb, var(--accent) 8%, var(--surface)); padding: 1px 5px; border-radius: 4px; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+
+/* Header */
+header { display: grid; gap: 14px; }
+header .lede { font-size: 17px; max-width: 68ch; color: var(--ink); }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 20px; font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); }
+.meta b { color: var(--ink); font-weight: 500; }
+
+/* Diagram */
+figure { margin: 0; display: grid; gap: 12px; }
+.diagram-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+.diagram-wrap svg { display: block; width: 100%; min-width: 940px; height: auto; }
+figcaption { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 13px; color: var(--muted); align-items: center; }
+.key { display: inline-flex; align-items: center; gap: 8px; }
+.swatch { width: 14px; height: 14px; border-radius: 3px; border: 1.5px solid; }
+.sw-app { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--surface)); }
+.sw-model { border-color: var(--model); background: color-mix(in srgb, var(--model) 12%, var(--surface)); }
+.sw-data { border-color: var(--data); background: color-mix(in srgb, var(--data) 12%, var(--surface)); }
+.sw-ext { border-color: var(--muted); border-style: dashed; background: var(--surface); }
+.scroll-hint { display: none; }
+@media (max-width: 980px) { .scroll-hint { display: inline; } }
+
+/* SVG styling */
+svg text { font-family: var(--font-body); fill: var(--ink); }
+svg .band { fill: none; stroke: var(--line); stroke-width: 1; }
+svg .band-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em; fill: var(--muted); }
+svg .box { stroke-width: 1.5; }
+svg .app { fill: color-mix(in srgb, var(--accent) 9%, var(--surface)); stroke: var(--accent); }
+svg .app-soft { fill: color-mix(in srgb, var(--accent) 4%, var(--surface)); stroke: var(--accent); stroke-dasharray: 2 0; }
+svg .model { fill: color-mix(in srgb, var(--model) 10%, var(--surface)); stroke: var(--model); }
+svg .data { fill: color-mix(in srgb, var(--data) 10%, var(--surface)); stroke: var(--data); }
+svg .ext { fill: var(--surface); stroke: var(--muted); stroke-dasharray: 5 4; }
+svg .ui { fill: var(--surface); stroke: var(--muted); }
+svg .t-title { font-family: var(--font-display); font-weight: 600; font-size: 15px; }
+svg .t-sub { font-family: var(--font-mono); font-size: 12px; fill: var(--muted); }
+svg .t-body { font-size: 12.5px; fill: var(--ink); }
+svg .t-step { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.1em; fill: var(--accent); }
+svg .t-model { fill: var(--model); }
+svg .wire { fill: none; stroke: var(--ink); stroke-width: 1.4; opacity: 0.75; }
+svg .wire-data { stroke: var(--data); opacity: 1; }
+svg .wire-model { stroke: var(--model); opacity: 1; }
+svg .arrowhead { fill: var(--ink); }
+svg .arrowhead-data { fill: var(--data); }
+svg .arrowhead-model { fill: var(--model); }
+svg .lbl { font-family: var(--font-mono); font-size: 11.5px; fill: var(--muted); paint-order: stroke; stroke: var(--surface); stroke-width: 5px; stroke-linejoin: round; }
+
+/* Two-column spread */
+.spread { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 40px; align-items: start; }
+@media (max-width: 860px) { .spread { grid-template-columns: minmax(0, 1fr); } }
+section { display: grid; gap: 16px; min-width: 0; }
+
+ol.run { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; counter-reset: run; }
+ol.run li { counter-increment: run; display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 2px 12px; }
+ol.run li::before {
+  content: counter(run); grid-row: span 2;
+  width: 26px; height: 26px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+  border: 1.5px solid var(--accent); color: var(--accent);
+}
+ol.run h3 { line-height: 26px; }
+ol.run p { color: var(--ink); font-size: 14.5px; }
+ol.run .tag { font-family: var(--font-mono); font-size: 11.5px; color: var(--model); white-space: nowrap; }
+
+.callout {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px;
+  display: grid; gap: 6px; font-size: 14.5px;
+}
+.callout h3 { color: var(--accent); }
+
+.guards { display: grid; gap: 18px; }
+.guard { display: grid; gap: 8px; }
+.guard h3 { display: flex; align-items: center; gap: 8px; }
+.guard h3::before { content: ""; width: 8px; height: 8px; border-radius: 2px; background: var(--accent); }
+.guard.cost h3::before { background: var(--model); }
+.guard.rel h3::before { background: var(--data); }
+.guard ul { margin: 0; padding-left: 18px; display: grid; gap: 5px; font-size: 14px; }
+.guard li::marker { color: var(--muted); }
+
+/* Components table */
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 760px; font-size: 13.5px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+tr:last-child td { border-bottom: 0; }
+th { font-family: var(--font-mono); font-weight: 500; font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: color-mix(in srgb, var(--accent) 4%, var(--surface)); }
+td:first-child { font-weight: 600; white-space: nowrap; }
+td .mono { color: var(--muted); font-size: 12px; line-height: 1.5; display: block; }
+td.model-cell { color: var(--model); font-weight: 500; }
+
+/* Footer grid */
+.facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
+@media (max-width: 860px) { .facts { grid-template-columns: minmax(0, 1fr); } }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-family: var(--font-mono); font-size: 12px; padding: 3px 9px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); }
+dl { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 14px; font-size: 13.5px; }
+dt { font-family: var(--font-mono); font-size: 12px; color: var(--muted); padding-top: 1px; }
+dd { margin: 0; font-variant-numeric: tabular-nums; }
+.source { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px; }
+</style>
+
+<main class="sheet">
+  <header>
+    <span class="eyebrow">System design · homepage agent</span>
+    <h1>Thirty Seconds</h1>
+    <p class="lede">A visitor types a company's website on the homepage. About 30 seconds later they get a shareable page describing the 3 to 5 AI agents Davin would build for that company. Behind it sits one Next.js API route that reads the site, makes two or three Claude calls in a fixed order, checks the result, and saves it to Redis.</p>
+    <div class="meta">
+      <span><b>Entry</b> POST /api/blueprint</span>
+      <span><b>Models</b> Claude Haiku 5.5 · Claude Sonnet 5.5</span>
+      <span><b>Deadline</b> 60 s per run</span>
+      <span><b>Output</b> /b/{slug}</span>
+    </div>
+  </header>
+
+  <figure>
+    <div class="diagram-wrap">
+      <svg viewBox="0 0 1220 716" role="img" aria-labelledby="dg-title dg-desc">
+        <title id="dg-title">Thirty Seconds system diagram</title>
+        <desc id="dg-desc">The browser posts a URL to a Vercel function. The handler runs cheap checks against Redis, then a four-step pipeline reads the company site, calls Claude Haiku for research and Claude Sonnet for design, checks quality and saves to Redis. Progress streams back to the browser as NDJSON, and the browser then opens the server-rendered blueprint page, which reads from Redis.</desc>
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrowhead" d="M0,0 L10,5 L0,10 z"/></marker>
+          <marker id="ah-data" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrowhead-data" d="M0,0 L10,5 L0,10 z"/></marker>
+          <marker id="ah-model" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrowhead-model" d="M0,0 L10,5 L0,10 z"/></marker>
+        </defs>
+
+        <!-- Bands -->
+        <rect class="band" x="16" y="16" width="1188" height="120" rx="10"/>
+        <text class="band-label" transform="rotate(-90 38 76)" x="38" y="80" text-anchor="middle">BROWSER</text>
+        <rect class="band" x="16" y="166" width="1188" height="274" rx="10"/>
+        <text class="band-label" transform="rotate(-90 38 303)" x="38" y="307" text-anchor="middle">VERCEL FUNCTION · NODE</text>
+        <rect class="band" x="16" y="460" width="1188" height="240" rx="10"/>
+        <text class="band-label" transform="rotate(-90 38 580)" x="38" y="584" text-anchor="middle">EXTERNAL SERVICES</text>
+
+        <!-- Browser row -->
+        <rect class="box ui" x="60" y="46" width="210" height="70" rx="8"/>
+        <text class="t-title" x="76" y="74">Homepage  /</text>
+        <text class="t-sub" x="76" y="96">BlueprintLauncher form</text>
+
+        <rect class="box ui" x="478" y="46" width="220" height="70" rx="8"/>
+        <text class="t-title" x="494" y="74">Run console</text>
+        <text class="t-sub" x="494" y="96">steps · pages · agent names</text>
+
+        <rect class="box ui" x="914" y="46" width="274" height="70" rx="8"/>
+        <text class="t-title" x="930" y="74">Blueprint page</text>
+        <text class="t-sub" x="930" y="96">agents · org chart · receipt</text>
+
+        <!-- Handler -->
+        <rect class="box app" x="60" y="206" width="210" height="214" rx="8"/>
+        <text class="t-title" x="76" y="232">API route + handler</text>
+        <text class="t-sub" x="76" y="252">POST /api/blueprint</text>
+        <text class="t-body" x="76" y="282">Same origin + honeypot</text>
+        <text class="t-body" x="76" y="302">Flood guard, 10 per min</text>
+        <text class="t-body" x="76" y="322">Normalize and vet the URL</text>
+        <text class="t-body" x="76" y="342">Cached? Return it now</text>
+        <text class="t-body" x="76" y="362">Daily limits + $ budget</text>
+        <text class="t-body" x="76" y="382">Per-host lock</text>
+        <text class="t-sub" x="76" y="406">no money spent yet</text>
+
+        <!-- Pipeline container -->
+        <rect class="box app-soft" x="294" y="206" width="596" height="214" rx="8"/>
+        <text class="t-sub" x="310" y="228" style="fill: var(--accent)">runPipeline · 60 s deadline</text>
+        <rect class="box app" x="310" y="238" width="556" height="28" rx="5"/>
+        <text class="t-body" x="588" y="257" text-anchor="middle">RunEmitter buffers every event and streams it as NDJSON</text>
+
+        <rect class="box app" x="310" y="286" width="124" height="100" rx="7"/>
+        <text class="t-step" x="324" y="306">STEP 1</text>
+        <text class="t-title" x="324" y="328">Read site</text>
+        <text class="t-sub" x="324" y="348">home + 3 pages</text>
+        <text class="t-sub" x="324" y="366">SSRF-guarded</text>
+
+        <rect class="box app" x="454" y="286" width="124" height="100" rx="7"/>
+        <text class="t-step" x="468" y="306">STEP 2</text>
+        <text class="t-title" x="468" y="328">Research</text>
+        <text class="t-sub t-model" x="468" y="348">Haiku 5.5</text>
+        <text class="t-sub" x="468" y="366">→ profile JSON</text>
+
+        <rect class="box app" x="598" y="286" width="124" height="100" rx="7"/>
+        <text class="t-step" x="612" y="306">STEP 3</text>
+        <text class="t-title" x="612" y="328">Design</text>
+        <text class="t-sub t-model" x="612" y="348">Sonnet 5.5</text>
+        <text class="t-sub" x="612" y="366">→ 3–5 agents</text>
+
+        <rect class="box app" x="742" y="286" width="124" height="100" rx="7"/>
+        <text class="t-step" x="756" y="306">STEP 4</text>
+        <text class="t-title" x="756" y="328">Check + save</text>
+        <text class="t-sub" x="756" y="348">quality gate</text>
+        <text class="t-sub" x="756" y="366">1 redraft max</text>
+
+        <!-- ISR page -->
+        <rect class="box app" x="914" y="206" width="274" height="214" rx="8"/>
+        <text class="t-title" x="930" y="232">Blueprint page render</text>
+        <text class="t-sub" x="930" y="252">/b/[slug] · ISR 300 s</text>
+        <text class="t-body" x="930" y="282">Examples load from committed JSON</text>
+        <text class="t-body" x="930" y="302">Runs load from Redis via</text>
+        <text class="t-body" x="930" y="320">unstable_cache</text>
+        <text class="t-body" x="930" y="342">Open Graph image per blueprint</text>
+        <text class="t-body" x="930" y="362">Not indexed unless an example</text>
+
+        <!-- External -->
+        <rect class="box ext" x="310" y="485" width="124" height="80" rx="7"/>
+        <text class="t-title" x="324" y="512">Company site</text>
+        <text class="t-sub" x="324" y="532">undici fetch</text>
+        <text class="t-sub" x="324" y="550">≤ 1.5 MB/page</text>
+
+        <rect class="box model" x="454" y="485" width="268" height="80" rx="7"/>
+        <text class="t-title" x="470" y="512">Anthropic Messages API</text>
+        <text class="t-sub" x="470" y="532">Zod structured output</text>
+        <text class="t-sub" x="470" y="550">+ hosted web_search fallback</text>
+
+        <rect class="box data" x="60" y="610" width="1128" height="70" rx="8"/>
+        <text class="t-title" x="80" y="638">Upstash Redis</text>
+        <text class="t-sub" x="80" y="662">bp:{slug}  ·  dom:{host} 7 d  ·  neg:{host} 24 h  ·  lock:{host} 100 s  ·  rl:d / rl:m per visitor  ·  day:{date}  ·  budget:{month}</text>
+
+        <!-- Wires -->
+        <path class="wire" d="M165 116 V203" marker-end="url(#ah)"/>
+        <text class="lbl" x="174" y="155">POST { url }</text>
+
+        <path class="wire" d="M588 238 V119" marker-end="url(#ah)"/>
+        <text class="lbl" x="597" y="155">NDJSON events</text>
+
+        <path class="wire" d="M698 81 H911" marker-end="url(#ah)"/>
+        <text class="lbl" x="805" y="71" text-anchor="middle">on done → /b/{slug}</text>
+
+        <path class="wire" d="M1051 116 V203" marker-end="url(#ah)"/>
+        <text class="lbl" x="1060" y="155">server render</text>
+
+        <path class="wire" d="M270 336 H307" marker-end="url(#ah)"/>
+        <path class="wire" d="M434 336 H451" marker-end="url(#ah)"/>
+        <path class="wire" d="M578 336 H595" marker-end="url(#ah)"/>
+        <path class="wire" d="M722 336 H739" marker-end="url(#ah)"/>
+
+        <path class="wire" d="M372 286 V268" marker-end="url(#ah)"/>
+        <path class="wire" d="M516 286 V268" marker-end="url(#ah)"/>
+        <path class="wire" d="M660 286 V268" marker-end="url(#ah)"/>
+        <path class="wire" d="M804 286 V268" marker-end="url(#ah)"/>
+
+        <path class="wire" d="M372 386 V482" marker-end="url(#ah)"/>
+        <text class="lbl" x="380" y="452">GET</text>
+        <path class="wire wire-model" d="M516 386 V482" marker-end="url(#ah-model)"/>
+        <text class="lbl" x="524" y="452">parse</text>
+        <path class="wire wire-model" d="M660 386 V482" marker-end="url(#ah-model)"/>
+        <text class="lbl" x="668" y="452">stream</text>
+
+        <path class="wire wire-data" d="M165 423 V607" marker-start="url(#ah-data)" marker-end="url(#ah-data)"/>
+        <text class="lbl" x="174" y="530">cache · limits</text>
+        <text class="lbl" x="174" y="548">budget · lock</text>
+        <path class="wire wire-data" d="M804 386 V607" marker-end="url(#ah-data)"/>
+        <text class="lbl" x="812" y="540">write bp + dom</text>
+        <path class="wire wire-data" d="M1051 610 V423" marker-end="url(#ah-data)"/>
+        <text class="lbl" x="1060" y="540">read bp:{slug}</text>
+      </svg>
+    </div>
+    <figcaption>
+      <span class="key"><span class="swatch sw-app"></span>App code on Vercel</span>
+      <span class="key"><span class="swatch sw-model"></span>Claude model call</span>
+      <span class="key"><span class="swatch sw-data"></span>Redis state</span>
+      <span class="key"><span class="swatch sw-ext"></span>Untrusted third party</span>
+      <span class="scroll-hint">Scroll sideways to see the whole diagram.</span>
+    </figcaption>
+  </figure>
+
+  <div class="spread">
+    <section>
+      <h2>One run, start to finish</h2>
+      <ol class="run">
+        <li>
+          <h3>The visitor submits a URL</h3>
+          <p><code>BlueprintLauncher</code> posts <code>{ url }</code> as JSON and reads the response body as a stream. Without JavaScript the same form posts normally and gets a 303 redirect to the result or to <code>/sorry/{code}</code>.</p>
+        </li>
+        <li>
+          <h3>The handler runs the cheap checks first</h3>
+          <p>Body size, same-origin, honeypot, a 10-per-minute flood guard, then URL normalization (no IP literals, platform hosts or the site itself). A domain seen in the last 7 days returns its cached blueprint at once. Only then does it take a per-visitor run, a global run, a $0.15 budget reservation and a per-host lock.</p>
+        </li>
+        <li>
+          <h3>Read the site</h3>
+          <p>Fetches the homepage and up to 3 same-site pages scored by link text (about, pricing, products), in parallel. Parked domains, bot challenges and thin pages are detected here.</p>
+        </li>
+        <li>
+          <h3>Research <span class="tag">Haiku 5.5</span></h3>
+          <p>Scraped text is wrapped as untrusted <code>&lt;website_content&gt;</code> and turned into a typed profile: offerings, customers, business model, operations, scale signals, a fit verdict and safety flags. If the site blocked the bot or said too little, a web search writes a brief and research runs again with it.</p>
+        </li>
+        <li>
+          <h3>Design <span class="tag">Sonnet 5.5</span></h3>
+          <p>Sees only the profile plus a catalog of Davin's past projects. Streams 3 to 5 agents, each with a trigger, actions, read/write tools, a human approval gate and the evidence behind it, then a first build and caveats. Agent names are picked out of the partial JSON and shown live.</p>
+        </li>
+        <li>
+          <h3>Check and save</h3>
+          <p>Plain code checks the draft: at least 3 distinct agents, evidence on each, at least one human gate, the company or two offerings named, no URLs, emails or phone numbers. A failed draft gets one redraft with the failures listed, if 20 seconds remain. The result and a cost receipt are written to Redis.</p>
+        </li>
+        <li>
+          <h3>Hand off to the blueprint page</h3>
+          <p>The stream ends with <code>done</code>, the browser goes to <code>/b/{slug}</code>, and that page renders on the server from Redis and stays cached for 5 minutes.</p>
+        </li>
+      </ol>
+      <div class="callout">
+        <h3>A pipeline, not an open-ended agent loop</h3>
+        <p>The order of steps is fixed in code. Claude is called 2 times on a normal run and at most about 6 on the worst path, and every answer must match a Zod schema. The only tool a model touches is Anthropic's hosted web search in the fallback. That keeps cost, time and failure modes bounded.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Guardrails</h2>
+      <div class="guards">
+        <div class="guard cost">
+          <h3>Cost</h3>
+          <ul>
+            <li>Every run reserves $0.15 against a monthly cap ($10 by default), then settles to the real token and search cost.</li>
+            <li>40 runs a day site-wide and 3 per visitor, keyed by a salted hash of the IP.</li>
+            <li>Failures that aren't the visitor's fault (timeouts, provider errors, quality) give the run back.</li>
+            <li><code>THIRTY_LIVE=off</code> stops new runs without a redeploy. Cached and example blueprints keep working.</li>
+          </ul>
+        </div>
+        <div class="guard">
+          <h3>Safety</h3>
+          <ul>
+            <li>DNS answers are checked against private and reserved ranges at connect time. IP literals are refused and every redirect is re-checked, 4 hops at most.</li>
+            <li>Scraped <code>&lt;</code> and <code>&gt;</code> are neutralized so page text can't close the prompt's tags. Injection attempts are flagged and logged, never followed.</li>
+            <li>Adult or illegal businesses stop as <code>unsafe</code>, model refusals as <code>declined</code>.</li>
+            <li>The design model never sees raw page text, only the extracted profile.</li>
+          </ul>
+        </div>
+        <div class="guard rel">
+          <h3>Reliability</h3>
+          <ul>
+            <li>The run is kept alive with <code>after()</code>, so it finishes and is saved even if the visitor closes the tab.</li>
+            <li>A per-host lock means two people entering the same domain share one run. The second waits and polls for up to 60 s.</li>
+            <li>Not-a-company, unreachable and unsafe results are cached for 24 h so they aren't paid for twice.</li>
+            <li>Redis calls time out at 3 s. In development an in-memory store stands in.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section>
+    <h2>The pieces</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Piece</th><th>Built with</th><th>Job</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Launcher + run console<span class="mono">components/thirty/BlueprintLauncher.tsx<br>RunConsole.tsx</span></td>
+            <td>React client component, fetch + stream reader</td>
+            <td>Posts the URL, renders step, page, company and agent events as they arrive, gives up after 75 s, navigates on <code>done</code>.</td>
+          </tr>
+          <tr>
+            <td>API route<span class="mono">app/api/blueprint/route.ts</span></td>
+            <td>Next.js 16 route handler, Node runtime, 90 s max</td>
+            <td>POST only. Wraps the handler and registers the run with <code>after()</code>.</td>
+          </tr>
+          <tr>
+            <td>Handler<span class="mono">lib/thirty/handler.ts</span></td>
+            <td>TypeScript with injected dependencies</td>
+            <td>Ordered checks, caches, limits, budget and lock. Streams NDJSON for JSON callers, redirects for form callers.</td>
+          </tr>
+          <tr>
+            <td>Pipeline<span class="mono">lib/thirty/pipeline.ts</span></td>
+            <td>AbortController deadline, RunEmitter</td>
+            <td>Runs the four steps, settles the budget, releases the lock, writes the receipt and one JSON log line per run.</td>
+          </tr>
+          <tr>
+            <td>Site reader<span class="mono">fetchSite.ts · extract.ts<br>ssrf.ts · url.ts</span></td>
+            <td>undici with a guarded DNS lookup, node-html-parser</td>
+            <td>Fetches and extracts title, meta, headings and text, 12k characters a page and 30k in total.</td>
+          </tr>
+          <tr>
+            <td>Research agent<span class="mono">research.ts · prompts.ts</span></td>
+            <td class="model-cell">Claude Haiku 5.5, <code>messages.parse</code>, effort low</td>
+            <td>Turns site text into the company profile. Reports only what the text supports.</td>
+          </tr>
+          <tr>
+            <td>Search fallback<span class="mono">searchFallback.ts</span></td>
+            <td class="model-cell">Claude Sonnet 5.5 + <code>web_search</code>, 3 uses max</td>
+            <td>Writes a factual brief when the site blocks bots or is too thin. Returns NO_COMPANY_FOUND when there is nothing real.</td>
+          </tr>
+          <tr>
+            <td>Design agent<span class="mono">design.ts · projectCatalog.ts</span></td>
+            <td class="model-cell">Claude Sonnet 5.5, <code>messages.stream</code>, effort low</td>
+            <td>Drafts the blueprint and links each agent to the closest of 8 past projects, or none.</td>
+          </tr>
+          <tr>
+            <td>Quality gate<span class="mono">quality.ts</span></td>
+            <td>Deterministic checks</td>
+            <td>Trims and caps every field, then passes or returns a list of failures for the redraft.</td>
+          </tr>
+          <tr>
+            <td>Store, limits, budget<span class="mono">store.ts · limits.ts · budget.ts</span></td>
+            <td>Upstash Redis over REST</td>
+            <td>Blueprints, host caches, locks, rate-limit counters and monthly spend in micro-dollars.</td>
+          </tr>
+          <tr>
+            <td>Blueprint page<span class="mono">app/b/[slug] · BlueprintView<br>OrgChart · RunReceipt</span></td>
+            <td>Server component, ISR, <code>unstable_cache</code></td>
+            <td>Shows the agents, an org chart, the first build and a receipt with steps, models, tokens and estimated cost.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="facts">
+    <section>
+      <h2>Stack</h2>
+      <div class="chips">
+        <span class="chip">Next.js 16 App Router</span>
+        <span class="chip">React 18</span>
+        <span class="chip">TypeScript</span>
+        <span class="chip">Tailwind CSS</span>
+        <span class="chip">@anthropic-ai/sdk</span>
+        <span class="chip">Zod 4</span>
+        <span class="chip">Upstash Redis</span>
+        <span class="chip">undici</span>
+        <span class="chip">node-html-parser</span>
+        <span class="chip">Vitest</span>
+        <span class="chip">Vercel</span>
+        <span class="chip">Vercel Analytics</span>
+      </div>
+    </section>
+    <section>
+      <h2>Time limits</h2>
+      <dl>
+        <dt>run</dt><dd>60 s from request arrival</dd>
+        <dt>read</dt><dd>10 s total, 8 s home, 5 s per subpage</dd>
+        <dt>research</dt><dd>15 s per call</dd>
+        <dt>search</dt><dd>20 s</dd>
+        <dt>design</dt><dd>35 s; redraft only with 20 s left</dd>
+        <dt>browser</dt><dd>75 s watchdog, 5 s keepalive pings</dd>
+      </dl>
+    </section>
+    <section>
+      <h2>Settings</h2>
+      <dl>
+        <dt>THIRTY_LIVE</dt><dd>on / off kill switch</dd>
+        <dt>THIRTY_MODEL_*</dt><dd>research and blueprint models</dd>
+        <dt>THIRTY_EFFORT_BLUEPRINT</dt><dd>low by default</dd>
+        <dt>THIRTY_MONTHLY_BUDGET_USD</dt><dd>10</dd>
+        <dt>THIRTY_DAILY_RUNS</dt><dd>40 site-wide</dd>
+        <dt>THIRTY_IP_DAILY_RUNS</dt><dd>3 per visitor</dd>
+        <dt>THIRTY_MOCK</dt><dd>scripted runs, no API key, never in production</dd>
+      </dl>
+    </section>
+  </div>
+
+  <p class="source">Written from the code on the <span class="mono">feat/thirty-seconds</span> branch on 11 November 2026, mainly <span class="mono">src/lib/thirty/</span> and <span class="mono">src/app/api/blueprint/route.ts</span>. Admin and example scripts: <span class="mono">npm run thirty:admin</span> (get, delete, stats) and <span class="mono">npm run thirty:examples</span> (regenerates the three example blueprints through the real pipeline).</p>
+</main>
