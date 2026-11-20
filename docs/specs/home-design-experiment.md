@@ -62,7 +62,7 @@ New:
 
 | File | Responsibility |
 |---|---|
-| `src/proxy.ts` | Matcher for `/` and `/home/:path*`. Calls `decideHome`, applies the result (rewrite or redirect, cookies, header). Wraps everything in try/catch and falls back to `NextResponse.next()`. |
+| `src/proxy.ts` | Matcher for page routes: every path except `/api/`, `/_next/`, `/relay-dh`, generated Open Graph images, and paths with a file extension. Calls `decideHome`, applies the result (rewrite or redirect, cookies, header; on other pages only `dh_id` for a visitor without one). Wraps everything in try/catch and falls back to `NextResponse.next()`. |
 | `src/lib/experiments/homeDesign.ts` | Client-safe constants and pure helpers: flag key, design keys, cookie names, `isDesign`, `isExperimentArm`, `assignVariant`, `parseHomeCookie`, `formatHomeCookie`, `readDesignMode`, `distinctIdFromPostHogCookie`. |
 | `src/lib/experiments/decide.ts` | `decideHome(input): HomeDecision`. Pure. No Next imports, so it is unit-tested directly. |
 | `src/lib/experiments/browser.ts` | Client: `readHomeAssignment(cookieString)`, `reportHomeView(design)`, `checkAssignment()`. |
@@ -99,7 +99,7 @@ All are first-party, `Path=/`, `SameSite=Lax`, `Secure` in production, readable 
 
 | Cookie | Value | Lifetime | Set by |
 |---|---|---|---|
-| `dh_id` | Visitor id, `[A-Za-z0-9_-]{1,128}` | 1 year, refreshed on each visit to `/` | Proxy |
+| `dh_id` | Visitor id, `[A-Za-z0-9_-]{1,128}` | 1 year, refreshed on each visit to `/` | Proxy: on `/`, and on the first response of any other page for a visitor who has none |
 | `dh_home` | `<design>.<source>`, source is `ab`, `pin`, or `qa` | 1 year | Proxy |
 | `dh_force` | A design key | Session | Proxy, from `?variant=` |
 | `dh_internal` | `1` | 1 year | Proxy, from any valid `?variant=` |
@@ -110,16 +110,18 @@ All are first-party, `Path=/`, `SameSite=Lax`, `Secure` in production, readable 
 
 ### 4.5 Proxy contract
 
-Response header on every request the proxy handles for `/`: `x-home-design: <design>.<source>`.
+Response header on every request the proxy handles for `/`: `x-home-design: <design>.<source>`. Other pages never get `x-home-design` or `dh_home`.
 
-`decideHome` input: `{ pathname, searchParams, cookies: { dh_id, dh_force, posthog }, mode, newId }`. Output: `{ kind: "rewrite", design, source, id }`, `{ kind: "redirect", to, setForce?, clearForce?, internal? }`, or `{ kind: "pass" }`.
+`Cache-Control: private, no-cache` is set on every response that sets a cookie (the rewritten `/`, and another page's response when it sets `dh_id`), and only on those.
+
+`decideHome` input: `{ pathname, searchParams, cookies: { dh_id, dh_force, posthog }, mode, newId }`. Output: `{ kind: "rewrite", design, source, id }`, `{ kind: "redirect", to, setForce?, clearForce?, internal? }`, or `{ kind: "pass", setId? }`.
 
 ## 5. Behavior: assignment and measurement
 
 ### 5.1 Proxy decision, in order
 
 1. Path starts with `/home/`: redirect 307 to `/`, keeping the query string.
-2. Path is not exactly `/`: pass.
+2. Path is not exactly `/`: pass. If the visitor has no valid `dh_id`, the pass carries an id to set (the id from step 4's PostHog cookie, else a new one), and the proxy sets `dh_id` on that page's response. This way the document response gives the visitor their id before any script runs, so posthog-js is started from it and a homepage prefetch cannot mint a second id (FM-33).
 3. Query has `variant`:
    - A design key: set `dh_force` and `dh_internal`, redirect 307 to `/` with `variant` removed and every other parameter kept.
    - `auto`: clear `dh_force`, redirect the same way. `dh_internal` stays.
@@ -163,7 +165,7 @@ Every client event also carries the super properties `home_variant` and `home_va
 - If `dh_home` parses and its source is `ab`: `bootstrap.featureFlags = { "home-design": design }`.
 - If `dh_home` parses: `posthog.register({ home_variant, home_variant_source })`.
 - If `dh_internal` is `1`: `posthog.setInternalOrTestUser()`. The project's existing test-account filter (cohort 744540, person property `$internal_or_test_user`) then excludes that person.
-- A visitor whose first page is not `/` has no `dh_id` yet. posthog-js mints its own id. On their first request for `/` the proxy adopts that id from PostHog's cookie (5.1 step 4), so the person stays the same.
+- A visitor whose first page is not `/` gets `dh_id` from that page's own response (5.1 step 2), so posthog-js starts from it and the homepage later hashes the same id. A visitor who already has posthog-js's cookie but no `dh_id` (from before this change) has that id adopted instead (5.1 step 4), so the person stays the same.
 
 ### 5.5 `reportHomeView(design)`
 
@@ -291,6 +293,7 @@ Reference: `docs/prototypes/thirty-home/02-drafting-table.html`. Two columns fro
 | FM-30 | Operations | Bundle growth, or `/` turning dynamic | Slower landing page | Prevent: designs are static; posthog-js stays lazy | Same speed | Build output: `/` and `/home/[variant]` static; first-load JS of each design within 15 kB of today's `/` |
 | FM-31 | Analytics | `call_booked` fires twice (Calendly re-posts, React strict mode) | Inflated conversions | Prevent: a ref guard, once per page load | Nothing | Walk; unit test of the guard |
 | FM-32 | Analytics | Visitor books by the fallback link in a new tab | Booking not captured | Accept and expose: `call_link_opened` is tracked; the UTM values still attribute the booking inside Calendly | Calendly in a new tab | Walk |
+| FM-33 | Identity | First page is not `/`, and the header's prefetch of `/` leaves before posthog-js has written its cookie | The proxy mints a second id; on the next load posthog-js is started from it, so one visitor becomes two PostHog persons and the design is hashed from an id PostHog was not using | Prevent: the proxy runs on every page and sets `dh_id` on the first page's own response (5.1 step 2), before any script runs | Nothing | UP-19 walk: land on `/b/example-linear`, click the logo, reload; one distinct id across every event, equal to `dh_id` and to the id the design was hashed from. Added during verification, where the race was reproduced. |
 
 ## 9. Errors
 

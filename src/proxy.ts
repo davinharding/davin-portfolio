@@ -1,5 +1,7 @@
-// Runs before the homepage is served. Picks the visitor's design and rewrites `/`
-// to its prerendered page, so there is no flash and nothing renders per request.
+// Runs before every page is served. On `/` it picks the visitor's design and
+// rewrites to its prerendered page, so there is no flash and nothing renders per
+// request. On any other page it only gives a new visitor their id, so posthog-js
+// starts from the same id the homepage will hash.
 // Spec: docs/specs/home-design-experiment.md.
 import { NextResponse, type NextRequest } from "next/server";
 import { posthogKey } from "@/lib/analytics/config";
@@ -14,7 +16,12 @@ import {
 } from "@/lib/experiments/homeDesign";
 import { isMockMode } from "@/lib/thirty/config";
 
-export const config = { matcher: ["/", "/home/:path*"] };
+// Page routes only: not the API, Next's own files, the PostHog relay, generated
+// images, or anything with a file extension. Every /home/* path is matched too,
+// dotted or not, so crafted ones are still sent back to `/`.
+export const config = {
+  matcher: ["/((?!api/|_next/|relay-dh|.*opengraph-image|.*twitter-image|.*\\.[^/]*$).*)", "/home/:path*"],
+};
 
 let warnedAboutMode = false;
 
@@ -44,10 +51,18 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
       mode: designMode(),
       newId: () => crypto.randomUUID(),
     });
-    if (decision.kind === "pass") return NextResponse.next();
-
     const cookie = { path: "/", sameSite: "lax" as const, secure: nextUrl.protocol === "https:" };
     const lasting = { ...cookie, maxAge: HOME_COOKIE_MAX_AGE_SEC };
+
+    if (decision.kind === "pass") {
+      const response = NextResponse.next();
+      if (decision.setId) {
+        response.cookies.set(HOME_COOKIES.id, decision.setId, lasting);
+        // A response that sets a visitor's id must never be served to someone else.
+        response.headers.set("Cache-Control", "private, no-cache");
+      }
+      return response;
+    }
 
     if (decision.kind === "redirect") {
       // The target is always this site's root, so a crafted path or query cannot redirect elsewhere.

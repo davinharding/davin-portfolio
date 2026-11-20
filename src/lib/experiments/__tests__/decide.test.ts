@@ -127,9 +127,33 @@ describe("decideHome: other paths", () => {
     expect(await decide({ pathname: "/home/open-roles" })).toEqual({ kind: "redirect", search: "" });
   });
 
-  it("leaves every other path alone", async () => {
+  it("leaves every other path alone for a visitor who already has an id", async () => {
     for (const pathname of ["/work", "/homepage", "/b/example-linear", "/api/blueprint", "/call", "//evil.com"]) {
-      expect(await decide({ pathname, search: "variant=classic" })).toEqual({ kind: "pass" });
+      expect(await decide({ pathname, search: "variant=classic", cookies: { id: "visitor-1" } })).toEqual({ kind: "pass" });
     }
+  });
+
+  it("gives a visitor whose first page is not the homepage an id, and nothing else", async () => {
+    // UP-19: without this, the homepage prefetch could mint a second id that later replaced posthog-js's own.
+    for (const pathname of ["/work", "/b/example-linear", "/call", "/sorry/rate-limited"]) {
+      expect(await decide({ pathname, search: "variant=classic" })).toEqual({ kind: "pass", setId: "fresh-id" });
+    }
+  });
+
+  it("adopts posthog-js's id on other pages too, so the visitor stays one person", async () => {
+    expect(await decide({ pathname: "/work", cookies: { posthog: posthogCookie("ph-existing") } })).toEqual({
+      kind: "pass",
+      setId: "ph-existing",
+    });
+  });
+
+  it("replaces a tampered id cookie on other pages", async () => {
+    expect(await decide({ pathname: "/work", cookies: { id: "<script>" } })).toEqual({ kind: "pass", setId: "fresh-id" });
+  });
+
+  it("gives the homepage the same id that another page set first", async () => {
+    const pass = await decide({ pathname: "/b/example-linear" });
+    const id = pass.kind === "pass" ? pass.setId : undefined;
+    expect(await decide({ cookies: { id } })).toMatchObject({ kind: "rewrite", id: "fresh-id", design: await assignVariant("fresh-id") });
   });
 });
