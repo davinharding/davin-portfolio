@@ -26,7 +26,7 @@ A modern, responsive portfolio showcasing 8+ years of full-stack development, fr
 - **GitHub contribution calendar** pulled live from the API
 - **Particle network background** for a dynamic, polished feel
 - **Fully responsive** across desktop, tablet, and mobile
-- **Vercel Analytics** for traffic insights
+- **PostHog** for usage analytics and session replay (project "davin.io"), plus **Vercel Analytics** for traffic insights
 
 ## 🛠 Tech Stack
 
@@ -41,7 +41,7 @@ A modern, responsive portfolio showcasing 8+ years of full-stack development, fr
 | Timeline | react-vertical-timeline-component |
 | Scheduling | react-calendly |
 | Deployment | Vercel |
-| Analytics | @vercel/analytics |
+| Analytics | posthog-js, @vercel/analytics |
 
 ## 📁 Project Structure
 

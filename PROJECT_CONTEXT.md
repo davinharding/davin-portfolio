@@ -16,7 +16,7 @@ This is a **personal developer portfolio website** for Davin Harding, a full-sta
 | **Language** | TypeScript |
 | **Styling** | Tailwind CSS |
 | **Deployment** | Vercel |
-| **Analytics** | Google Analytics + Vercel Analytics |
+| **Analytics** | PostHog (events, replays, server-side run events) + Google Analytics + Vercel Analytics |
 | **Animations** | react-awesome-reveal, tsParticles |
 | **UI Components** | Headless UI, hamburger-react |
 | **Special Integrations** | Calendly (scheduling), react-github-calendar |

@@ -192,6 +192,27 @@
         "3317"
       ],
       "port": 3317
+    },
+    {
+      "name": "verify-ph-down",
+      "runtimeExecutable": "env",
+      "runtimeArgs": [
+        "THIRTY_MOCK=1",
+        "UPSTASH_REDIS_REST_URL=",
+        "UPSTASH_REDIS_REST_TOKEN=",
+        "KV_REST_API_URL=",
+        "KV_REST_API_TOKEN=",
+        "ANTHROPIC_API_KEY=",
+        "THIRTY_IP_DAILY_RUNS=3",
+        "THIRTY_DAILY_RUNS=1000",
+        "POSTHOG_HOST=http://127.0.0.1:9",
+        "npx",
+        "next",
+        "start",
+        "-p",
+        "3319"
+      ],
+      "port": 3319
     }
   ]
 }

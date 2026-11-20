@@ -55,8 +55,10 @@ for (const name of names) {
       day: "script",
       reservation: { monthKey: "script", reservedMicros: 0 },
       requestStartedAt: Date.now(),
+      analytics: { distinctId: "examples-script" },
     },
-    { store, stages, models, emitter, slugFor: () => `example-${name}` }
+    // Regenerating examples is not visitor traffic, so nothing goes to analytics.
+    { store, stages, models, emitter, slugFor: () => `example-${name}`, report: async () => false }
   );
   if (!outcome.ok) {
     console.error(`  [${name}] failed: ${outcome.code}`);
