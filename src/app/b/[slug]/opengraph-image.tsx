@@ -52,7 +52,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
           ))}
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: 24, color: "#94a3b8" }}>
-          <span>Davin Harding builds AI agents that take real work off your team</span>
+          <span>Your next hire is an AI agent. Davin Harding builds it.</span>
           <span>davin.io</span>
         </div>
       </div>
