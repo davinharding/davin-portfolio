@@ -655,7 +655,7 @@ html.light .theme-icon__rays {
 /* ---------------------------------------------------------------------------
    Day/night reveal (driven by ThemeProvider.tsx + lib/themeFx.ts)
    The new theme spreads out as a circle from the toggle, its edge lit like a
-   horizon: sunbeams flood in for day, stars wink on as night sweeps past.
+   horizon: a soft warm dawn line for day, stars wink on as night sweeps past.
    --------------------------------------------------------------------------- */
 
 html[data-theme-transition]::view-transition-old(root),
@@ -686,13 +686,15 @@ html[data-theme-transition]::view-transition-new(root) {
 }
 
 .theme-fx--day {
-  --fx-glow: 251 146 60; /* orange-400 */
-  --fx-glow-inner: 253 224 71; /* yellow-300 */
+  --fx-glow: 251 191 36; /* amber-400 */
+  --fx-glow-inner: 254 243 199; /* amber-100 */
+  --fx-edge: 0.45; /* gentler than night: a bright edge reads loud on a light page */
 }
 
 .theme-fx--night {
   --fx-glow: 96 165 250; /* blue-400, the site's primary */
   --fx-glow-inner: 139 92 246; /* violet-500 */
+  --fx-edge: 0.9;
 }
 
 /* Glowing band riding the edge of the reveal, in lockstep with its clip-path */
@@ -707,8 +709,8 @@ html[data-theme-transition]::view-transition-new(root) {
     closest-side,
     transparent 72%,
     rgb(var(--fx-glow-inner) / 0.12) 86%,
-    rgb(var(--fx-glow) / 0.55) 98%,
-    rgb(var(--fx-glow) / 0.9) 99.6%,
+    rgb(var(--fx-glow) / calc(var(--fx-edge) * 0.6)) 98%,
+    rgb(var(--fx-glow) / var(--fx-edge)) 99.6%,
     transparent 100%
   );
   transform: scale(0);
@@ -726,77 +728,6 @@ html[data-theme-transition]::view-transition-new(root) {
 @keyframes theme-fx-out {
   to {
     opacity: 0;
-  }
-}
-
-/* Day: a warm sun bloom at the toggle and slowly turning rays */
-.theme-fx__sun {
-  position: absolute;
-  left: var(--fx-x);
-  top: var(--fx-y);
-  width: 70vmin;
-  height: 70vmin;
-  margin: -35vmin 0 0 -35vmin;
-  border-radius: 50%;
-  background: radial-gradient(
-    closest-side,
-    rgb(254 240 138 / 0.7),
-    rgb(251 191 36 / 0.35) 35%,
-    rgb(251 146 60 / 0.12) 65%,
-    transparent
-  );
-  opacity: 0;
-  animation: theme-fx-sun 1.7s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
-}
-
-@keyframes theme-fx-sun {
-  0% {
-    opacity: 0;
-    transform: scale(0.2);
-  }
-  25% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.4);
-  }
-}
-
-@property --fx-beam-angle {
-  syntax: "<angle>";
-  inherits: false;
-  initial-value: 0deg;
-}
-
-.theme-fx__beams {
-  position: absolute;
-  inset: 0;
-  background: repeating-conic-gradient(
-    from var(--fx-beam-angle) at var(--fx-x) var(--fx-y),
-    rgb(251 191 36 / 0.16) 0deg 3deg,
-    transparent 3deg 14deg
-  );
-  mask-image: radial-gradient(
-    circle at var(--fx-x) var(--fx-y),
-    #000 8%,
-    transparent 75%
-  );
-  opacity: 0;
-  animation: theme-fx-beams 2s ease-out forwards;
-}
-
-@keyframes theme-fx-beams {
-  0% {
-    opacity: 0;
-    --fx-beam-angle: -10deg;
-  }
-  30% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    --fx-beam-angle: 25deg;
   }
 }
 
