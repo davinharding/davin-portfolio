@@ -133,5 +133,16 @@ describe("host helpers", () => {
   it("does not treat lookalike hosts as platforms", () => {
     expect(isPlatformHost("notlinkedin.com")).toBe(false);
     expect(isPlatformHost("googleads-partner.com")).toBe(false);
+    expect(isPlatformHost("mygoogle.com")).toBe(false);
+    expect(isPlatformHost("amazon.acme.com")).toBe(false);
+    expect(isPlatformHost("google.example.io")).toBe(false);
+  });
+
+  it("treats subdomains of Google and Amazon country sites as platforms", () => {
+    expect(isPlatformHost("maps.google.co.uk")).toBe(true);
+    expect(isPlatformHost("www.google.com.au")).toBe(true);
+    expect(isPlatformHost("smile.amazon.de")).toBe(true);
+    expect(isPlatformHost("sellercentral.amazon.com")).toBe(true);
+    expect(isPlatformHost("google.de")).toBe(true);
   });
 });

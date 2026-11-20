@@ -78,10 +78,13 @@ function matchesHostOrSubdomain(hostname: string, base: string): boolean {
   return hostname === base || hostname.endsWith(`.${base}`);
 }
 
-/** `google.com`, `google.co.uk`, `www.google.de`, and Amazon storefronts in any country. */
+/**
+ * Google and Amazon in any country, with any subdomain: `google.co.uk`,
+ * `maps.google.com.au`, `smile.amazon.de`. The suffix must look like a country
+ * domain, so `amazon.acme.com` stays a company site.
+ */
 function isCountryVariantPlatform(hostname: string): boolean {
-  const bare = hostname.replace(/^www\./, "");
-  return /^(google|amazon)\.[a-z.]+$/.test(bare);
+  return /(^|\.)(google|amazon)\.(com|[a-z]{2}|(co|com)\.[a-z]{2})$/.test(hostname);
 }
 
 export function isPlatformHost(hostname: string): boolean {
