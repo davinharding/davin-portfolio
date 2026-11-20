@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { track } from "@vercel/analytics";
+import { track } from "@/lib/analytics/track";
 import { cn } from "@/lib/utils";
 
 export type ExampleLinkItem = { slug: string; name: string; label: string };
@@ -28,13 +28,7 @@ export function ExampleLinks({
           <li key={ex.slug}>
             <Link
               href={`/b/${ex.slug}`}
-              onClick={() => {
-                try {
-                  track("example_opened", { example: ex.slug });
-                } catch {
-                  // Analytics must never affect navigation.
-                }
-              }}
+              onClick={() => track("example_opened", { example: ex.slug })}
               className={cn(
                 "inline-flex items-baseline gap-1.5 rounded-md border px-3 py-1.5 transition-colors",
                 emphasized

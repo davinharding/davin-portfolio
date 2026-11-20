@@ -3,11 +3,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { track } from "@vercel/analytics";
 import { ArrowRight, Calendar, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ERRORS, errorMessage, isErrorCode, type ErrorCode, type NextStep } from "@/lib/thirty/errors";
 import { STEP_ORDER, stepLabel, type RunEvent } from "@/lib/thirty/events";
+import { analyticsIds, track } from "@/lib/analytics/track";
 import { cn } from "@/lib/utils";
 import { ExampleLinks, type ExampleLinkItem } from "./ExampleLinks";
 import { RunConsole, type ConsoleStep } from "./RunConsole";
@@ -51,14 +51,6 @@ function secondsBucket(ms: number): string {
   if (s < 30) return "15-30";
   if (s < 45) return "30-45";
   return "45+";
-}
-
-function safeTrack(name: string, props?: Record<string, string | boolean>) {
-  try {
-    track(name, props);
-  } catch {
-    // Analytics must never affect the flow.
-  }
 }
 
 function formatRetry(code: ClientErrorCode, seconds?: number): string | null {
@@ -192,7 +184,7 @@ export default function BlueprintLauncher({ examples }: { examples: readonly Exa
     setError(err);
     setPhase("error");
     setStatusLine(null);
-    if (err.code !== "lost") safeTrack("blueprint_failed", { code: err.code });
+    if (err.code !== "lost") track("blueprint_failed", { code: err.code });
     setFocusInput((n) => n + 1);
   }, []);
 
@@ -254,7 +246,7 @@ export default function BlueprintLauncher({ examples }: { examples: readonly Exa
           prev.map((s) => (s.status === "active" || s.status === "pending" ? { ...s, status: "done" } : s))
         );
       }
-      safeTrack("blueprint_done", { cached, seconds: secondsBucket(Date.now() - startRef.current) });
+      track("blueprint_done", { cached, slug, seconds: secondsBucket(Date.now() - startRef.current) });
       navTimerRef.current = setTimeout(() => router.push(`/b/${slug}`), cached ? 500 : 700);
     },
     [router]
@@ -281,7 +273,7 @@ export default function BlueprintLauncher({ examples }: { examples: readonly Exa
       startRef.current = Date.now();
       setElapsedMs(0);
       setPhase("submitting");
-      safeTrack("blueprint_started");
+      track("blueprint_started", { input_host: guess });
 
       const controller = new AbortController();
       abortRef.current = controller;
@@ -299,7 +291,7 @@ export default function BlueprintLauncher({ examples }: { examples: readonly Exa
         response = await fetch("/api/blueprint", {
           method: "POST",
           headers: { "Content-Type": "application/json", Accept: "application/x-ndjson" },
-          body: JSON.stringify({ url: rawUrl, website_confirm: honeypot }),
+          body: JSON.stringify({ url: rawUrl, website_confirm: honeypot, ...analyticsIds() }),
           signal: controller.signal,
         });
       } catch {
@@ -499,7 +491,7 @@ export default function BlueprintLauncher({ examples }: { examples: readonly Exa
                   ) : null}
                   {next.includes("book_call") ? (
                     <Button asChild size="sm" variant={next.includes("retry") ? "ghost" : "default"}>
-                      <Link href="/call" onClick={() => safeTrack("blueprint_cta_call", { from: "error" })}>
+                      <Link href="/call" onClick={() => track("blueprint_cta_call", { from: "error" })}>
                         <Calendar className="h-4 w-4" aria-hidden="true" />
                         Book a call
                       </Link>
