@@ -577,10 +577,11 @@ a.team-slot:hover {
 .drafting-t--ink {
   fill: hsl(var(--primary));
 }
-/* The phone layout is drawn at a smaller scale, so its type is set larger. */
+/* The phone layout is drawn at a smaller scale, so its type is set larger: at
+   least 10 px on screen in a 328 px container (drawingScale.ts). */
 .drafting-drawing--narrow .drafting-t,
 .drafting-drawing--narrow .drafting-t--label {
-  font-size: 9px;
+  font-size: 9.5px;
 }
 .drafting-drawing--narrow .drafting-t--strong,
 .drafting-drawing--narrow .drafting-t--value {

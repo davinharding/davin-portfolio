@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import type { BlueprintRun } from "../useBlueprintRun";
+import { NARROW_VIEWBOX_WIDTH } from "./drawingScale";
 
 /** Open boxes drawn before the run says how many agents there are. */
 const DEFAULT_SLOTS = 4;
@@ -234,7 +235,7 @@ function NarrowDrawing({ run, progress: p, host }: DrawingProps) {
 
   return (
     <svg
-      viewBox={`0 0 300 ${titleTop + 68}`}
+      viewBox={`0 0 ${NARROW_VIEWBOX_WIDTH} ${titleTop + 68}`}
       className="drafting-drawing drafting-drawing--narrow h-auto w-full sm:hidden"
       role="img"
       aria-label={ALT}
