@@ -141,7 +141,7 @@ export function BlueprintView({ blueprint: stored }: { blueprint: StoredBlueprin
 
       <section aria-label="Next steps" className="py-8 md:py-10 border-t border-border">
         <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-start gap-3">
-          <CallCta />
+          <CallCta slug={stored.slug} />
           <CopyLinkButton fallbackUrl={`${SITE_URL}/b/${stored.slug}`} />
           <Button asChild variant="ghost" size="lg">
             <Link href="/">
