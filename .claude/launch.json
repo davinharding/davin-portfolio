@@ -1,0 +1,197 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "portfolio",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "start"
+      ],
+      "port": 3000
+    },
+    {
+      "name": "portfolio-theme",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "../davin-portfolio-theme",
+        "run",
+        "start",
+        "--",
+        "-p",
+        "3101"
+      ],
+      "port": 3101
+    },
+    {
+      "name": "portfolio-mock",
+      "runtimeExecutable": "env",
+      "runtimeArgs": [
+        "THIRTY_MOCK=1",
+        "npm",
+        "run",
+        "dev",
+        "--",
+        "-p",
+        "3210"
+      ],
+      "port": 3210
+    },
+    {
+      "name": "verify-mock",
+      "runtimeExecutable": "env",
+      "runtimeArgs": [
+        "THIRTY_MOCK=1",
+        "UPSTASH_REDIS_REST_URL=",
+        "UPSTASH_REDIS_REST_TOKEN=",
+        "KV_REST_API_URL=",
+        "KV_REST_API_TOKEN=",
+        "ANTHROPIC_API_KEY=",
+        "THIRTY_IP_DAILY_RUNS=3",
+        "THIRTY_DAILY_RUNS=1000",
+        "npx",
+        "next",
+        "start",
+        "-p",
+        "3311"
+      ],
+      "port": 3311
+    },
+    {
+      "name": "verify-killswitch",
+      "runtimeExecutable": "env",
+      "runtimeArgs": [
+        "THIRTY_MOCK=1",
+        "UPSTASH_REDIS_REST_URL=",
+        "UPSTASH_REDIS_REST_TOKEN=",
+        "KV_REST_API_URL=",
+        "KV_REST_API_TOKEN=",
+        "ANTHROPIC_API_KEY=",
+        "THIRTY_IP_DAILY_RUNS=3",
+        "THIRTY_DAILY_RUNS=1000",
+        "THIRTY_LIVE=off",
+        "npx",
+        "next",
+        "start",
+        "-p",
+        "3312"
+      ],
+      "port": 3312
+    },
+    {
+      "name": "verify-cap1",
+      "runtimeExecutable": "env",
+      "runtimeArgs": [
+        "THIRTY_MOCK=1",
+        "UPSTASH_REDIS_REST_URL=",
+        "UPSTASH_REDIS_REST_TOKEN=",
+        "KV_REST_API_URL=",
+        "KV_REST_API_TOKEN=",
+        "ANTHROPIC_API_KEY=",
+        "THIRTY_IP_DAILY_RUNS=3",
+        "THIRTY_DAILY_RUNS=1",
+        "npx",
+        "next",
+        "start",
+        "-p",
+        "3313"
+      ],
+      "port": 3313
+    },
+    {
+      "name": "verify-budget0",
+      "runtimeExecutable": "env",
+      "runtimeArgs": [
+        "THIRTY_MOCK=1",
+        "UPSTASH_REDIS_REST_URL=",
+        "UPSTASH_REDIS_REST_TOKEN=",
+        "KV_REST_API_URL=",
+        "KV_REST_API_TOKEN=",
+        "ANTHROPIC_API_KEY=",
+        "THIRTY_IP_DAILY_RUNS=3",
+        "THIRTY_DAILY_RUNS=1000",
+        "THIRTY_MONTHLY_BUDGET_USD=0",
+        "npx",
+        "next",
+        "start",
+        "-p",
+        "3314"
+      ],
+      "port": 3314
+    },
+    {
+      "name": "verify-redis-down",
+      "runtimeExecutable": "env",
+      "runtimeArgs": [
+        "THIRTY_MOCK=",
+        "UPSTASH_REDIS_REST_URL=http://127.0.0.1:9",
+        "UPSTASH_REDIS_REST_TOKEN=x",
+        "KV_REST_API_URL=",
+        "KV_REST_API_TOKEN=",
+        "ANTHROPIC_API_KEY=",
+        "npx",
+        "next",
+        "start",
+        "-p",
+        "3315"
+      ],
+      "port": 3315
+    },
+    {
+      "name": "verify-mock-redisenv",
+      "runtimeExecutable": "env",
+      "runtimeArgs": [
+        "THIRTY_MOCK=1",
+        "UPSTASH_REDIS_REST_URL=http://127.0.0.1:9",
+        "UPSTASH_REDIS_REST_TOKEN=x",
+        "KV_REST_API_URL=",
+        "KV_REST_API_TOKEN=",
+        "ANTHROPIC_API_KEY=",
+        "npx",
+        "next",
+        "start",
+        "-p",
+        "3318"
+      ],
+      "port": 3318
+    },
+    {
+      "name": "verify-prod-nosalt",
+      "runtimeExecutable": "env",
+      "runtimeArgs": [
+        "VERCEL_ENV=production",
+        "THIRTY_MOCK=1",
+        "UPSTASH_REDIS_REST_URL=",
+        "UPSTASH_REDIS_REST_TOKEN=",
+        "KV_REST_API_URL=",
+        "KV_REST_API_TOKEN=",
+        "THIRTY_IP_SALT=",
+        "npx",
+        "next",
+        "start",
+        "-p",
+        "3316"
+      ],
+      "port": 3316
+    },
+    {
+      "name": "verify-live",
+      "runtimeExecutable": "env",
+      "runtimeArgs": [
+        "UPSTASH_REDIS_REST_URL=",
+        "UPSTASH_REDIS_REST_TOKEN=",
+        "KV_REST_API_URL=",
+        "KV_REST_API_TOKEN=",
+        "THIRTY_IP_DAILY_RUNS=20",
+        "THIRTY_DAILY_RUNS=40",
+        "npx",
+        "next",
+        "start",
+        "-p",
+        "3317"
+      ],
+      "port": 3317
+    }
+  ]
+}
