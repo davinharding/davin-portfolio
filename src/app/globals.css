@@ -334,6 +334,20 @@ html.loader-done .splash {
   }
 }
 
+/* While the run console is on screen the headline steps down so the run fits
+   one screen. The stage is data-step="idle" whenever the form shows. */
+.thirty-hero {
+  transition: font-size 200ms ease, margin 200ms ease;
+}
+.thirty-stage:not([data-step="idle"]) .thirty-hero {
+  @apply text-3xl md:text-4xl mb-5 md:mb-6;
+}
+@media (prefers-reduced-motion: reduce) {
+  .thirty-hero {
+    transition: none;
+  }
+}
+
 /* Blueprint org chart: a vertical rail on narrow screens, a tree from md up. */
 .org-chart__agents {
   --org-gap: 0.75rem;

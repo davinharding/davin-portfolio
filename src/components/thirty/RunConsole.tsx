@@ -61,7 +61,7 @@ export const RunConsole = forwardRef<HTMLHeadingElement, RunConsoleProps>(functi
       aria-labelledby="run-console-title"
       className="w-full rounded-lg border border-border bg-card/80 backdrop-blur-sm p-4 sm:p-5 text-left"
     >
-      <div className="flex items-start justify-between gap-4 mb-4">
+      <div className="flex items-start justify-between gap-4 mb-4 compact:mb-3">
         <div className="min-w-0">
           <h2
             id="run-console-title"
@@ -71,7 +71,8 @@ export const RunConsole = forwardRef<HTMLHeadingElement, RunConsoleProps>(functi
           >
             Drafting a blueprint for {host}
           </h2>
-          <p className="text-xs text-muted-foreground mt-1">
+          {/* Compact screens skip the reminder (the form just said it) to keep the run on one screen. */}
+          <p className={cn("text-xs text-muted-foreground mt-1", !slow && "compact:hidden")}>
             {slow ? "Taking a little longer than usual." : "About 30 seconds. Reads your public site, nothing else."}
           </p>
         </div>
@@ -83,7 +84,7 @@ export const RunConsole = forwardRef<HTMLHeadingElement, RunConsoleProps>(functi
         </p>
       </div>
 
-      <ol aria-live="polite" aria-relevant="additions text" className="space-y-3">
+      <ol aria-live="polite" aria-relevant="additions text" className="space-y-3 compact:space-y-2">
         {steps.map((step) => (
           <li key={step.id} className="flex gap-3">
             <span className="mt-0.5">
@@ -101,20 +102,26 @@ export const RunConsole = forwardRef<HTMLHeadingElement, RunConsoleProps>(functi
                 <span className="sr-only">, {STATUS_TEXT[step.status]}</span>
               </p>
               {step.details.length > 0 ? (
-                <ul className="mt-1 space-y-0.5">
-                  {step.details.map((d, i) => (
-                    <li key={`${i}-${d}`} className="text-xs text-muted-foreground break-words">
-                      {d}
-                    </li>
-                  ))}
-                </ul>
+                <>
+                  <ul className="mt-1 space-y-0.5 compact:hidden">
+                    {step.details.map((d, i) => (
+                      <li key={`${i}-${d}`} className="text-xs text-muted-foreground break-words">
+                        {d}
+                      </li>
+                    ))}
+                  </ul>
+                  {/* Compact screens keep every detail visible on one line so the run fits one screen. */}
+                  <p className="mt-0.5 hidden truncate text-xs text-muted-foreground compact:block">
+                    {step.details.join(" · ")}
+                  </p>
+                </>
               ) : null}
             </div>
           </li>
         ))}
       </ol>
 
-      <div className="mt-5 flex items-center justify-between gap-3 min-h-9">
+      <div className="mt-5 compact:mt-3 flex items-center justify-between gap-3 min-h-9">
         <p className="text-sm text-foreground" role="status">
           {statusLine ?? ""}
         </p>

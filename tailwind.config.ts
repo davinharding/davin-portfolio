@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import plugin from "tailwindcss/plugin";
 
 const config: Config = {
     darkMode: ["class"],
@@ -65,6 +66,10 @@ const config: Config = {
   		}
   	}
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    // Phones and short windows, where the homepage run console must stay compact to fit one screen.
+    plugin(({ addVariant }) => addVariant("compact", "@media (max-width: 639px), (max-height: 820px)")),
+  ],
 };
 export default config;

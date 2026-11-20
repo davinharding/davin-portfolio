@@ -7,8 +7,8 @@ const currentYear = new Date().getFullYear();
 const Footer: React.FC = () => {
   return (
     <footer className="bg-background border-t border-border">
-      <div className="container-narrow py-8">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="container-narrow py-3 md:py-4">
+        <div className="flex items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
             © {currentYear} Davin Harding
           </p>

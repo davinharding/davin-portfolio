@@ -114,7 +114,7 @@ Server component, statically rendered. Keeps the existing `Header` and `Footer` 
 
 Above the fold, vertically centered in the viewport (`min-h-[100dvh]`), nothing else:
 
-1. `h1`: **Davin Harding builds AI agents that ship.**
+1. `h1`: **Davin builds AI agents that take real work off your team.**
 2. The form (client component `BlueprintLauncher`):
    - A visually hidden `<label>` "Your company's website".
    - `<input name="url" type="text" inputmode="url" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" maxlength="2048" required placeholder="yourcompany.com">`. Use `type="text"`, not `type="url"`, so bare domains pass native validation. Font size at least 16px so iOS does not zoom.
@@ -131,7 +131,7 @@ Behavior notes:
 - The existing splash animation still plays on first visit. Do not autofocus the input on touch devices. On fine-pointer devices, focus the input once the splash has finished (`html.loader-done`), without scrolling.
 - Old anchors: if the page loads with `location.hash` of `#projects`, `#skills`, or `#experience`, `router.replace("/work" + hash)`.
 - When live runs are unavailable (kill switch, missing config), the page renders the same. The submit returns `live_disabled` and the UI shows that message with the examples. Do not hide the form at build time; availability can change without a redeploy.
-- Metadata: title "Davin Harding builds AI agents that ship", description along the lines of "Enter your company's website and watch my agents draft a blueprint of the AI agents I would build for you, in about 30 seconds." Update `SITE_TITLE` and `SITE_DESCRIPTION` usage in `layout.tsx` only as far as needed; keep the JSON-LD.
+- Metadata: title "Davin Harding builds AI agents that take real work off your team", description along the lines of "Enter your company's website and watch my agents draft a blueprint of the AI agents I would build for you, in about 30 seconds." Update `SITE_TITLE` and `SITE_DESCRIPTION` usage in `layout.tsx` only as far as needed; keep the JSON-LD.
 
 ### 4.2 `/work`
 
