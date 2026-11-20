@@ -3,6 +3,7 @@
 // visitor's connection: the money is spent either way, so the result is kept.
 import { randomUUID } from "node:crypto";
 import type Anthropic from "@anthropic-ai/sdk";
+import { captureServerEvent, type ReportEvent } from "@/lib/analytics/server";
 import { getConfig, LIMITS, type ThirtyConfig } from "./config";
 import {
   costUsd,
@@ -117,6 +118,8 @@ export type RunContext = {
   reservation: Reservation;
   /** When the request arrived; the overall deadline counts from here. */
   requestStartedAt: number;
+  /** Who to attribute the run to in analytics (browser ids, else the salted visitor hash). */
+  analytics: { distinctId: string; sessionId?: string };
 };
 
 export type RunDeps = {
@@ -127,6 +130,10 @@ export type RunDeps = {
   now?: () => number;
   slugFor?: (host: string) => string;
   log?: (line: string) => void;
+  /** Server-side analytics; defaults to PostHog. */
+  report?: ReportEvent;
+  /** Marks analytics events from mock runs. */
+  mock?: boolean;
   deadlineMs?: number;
   minMsForDesignRetry?: number;
 };
@@ -201,6 +208,8 @@ export async function runPipeline(ctx: RunContext, deps: RunDeps): Promise<RunOu
   let slug: string | null = null;
   /** A model call was cut off, so its cost never came back in `usage`. */
   let spendUnknown = false;
+  let pagesRead = 0;
+  let companyName: string | null = null;
 
   const stepStarts = new Map<StepId, number>();
   const step = (id: StepId, status: StepStatus, label = stepLabel(id, ctx.host)) => {
@@ -251,6 +260,7 @@ export async function runPipeline(ctx: RunContext, deps: RunDeps): Promise<RunOu
     if (read.kind === "parked") throw new RunError("not_a_company");
     if (read.kind === "pages") {
       pages = read.pages;
+      pagesRead = pages.length;
       finalUrl = read.finalUrl;
       for (const p of pages.slice(0, LIMITS.maxPages)) {
         emit({ t: "page", url: p.url, title: pageTitle(p) });
@@ -288,6 +298,7 @@ export async function runPipeline(ctx: RunContext, deps: RunDeps): Promise<RunOu
       offerings: profile.offerings.map((o) => cleanText(o, 80)).filter(Boolean).slice(0, 12),
       customers: cleanText(profile.customers, 240),
     };
+    companyName = company.name;
     emit({ t: "company", name: company.name, oneLiner: company.oneLiner });
     step("research", "done");
 
@@ -446,6 +457,28 @@ export async function runPipeline(ctx: RunContext, deps: RunDeps): Promise<RunOu
       outcome: outcome.ok ? "done" : outcome.code,
     })
   );
+  // After the terminal event, so it never delays the stream; capped at 2s and never throws.
+  await (deps.report ?? captureServerEvent)({
+    event: "blueprint_run",
+    ...ctx.analytics,
+    properties: {
+      outcome: outcome.ok ? "done" : outcome.code,
+      host: ctx.host,
+      slug: outcome.ok ? outcome.slug : null,
+      company: companyName,
+      method,
+      total_ms: now() - ctx.requestStartedAt,
+      cost_usd: Math.round(actualUsd * 1e6) / 1e6,
+      input_tokens: t.input,
+      output_tokens: t.output,
+      web_searches: t.webSearches,
+      pages_read: pagesRead,
+      spend_unknown: spendUnknown,
+      mock: Boolean(deps.mock),
+    },
+    set: { last_blueprint_host: ctx.host },
+    setOnce: { first_blueprint_host: ctx.host },
+  }).catch(() => false);
   return outcome;
 }
 

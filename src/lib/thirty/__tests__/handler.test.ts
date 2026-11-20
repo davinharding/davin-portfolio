@@ -9,6 +9,7 @@ import { keys, MemoryStore, StoreError, type Store } from "../store";
 let store: MemoryStore;
 let pending: Promise<unknown>[];
 let startRun: ReturnType<typeof vi.fn>;
+let reported: Array<Parameters<HandlerDeps["report"]>[0]>;
 
 function makeDeps(overrides: Partial<HandlerDeps> = {}, cfg: Partial<ReturnType<typeof getConfig>> = {}): HandlerDeps {
   return {
@@ -19,6 +20,10 @@ function makeDeps(overrides: Partial<HandlerDeps> = {}, cfg: Partial<ReturnType<
     config: () => ({ ...getConfig(), ipSalt: "salt", ...cfg }),
     startRun: startRun as unknown as HandlerDeps["startRun"],
     keepAlive: (p) => pending.push(p),
+    report: async (e) => {
+      reported.push(e);
+      return true;
+    },
     now: Date.now,
     sleep: (ms) => new Promise((r) => setTimeout(r, Math.min(ms, 5))),
     lockPollMs: 5,
@@ -30,6 +35,7 @@ function makeDeps(overrides: Partial<HandlerDeps> = {}, cfg: Partial<ReturnType<
 beforeEach(() => {
   store = new MemoryStore();
   pending = [];
+  reported = [];
   startRun = vi.fn((ctx, emitter, s: Store) =>
     runPipeline(ctx, {
       store: s,
@@ -37,6 +43,10 @@ beforeEach(() => {
       models: MOCK_MODELS,
       emitter,
       log: () => undefined,
+      report: async (e) => {
+        reported.push(e);
+        return true;
+      },
     })
   );
 });
@@ -185,6 +195,33 @@ describe("runs", () => {
       .filter(([k]) => k.startsWith("rl:d:"))
       .map(([, v]) => v.value);
     expect(counts).toEqual(["1"]);
+  });
+
+  it("attributes runs and cache hits to the browser's PostHog ids, ignoring junk ids", async () => {
+    const handle = createBlueprintHandler(makeDeps());
+    const run = await handle(jsonReq({ url: "acme.test", ph_id: "019a-browser", ph_session: "019a-session" }));
+    await events(run);
+    await Promise.all(pending);
+    expect(reported.find((e) => e.event === "blueprint_run")).toMatchObject({
+      distinctId: "019a-browser",
+      sessionId: "019a-session",
+      properties: { outcome: "done", host: "acme.test" },
+    });
+
+    const hit = await handle(jsonReq({ url: "acme.test", ph_id: "<script>alert(1)</script>", ph_session: 7 }));
+    await events(hit);
+    await Promise.all(pending);
+    const cacheHit = reported.find((e) => e.event === "blueprint_cache_hit");
+    expect(cacheHit).toMatchObject({ properties: { host: "acme.test", form: false } });
+    expect(cacheHit?.distinctId).toMatch(/^visitor:[0-9a-f]{32}$/);
+    expect(cacheHit?.sessionId).toBeUndefined();
+  });
+
+  it("form posts fall back to the salted visitor hash for analytics", async () => {
+    await createBlueprintHandler(makeDeps())(formReq({ url: "acme.test" }));
+    const run = reported.find((e) => e.event === "blueprint_run");
+    expect(run?.distinctId).toMatch(/^visitor:[0-9a-f]{32}$/);
+    expect(JSON.stringify(run)).not.toContain("1.2.3.4");
   });
 
   it("form posts wait for the run and redirect to the blueprint", async () => {

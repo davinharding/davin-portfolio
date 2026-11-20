@@ -1,6 +1,8 @@
 // Server-only. POST /api/blueprint: the cheap checks in order, then a run (or
 // a cache hit, or a wait on someone else's run). Dependencies are injected so
 // the whole flow is testable without a network, a model, or Redis.
+import { captureServerEvent, type ReportEvent } from "@/lib/analytics/server";
+import { sanitizeAnalyticsId } from "@/lib/analytics/config";
 import { getConfig, isLiveEnabled, isMockMode, isProduction, LIMITS, type ThirtyConfig } from "./config";
 import { releaseBudget, reserveBudget } from "./budget";
 import { errorMessage, errorStatus, isErrorCode, sorryParam, type ErrorCode } from "./errors";
@@ -32,6 +34,8 @@ export type HandlerDeps = {
   startRun: (ctx: RunContext, emitter: RunEmitter, store: Store, mock: boolean) => Promise<RunOutcome>;
   /** Keeps the function alive until the run settles (Next's `after`). */
   keepAlive: (work: Promise<unknown>) => void;
+  /** Sends a server-side analytics event; never throws. */
+  report: ReportEvent;
   now: () => number;
   sleep: (ms: number) => Promise<void>;
   lockPollMs: number;
@@ -47,7 +51,7 @@ export function defaultStartRun(
   const { stages, models } = mock
     ? { stages: mockStages(ctx.host, getConfig().mockMs), models: MOCK_MODELS }
     : liveStages();
-  return runPipeline(ctx, { store, stages, models, emitter });
+  return runPipeline(ctx, { store, stages, models, emitter, mock });
 }
 
 export const defaultDeps: Omit<HandlerDeps, "keepAlive"> = {
@@ -57,6 +61,7 @@ export const defaultDeps: Omit<HandlerDeps, "keepAlive"> = {
   isProduction,
   config: getConfig,
   startRun: defaultStartRun,
+  report: captureServerEvent,
   now: Date.now,
   sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
   lockPollMs: LIMITS.lockPollMs,
@@ -157,7 +162,13 @@ function streamEmitter(emitter: RunEmitter, dropEarly = false): Response {
   return new Response(stream, { status: 200, headers: STREAM_HEADERS });
 }
 
-type ParsedBody = { url: unknown; honeypot: string };
+type ParsedBody = {
+  url: unknown;
+  honeypot: string;
+  /** The browser's PostHog distinct and session ids (JavaScript client only). */
+  phId?: string;
+  phSession?: string;
+};
 
 async function parseBody(request: Request, mode: Mode): Promise<ParsedBody | null> {
   const declared = Number(request.headers.get("content-length") ?? "0");
@@ -177,8 +188,13 @@ async function parseBody(request: Request, mode: Mode): Promise<ParsedBody | nul
       return null;
     }
     if (!data || typeof data !== "object") return null;
-    const { url, website_confirm } = data as Record<string, unknown>;
-    return { url, honeypot: typeof website_confirm === "string" ? website_confirm : "" };
+    const { url, website_confirm, ph_id, ph_session } = data as Record<string, unknown>;
+    return {
+      url,
+      honeypot: typeof website_confirm === "string" ? website_confirm : "",
+      phId: sanitizeAnalyticsId(ph_id),
+      phSession: sanitizeAnalyticsId(ph_session),
+    };
   }
   const params = new URLSearchParams(text);
   return { url: params.get("url"), honeypot: params.get("website_confirm") ?? "" };
@@ -268,6 +284,8 @@ export function createBlueprintHandler(deps: HandlerDeps) {
     const mock = deps.isMockMode();
     const store = deps.getStore();
     const visitor = visitorId(clientIp(request.headers), cfg.ipSalt);
+    // Without JavaScript there is no browser id; the salted IP hash stands in (never the raw IP).
+    const analytics = { distinctId: body.phId ?? `visitor:${visitor}`, sessionId: body.phSession };
     const now = new Date(requestStartedAt);
 
     try {
@@ -292,6 +310,13 @@ export function createBlueprintHandler(deps: HandlerDeps) {
       if (store && !fresh) {
         const hit = await cachedSlug(store, host);
         if (hit) {
+          deps.keepAlive(
+            deps.report({
+              event: "blueprint_cache_hit",
+              ...analytics,
+              properties: { host, slug: hit.slug, form: mode === "form" },
+            })
+          );
           if (mode === "form") return redirectToBlueprint(hit.slug);
           return ndjson([
             { t: "cached", slug: hit.slug, createdAt: hit.createdAt },
@@ -366,6 +391,7 @@ export function createBlueprintHandler(deps: HandlerDeps) {
         day,
         reservation,
         requestStartedAt,
+        analytics,
       };
       const run = deps.startRun(ctx, emitter, store, mock).catch((err: unknown): RunOutcome => {
         console.error("[thirty] run crashed", err);

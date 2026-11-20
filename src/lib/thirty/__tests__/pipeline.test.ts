@@ -9,6 +9,7 @@ import { mockBlueprint, mockProfile } from "../mock";
 import { RunEmitter, runPipeline, type RunContext, type Stages } from "../pipeline";
 import type { Profile } from "../schema";
 import { keys, MemoryStore } from "../store";
+import type { ServerEvent } from "@/lib/analytics/server";
 
 const HOST = "acme.com";
 const NOW = new Date("2026-11-11T10:00:00Z");
@@ -60,10 +61,12 @@ function happyStages(overrides: Partial<Stages> = {}): Stages {
 let store: MemoryStore;
 let ctx: RunContext;
 let logs: string[];
+let reports: ServerEvent[];
 
 async function setup() {
   store = new MemoryStore();
   logs = [];
+  reports = [];
   await takeVisitorRun(store, "visitor", NOW, 3);
   await takeGlobalRun(store, NOW, 40);
   const reservation = await reserveBudget(store, NOW, 10);
@@ -77,6 +80,7 @@ async function setup() {
     day: "20261111",
     reservation: reservation!,
     requestStartedAt: Date.now(),
+    analytics: { distinctId: "browser-id", sessionId: "session-id" },
   };
 }
 
@@ -91,6 +95,10 @@ async function run(stages: Stages, extra: Partial<Parameters<typeof runPipeline>
     emitter,
     slugFor: () => "acme-com-abcdefgh",
     log: (l) => logs.push(l),
+    report: async (e) => {
+      reports.push(e);
+      return true;
+    },
     ...extra,
   });
   return { outcome, events, emitter };
@@ -455,5 +463,40 @@ describe("runPipeline failures", () => {
     errSpy.mockRestore();
     expect(outcome).toMatchObject({ ok: false, code: "internal" });
     expect(setSpy.mock.calls.filter(([k]) => String(k).startsWith("bp:"))).toHaveLength(3);
+  });
+});
+
+describe("runPipeline analytics", () => {
+  it("reports a finished run on the visitor's browser identity", async () => {
+    await run(happyStages());
+    expect(reports).toHaveLength(1);
+    expect(reports[0]).toMatchObject({
+      event: "blueprint_run",
+      distinctId: "browser-id",
+      sessionId: "session-id",
+      properties: {
+        outcome: "done",
+        host: HOST,
+        slug: "acme-com-abcdefgh",
+        company: "Acme",
+        method: "fetch",
+        pages_read: 2,
+        spend_unknown: false,
+        mock: false,
+      },
+      set: { last_blueprint_host: HOST },
+      setOnce: { first_blueprint_host: HOST },
+    });
+    expect(reports[0].properties?.cost_usd).toBeGreaterThan(0);
+  });
+
+  it("reports failures with their code and no slug", async () => {
+    await run(happyStages({ readSite: vi.fn(async () => ({ kind: "parked" as const, finalUrl: "https://acme.com/" })) }));
+    expect(reports[0].properties).toMatchObject({ outcome: "not_a_company", slug: null, company: null });
+  });
+
+  it("finishes the run even if reporting fails", async () => {
+    const { outcome } = await run(happyStages(), { report: async () => Promise.reject(new Error("down")) });
+    expect(outcome.ok).toBe(true);
   });
 });
