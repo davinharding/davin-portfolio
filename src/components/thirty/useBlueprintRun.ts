@@ -9,6 +9,7 @@ import { ERRORS, errorMessage, isErrorCode, type ErrorCode, type NextStep } from
 import { STEP_ORDER, stepLabel, type RunEvent, type StepId } from "@/lib/thirty/events";
 import { analyticsIds, track } from "@/lib/analytics/track";
 import { SLOW_RUN_MS, type ConsoleStep } from "./RunConsole";
+import { abandonRun } from "./runControl";
 
 export type RunPhase = "idle" | "submitting" | "running" | "navigating" | "error";
 
@@ -139,8 +140,7 @@ export function useBlueprintRun() {
   useEffect(() => {
     const onShow = (e: PageTransitionEvent) => {
       if (!e.persisted) return;
-      abortRef.current?.abort();
-      busyRef.current = false;
+      abandonRun({ abort: abortRef, cancelled: cancelledRef, busy: busyRef });
       setPhase("idle");
       setSteps([]);
       setCompany(null);
@@ -386,9 +386,7 @@ export function useBlueprintRun() {
   );
 
   const cancel = useCallback(() => {
-    cancelledRef.current = true;
-    abortRef.current?.abort();
-    busyRef.current = false;
+    abandonRun({ abort: abortRef, cancelled: cancelledRef, busy: busyRef });
     setPhase("idle");
     setSteps([]);
     setCompany(null);
