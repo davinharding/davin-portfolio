@@ -8,18 +8,12 @@ import { useBlueprintRun } from "./useBlueprintRun";
 /** The classic launcher: the form, then the run console in its place, with example links under it. */
 export default function BlueprintLauncher({ examples }: { examples: readonly ExampleLinkItem[] }) {
   const run = useBlueprintRun();
-  const emphasizeExamples = run.next.includes("examples");
 
   return (
     <div ref={run.rootRef} className="w-full">
       {run.busy ? <RunConsole run={run} /> : <UrlForm run={run} />}
       {!run.busy ? (
-        <ExampleLinks
-          examples={examples}
-          emphasized={emphasizeExamples}
-          lead={emphasizeExamples ? "These show the same thing:" : undefined}
-          className="mt-6"
-        />
+        <ExampleLinks examples={examples} offered={run.offersExamples} className="mt-6" />
       ) : null}
     </div>
   );

@@ -1,13 +1,10 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { MAX_AGENTS } from "@/lib/thirty/events";
 import type { BlueprintRun } from "../useBlueprintRun";
 import { NARROW_VIEWBOX_WIDTH } from "./drawingScale";
 
-/** Open boxes drawn before the run says how many agents there are. */
-const DEFAULT_SLOTS = 4;
-/** The blueprint schema allows at most five agents. */
-const MAX_SLOTS = 5;
 /** Which boxes carry a human-gate mark. Illustrative: gate status is not known until the run ends. */
 const GATED = [true, true, false, true, true];
 
@@ -35,17 +32,16 @@ export function twoLines(name: string, maxChars: number): string[] {
 
 type Slot = { name?: string; note: string; active: boolean; unused: boolean };
 
-/** One entry per agent box: drafted, being drafted, still open, or not needed after all. */
+const SLOT_LABEL = { drafted: "DRAFTED", drafting: "DRAFTING", open: "OPEN ROLE", unused: "NOT NEEDED" } as const;
+
+/** The run's agent slots as the drawing labels them. */
 function slotsFor(run: BlueprintRun): Slot[] {
-  const count = Math.min(MAX_SLOTS, Math.max(DEFAULT_SLOTS, run.agents.length));
-  const designing = run.busy && run.activeStep === "design";
-  return Array.from({ length: count }, (_, i) => {
-    const name = run.busy ? run.agents[i] : undefined;
-    if (name) return { name: name.toUpperCase(), note: "DRAFTED", active: true, unused: false };
-    if (run.busy && run.teamComplete) return { note: "NOT NEEDED", active: false, unused: true };
-    if (designing && i === run.agents.length) return { note: "DRAFTING", active: true, unused: false };
-    return { note: "OPEN ROLE", active: false, unused: false };
-  });
+  return run.slots.map(({ name, state }) => ({
+    name: name?.toUpperCase(),
+    note: SLOT_LABEL[state],
+    active: state === "drafted" || state === "drafting",
+    unused: state === "unused",
+  }));
 }
 
 function titleBlock(run: BlueprintRun) {
@@ -103,10 +99,10 @@ const ALT =
 function WideDrawing({ run, progress: p, host, today }: DrawingProps) {
   const slots = slotsFor(run);
   const n = slots.length;
-  const w = n === MAX_SLOTS ? 92 : 110;
+  const w = n === MAX_AGENTS ? 92 : 110;
   const centers = slots.map((_, i) => 10 + w / 2 + (i * (500 - w)) / (n - 1));
   const last = centers[n - 1];
-  const maxChars = n === MAX_SLOTS ? 15 : 17;
+  const maxChars = n === MAX_AGENTS ? 15 : 17;
   const shown = (at: number) => ({ opacity: p >= at ? 1 : 0 });
   const { time, checked } = titleBlock(run);
   const client = host ? host.toUpperCase() : null;
@@ -139,7 +135,7 @@ function WideDrawing({ run, progress: p, host, today }: DrawingProps) {
                     x={cx}
                     y={(lines.length === 1 ? 170 : 164) + j * 12}
                     textAnchor="middle"
-                    className={cn("drafting-t drafting-t--value", n === MAX_SLOTS && "drafting-t--tight")}
+                    className={cn("drafting-t drafting-t--value", n === MAX_AGENTS && "drafting-t--tight")}
                   >
                     {line}
                   </text>

@@ -6,10 +6,18 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { ERRORS, errorMessage, isErrorCode, type ErrorCode, type NextStep } from "@/lib/thirty/errors";
-import { STEP_ORDER, stepLabel, type RunEvent, type StepId } from "@/lib/thirty/events";
+import type { RunEvent, StepId } from "@/lib/thirty/events";
 import { analyticsIds, track } from "@/lib/analytics/track";
-import { SLOW_RUN_MS, type ConsoleStep } from "./RunConsole";
 import { abandonRun } from "./runControl";
+import {
+  agentSlots,
+  applyRunEvent,
+  displayHost,
+  initialSteps,
+  looksLikeWebsite,
+  SLOW_RUN_MS,
+  type ConsoleStep,
+} from "./runModel";
 
 export type RunPhase = "idle" | "submitting" | "running" | "navigating" | "error";
 
@@ -23,25 +31,6 @@ const CLIENT_ERRORS: Record<"lost" | "offline", { message: string; next: readonl
 };
 
 const WATCHDOG_MS = 75_000;
-
-/** Mirrors the server's first rules; the server stays the authority. */
-export function looksLikeWebsite(raw: string): boolean {
-  const s = raw.trim();
-  if (!s || s.length > 2048) return false;
-  return s.split(/\s+/).some((t) => /[^.\s]\.[^.\s]/.test(t));
-}
-
-/** A display guess until the server's step labels arrive. */
-export function displayHost(raw: string): string {
-  let s = raw.trim().split(/\s+/).find((t) => t.includes(".")) ?? raw.trim();
-  s = s.replace(/^[a-z][a-z0-9+.-]*:\/\//i, "").replace(/^[^@/]*@/, "");
-  s = s.split(/[/?#:]/)[0] ?? s;
-  return s.toLowerCase().replace(/^www\./, "").replace(/[.,;:!?)]+$/, "") || "your site";
-}
-
-function initialSteps(host: string): ConsoleStep[] {
-  return STEP_ORDER.map((id) => ({ id, label: stepLabel(id, host), status: "pending", details: [] }));
-}
 
 function secondsBucket(ms: number): string {
   const s = ms / 1000;
@@ -136,20 +125,25 @@ export function useBlueprintRun() {
     };
   }, []);
 
+  /** Stops any run in flight and shows the form again. */
+  const resetToIdle = useCallback(() => {
+    abandonRun({ abort: abortRef, cancelled: cancelledRef, busy: busyRef });
+    setPhase("idle");
+    setSteps([]);
+    setCompany(null);
+    setStatusLine(null);
+  }, []);
+
   // Returning through the back-forward cache shows a fresh form.
   useEffect(() => {
     const onShow = (e: PageTransitionEvent) => {
       if (!e.persisted) return;
-      abandonRun({ abort: abortRef, cancelled: cancelledRef, busy: busyRef });
-      setPhase("idle");
-      setSteps([]);
-      setCompany(null);
-      setStatusLine(null);
+      resetToIdle();
       setError(null);
     };
     window.addEventListener("pageshow", onShow);
     return () => window.removeEventListener("pageshow", onShow);
-  }, []);
+  }, [resetToIdle]);
 
   useEffect(() => {
     if (focusInput > 0) inputRef.current?.focus();
@@ -191,52 +185,7 @@ export function useBlueprintRun() {
 
   const applyEvent = useCallback((event: RunEvent) => {
     if (event.t === "company") setCompany({ name: event.name, oneLiner: event.oneLiner });
-    setSteps((prev) => {
-      const next = prev.map((s) => ({ ...s, details: [...s.details] }));
-      const find = (id: string) => next.find((s) => s.id === id);
-      const active = () => next.find((s) => s.status === "active");
-      switch (event.t) {
-        case "step": {
-          const step = find(event.id);
-          if (!step) return prev;
-          step.label = event.label;
-          if (event.status === "start") {
-            for (const s of next) {
-              if (STEP_ORDER.indexOf(s.id) < STEP_ORDER.indexOf(event.id) && s.status === "pending") {
-                s.status = "done";
-              }
-            }
-            step.status = "active";
-            step.startedAt = Date.now() - startRef.current;
-          } else {
-            step.status = event.status === "done" ? "done" : event.status === "skip" ? "skipped" : "failed";
-          }
-          return next;
-        }
-        case "page": {
-          const read = find("read");
-          if (read && read.details.length < 4) read.details.push(event.title);
-          return next;
-        }
-        case "company": {
-          const research = find("research");
-          if (research) research.details.push(event.oneLiner ? `${event.name}: ${event.oneLiner}` : event.name);
-          return next;
-        }
-        case "note": {
-          const target = active() ?? find("research");
-          if (target) target.details.push(event.text);
-          return next;
-        }
-        case "agent": {
-          const design = find("design");
-          if (design && !design.details.includes(event.name)) design.details.push(event.name);
-          return next;
-        }
-        default:
-          return prev;
-      }
-    });
+    setSteps((prev) => applyRunEvent(prev, event, () => Date.now() - startRef.current));
   }, []);
 
   const finish = useCallback(
@@ -386,13 +335,9 @@ export function useBlueprintRun() {
   );
 
   const cancel = useCallback(() => {
-    abandonRun({ abort: abortRef, cancelled: cancelledRef, busy: busyRef });
-    setPhase("idle");
-    setSteps([]);
-    setCompany(null);
-    setStatusLine(null);
+    resetToIdle();
     setFocusInput((n) => n + 1);
-  }, []);
+  }, [resetToIdle]);
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -408,6 +353,9 @@ export function useBlueprintRun() {
     : [];
   const stepOf = (id: StepId) => steps.find((s) => s.id === id);
   const design = stepOf("design");
+  const activeStep = steps.find((s) => s.status === "active")?.id ?? null;
+  const agents = design?.details ?? [];
+  const teamComplete = design ? design.status !== "pending" && design.status !== "active" : false;
 
   return {
     phase,
@@ -417,15 +365,21 @@ export function useBlueprintRun() {
     /** The host being drafted, as the server last named it. */
     host,
     steps,
-    activeStep: steps.find((s) => s.status === "active")?.id ?? null,
+    activeStep,
     /** Agent names in the order they were drafted. */
-    agents: design?.details ?? [],
+    agents,
     /** True once the design step has finished, so no more agents will arrive. */
-    teamComplete: design ? design.status !== "pending" && design.status !== "active" : false,
+    teamComplete,
+    /** The agent slots the homepage designs draw. */
+    slots: agentSlots(agents, { busy, designing: activeStep === "design", teamComplete }),
+    /** The field's value as a host, once it looks like a website. */
+    typedHost: looksLikeWebsite(url) ? displayHost(url) : null,
     company,
     error,
     /** What the UI should offer after the current error. */
     next,
+    /** The last error points the visitor at the example blueprints. */
+    offersExamples: next.includes("examples"),
     retryNote: error ? formatRetry(error.code, error.retryAfterSec) : null,
     statusLine,
     elapsedMs,

@@ -2,7 +2,7 @@
 // known ahead of time, so an active step fills toward a cap over its usual length
 // and only completes when the step itself reports done.
 import type { StepId } from "@/lib/thirty/events";
-import type { ConsoleStepStatus } from "../RunConsole";
+import type { ConsoleStepStatus } from "../runModel";
 
 /** Roughly how long each step takes in a normal run. */
 export const EXPECTED_STEP_MS: Record<StepId, number> = {

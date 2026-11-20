@@ -2,25 +2,9 @@
 
 import { Check, Circle, Loader2, Minus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { StepId } from "@/lib/thirty/events";
 import { cn } from "@/lib/utils";
+import { RUN_PROMISE, SLOW_RUN_NOTE, type ConsoleStepStatus } from "./runModel";
 import type { BlueprintRun } from "./useBlueprintRun";
-
-export type ConsoleStepStatus = "pending" | "active" | "done" | "skipped" | "failed";
-
-export type ConsoleStep = {
-  id: StepId;
-  label: string;
-  status: ConsoleStepStatus;
-  details: string[];
-  /** How far into the run the step became active, in milliseconds. */
-  startedAt?: number;
-};
-
-/** After this long the run views say it is taking longer than usual. */
-export const SLOW_RUN_MS = 30_000;
-export const SLOW_RUN_NOTE = "Taking a little longer than usual.";
-export const RUN_PROMISE = "About 30 seconds. Reads your public site, nothing else.";
 
 const STATUS_TEXT: Record<ConsoleStepStatus, string> = {
   pending: "pending",

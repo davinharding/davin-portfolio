@@ -5,7 +5,7 @@ import { ArrowRight, Calendar, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { trackCallCta } from "@/lib/analytics/track";
 import { cn } from "@/lib/utils";
-import { RUN_PROMISE } from "./RunConsole";
+import { RUN_PROMISE } from "./runModel";
 import type { BlueprintRun } from "./useBlueprintRun";
 
 const ERROR_ID = "blueprint-error";

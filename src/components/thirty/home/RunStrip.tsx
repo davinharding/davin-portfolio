@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { SLOW_RUN_NOTE } from "../RunConsole";
+import { SLOW_RUN_NOTE } from "../runModel";
 import type { BlueprintRun } from "../useBlueprintRun";
 import { EXPECTED_STEP_MS, SHORT_STEP_LABEL, stepFill } from "./stepProgress";
 

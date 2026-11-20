@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { ExampleLinks, type ExampleLinkItem } from "../ExampleLinks";
 import { RunConsole } from "../RunConsole";
 import { UrlForm } from "../UrlForm";
-import { displayHost, looksLikeWebsite, useBlueprintRun } from "../useBlueprintRun";
+import { useBlueprintRun } from "../useBlueprintRun";
 import { BlueprintDrawing } from "./BlueprintDrawing";
 
 /** Typing this many characters inks the whole drawing. */
@@ -59,8 +59,7 @@ export function DraftingTableContent({ examples }: { examples: readonly ExampleL
   // Ink follows what has been typed, and a run inks all of it.
   const typed = run.url.trim().length;
   const progress = run.busy ? 1 : Math.max(RESTING_INK, Math.min(1, typed / CHARS_TO_FULL_INK));
-  const host = run.busy ? run.host : looksLikeWebsite(run.url) ? displayHost(run.url) : "";
-  const emphasizeExamples = run.next.includes("examples");
+  const host = run.busy ? run.host : run.typedHost ?? "";
 
   const caption = run.busy
     ? run.phase === "navigating"
@@ -91,12 +90,7 @@ export function DraftingTableContent({ examples }: { examples: readonly ExampleL
           ) : (
             <>
               <UrlForm run={run} />
-              <ExampleLinks
-                examples={examples}
-                emphasized={emphasizeExamples}
-                lead={emphasizeExamples ? "These show the same thing:" : undefined}
-                className="mt-6"
-              />
+              <ExampleLinks examples={examples} offered={run.offersExamples} className="mt-6" />
             </>
           )}
         </div>

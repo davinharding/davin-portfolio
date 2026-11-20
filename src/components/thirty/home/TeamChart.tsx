@@ -6,14 +6,10 @@ import { ArrowRight, UserCheck } from "lucide-react";
 import { track } from "@/lib/analytics/track";
 import type { SampleTeam } from "@/lib/thirty/sampleTeams";
 import { cn } from "@/lib/utils";
-import { trackExampleOpened } from "../ExampleLinks";
+import { EXAMPLES_OFFERED_LEAD, trackExampleOpened } from "../ExampleLinks";
 import { GateBadge } from "../OrgChart";
-import { displayHost, looksLikeWebsite, type BlueprintRun } from "../useBlueprintRun";
+import type { BlueprintRun } from "../useBlueprintRun";
 
-/** Open slots shown before the run says how many agents there are. */
-const DEFAULT_SLOTS = 4;
-/** The blueprint schema allows at most five agents. */
-const MAX_SLOTS = 5;
 const ROTATE_MS = 4200;
 
 /**
@@ -27,8 +23,7 @@ export function TeamChart({ run, teams }: { run: BlueprintRun; teams: readonly S
   const [inside, setInside] = useState(false);
 
   // An error that points at the examples brings the sample teams back, whatever is typed.
-  const samplesOffered = run.next.includes("examples");
-  const wantsSamples = run.url.trim() === "" || samplesOffered;
+  const wantsSamples = run.url.trim() === "" || run.offersExamples;
   const mode = run.busy ? "run" : wantsSamples && teams.length > 0 ? "sample" : "yours";
   const team = teams[index % Math.max(1, teams.length)];
 
@@ -40,9 +35,7 @@ export function TeamChart({ run, teams }: { run: BlueprintRun; teams: readonly S
     return () => clearInterval(id);
   }, [mode, pinned, inside, run.reducedMotion, teams.length]);
 
-  const typedHost = looksLikeWebsite(run.url) ? displayHost(run.url) : null;
-  const slotCount = Math.min(MAX_SLOTS, Math.max(DEFAULT_SLOTS, run.agents.length));
-  const designing = run.activeStep === "design";
+  const { typedHost, slots } = run;
 
   const title = mode === "sample" ? team.company : mode === "run" ? run.host : typedHost ?? "Your team";
   const note =
@@ -67,7 +60,7 @@ export function TeamChart({ run, teams }: { run: BlueprintRun; teams: readonly S
           <>
             <div className="flex flex-wrap items-center gap-1" role="group" aria-label="Teams from earlier runs">
               <span className="mr-2 text-muted-foreground">
-                {samplesOffered ? "These show the same thing:" : "Teams I drafted earlier:"}
+                {run.offersExamples ? EXAMPLES_OFFERED_LEAD : "Teams I drafted earlier:"}
               </span>
               {teams.map((t, i) => (
                 <button
@@ -123,7 +116,7 @@ export function TeamChart({ run, teams }: { run: BlueprintRun; teams: readonly S
             <span className="text-foreground">
               {run.teamComplete
                 ? `${run.agents.length} ${run.agents.length === 1 ? "role" : "roles"} filled.`
-                : `${run.agents.length} of ${slotCount} roles filled.`}
+                : `${run.agents.length} of ${slots.length} roles filled.`}
             </span>
           </p>
         )}
@@ -146,7 +139,7 @@ export function TeamChart({ run, teams }: { run: BlueprintRun; teams: readonly S
         <div className="org-chart__stem" aria-hidden="true" />
         <ol
           className="org-chart__agents org-chart__agents--grid mt-3 md:mt-0"
-          style={{ "--org-cols": mode === "sample" ? team.agents.length : slotCount } as CSSProperties}
+          style={{ "--org-cols": mode === "sample" ? team.agents.length : slots.length } as CSSProperties}
         >
           {mode === "sample"
             ? team.agents.map((agent) => (
@@ -166,10 +159,10 @@ export function TeamChart({ run, teams }: { run: BlueprintRun; teams: readonly S
                   </Link>
                 </li>
               ))
-            : Array.from({ length: slotCount }, (_, i) => {
-                const agent = mode === "run" ? run.agents[i] : undefined;
-                const drafting = mode === "run" && designing && i === run.agents.length;
-                const unused = mode === "run" && run.teamComplete && !agent;
+            : slots.map((slot, i) => {
+                const agent = slot.name;
+                const drafting = slot.state === "drafting";
+                const unused = slot.state === "unused";
                 return (
                   <li key={i} className="org-chart__agent">
                     <div
