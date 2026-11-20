@@ -119,7 +119,12 @@ export type RunContext = {
   /** When the request arrived; the overall deadline counts from here. */
   requestStartedAt: number;
   /** Who to attribute the run to in analytics (browser ids, else the salted visitor hash). */
-  analytics: { distinctId: string; sessionId?: string; /** Added to every event for this run, such as the homepage design. */ context?: Record<string, string> };
+  analytics: {
+    distinctId: string;
+    sessionId?: string;
+    /** Added to every event for this run, such as the homepage design. */
+    context?: Record<string, string>;
+  };
 };
 
 export type RunDeps = {
