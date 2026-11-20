@@ -89,7 +89,7 @@ Changed:
 | `src/lib/analytics/track.ts` | Adds `onPostHog(cb)`: runs `cb` with the SDK now or when it loads. Never throws. |
 | `src/lib/thirty/handler.ts` | Reads `dh_home` from the request cookies, validates it, and adds the design properties to `blueprint_run` and `blueprint_cache_hit`. |
 | `src/components/thirty/CallCta.tsx`, `BlueprintView.tsx` | The call link becomes `/call?b=<slug>`. |
-| `src/app/call/CalendlyEmbed.tsx` | Calendly listeners, UTM values, fallback link (6.4). |
+| `src/app/call/CalendlyEmbed.tsx`, `src/lib/thirty/callFunnel.ts`, `src/lib/thirty/slugFormat.ts` | Calendly message handling, UTM values, fallback link (6.4). The slug format check moves to a client-safe module. |
 | `src/app/globals.css` | Styles for both designs, ported from the prototypes. |
 | `.env.example`, `README.md`, `.claude/launch.json` | `HOME_DESIGN`, a short section on the experiment, and the launch configs in section 11. |
 
@@ -195,7 +195,7 @@ Reference: `docs/prototypes/thirty-home/03-open-roles.html`. Centered headline, 
 | run | submitting, running, navigating | Host; the company one-liner once the `company` event arrives | Filled slots for each `agent` event in order, the next slot "Drafting…" while the design step is active, the rest "Open role" | "<n> of <slots> roles filled." |
 
 - Sample mode rotates to the next example every 4.2 s. Rotation stops while the pointer or focus is inside the chart, after a button is clicked, while the tab is hidden, and under reduced motion.
-- Slot count is `max(4, agents so far)`, capped at 5 (the schema maximum). A fifth agent adds a fifth slot.
+- Slot count is `max(4, agents so far)`, capped at 5 (the schema maximum). A fifth agent adds a fifth slot. When the design step finishes with fewer than four agents, the unfilled slot is dimmed and reads "Not needed". The drawing in 6.3 does the same.
 - During a run the form is replaced by `RunStrip`: heading "Drafting a blueprint for <host>", timer, five labeled bars (Check, Read, Research, Design, Review), a live status line with the active step's label and latest detail, and Cancel. A done step's bar is full. The active step's bar fills toward 90% over its expected time (1, 5, 5, 15, 3 seconds) and completes when the step does. Skipped steps are dimmed and struck through. A failed step is red.
 - Gate status is not streamed during a run, so run-mode slots say "Drafted", not gated or unattended.
 - When an error's next steps include `examples`, the chart shows sample mode regardless of the field, and the row's lead text is "These show the same thing:".
@@ -217,8 +217,8 @@ Reference: `docs/prototypes/thirty-home/02-drafting-table.html`. Two columns fro
 
 ### 6.4 `/call`
 
-- `CalendlyEmbed` reads `b` from `window.location.search` after mount, keeps it only if it passes `isValidSlug`, and reads the visitor's design from `dh_home`.
-- `useCalendlyEventListener` maps Calendly's messages to the events in 5.3. `call_booked` fires once per page load.
+- `CalendlyEmbed` reads `b` from `window.location.search` after mount, keeps it only if it passes `isValidSlug`, and reads the visitor's design from `dh_home`. The embed renders once both are known, so the iframe loads once.
+- A `message` listener maps Calendly's embed messages to the events in 5.3, through `createCallTracker` in `src/lib/thirty/callFunnel.ts`. It accepts only messages whose origin is `https://calendly.com`; react-calendly's own `useCalendlyEventListener` does not check the origin, so it is not used. `call_booked` fires once per page load.
 - Calendly UTM values: `utmSource: "davin.io"`, `utmMedium: "thirty-seconds"`, `utmCampaign: "home-design"`, `utmContent: <design or "none">`, `utmTerm: <slug or "">`. Davin then sees in Calendly which design and which blueprint each booking came from.
 - Under the embed, always visible: "Calendar not loading? Open the booking page in a new tab." linking to the same Calendly URL with the same UTM values.
 
@@ -278,10 +278,10 @@ Reference: `docs/prototypes/thirty-home/02-drafting-table.html`. Two columns fro
 | FM-17 | Config | `HOME_DESIGN` pinned while the experiment is still running | Pinned views counted as exposures | Prevent: pinned views have source `pin`, which the exposure filter excludes | The pinned design | UP-21, inspect the event |
 | FM-18 | Runtime | The proxy throws (crypto missing, unexpected input) | 500 on the homepage | Self-heal: catch, `NextResponse.next()`, classic page, no cookies | The classic design | Unit test with a throwing `decide`; walk with an injected fault flag in mock mode |
 | FM-19 | Security | `GET /home//evil.com` or a crafted query | Open redirect | Prevent: redirect targets are built as `new URL("/", request.url)` plus filtered parameters | Redirect to `/` | Unit test; walk |
-| FM-20 | Caching | A shared cache stores one visitor's design for another | Wrong design, skewed split | Prevent: the proxy runs on every request and rewrites to per-design static assets. Confirm no `s-maxage` on the `/` response. | Nothing | Two cookie jars, two ids chosen to hash to different designs, alternate requests |
+| FM-20 | Caching | A shared cache stores one visitor's design, and their `Set-Cookie`, for another | Wrong design, shared visitor id, skewed split | Prevent: the proxy sets `Cache-Control: private, no-cache` on the rewritten response, replacing the prerendered page's `s-maxage`. | Nothing | Response headers on `/`; two cookie jars, two ids chosen to hash to different designs, alternate requests |
 | FM-21 | Bots | Crawlers and unfurlers request `/` | Fake exposures | Prevent: no JavaScript means no `home_viewed`; PostHog drops headless browsers | Either design, same metadata | UP-25 |
 | FM-22 | Data | An example blueprint has 1 to 5 agents, or a long name | Broken chart | Prevent: the chart renders what exists; names wrap with `break-words` | A shorter or longer row | Unit test on `sampleTeams`; walk with a long-name fixture |
-| FM-23 | Rendering | A real run returns 5 agents, or 1 | Layout overflow, or empty slots at the end | Prevent: 5 slots or columns when a fifth arrives; leftover open slots are fine because the page navigates | Clean layout | Mock host `five-agents.test` and `one-agent.test` (11.2) |
+| FM-23 | Rendering | A real run returns 5 agents, or 3 (the quality check rejects fewer) | Layout overflow, or an open slot left at the end | Prevent: 5 slots or columns when a fifth arrives; once the design step finishes, an unfilled slot is dimmed and labeled "Not needed" | Clean layout | Mock host `five-agents.test`; the default mock host returns 3 |
 | FM-24 | Rendering | Host of 60+ characters | Overflow in the top node, drawing, strip | Prevent: `break-all` in HTML, ellipsis in SVG | Wrapped or cut text | Walk with a 63-character host |
 | FM-25 | Rendering | 360 px wide, 200% zoom, light theme | Clipped or unreadable | Prevent: layouts in 6.2 and 6.3 | Usable page | Walk both designs at 360, 375, 768, 1280 in both themes |
 | FM-26 | Time | A run passes 30 seconds | The strip's bars sit at 90%; visitor thinks it hung | Degrade gracefully: the active bar holds at 90% and the existing "Taking a little longer than usual." line shows in both run views | The note | Mock host `slow.test` |
@@ -351,8 +351,8 @@ New events are not ingested until the build runs, so metric creation uses `allow
 | `experiments/__tests__/browser.test.ts` | `readHomeAssignment` from cookie strings; `reportHomeView` properties for `ab`, `qa`, `pin`, missing cookie (FM-14); mismatch decision (FM-15); nothing throws when the SDK is absent (FM-04). |
 | `thirty/__tests__/handler.test.ts` (extended) | Design properties on `blueprint_run` and `blueprint_cache_hit`; tampered `dh_home` is dropped (FM-02). |
 | `thirty/__tests__/sampleTeams.test.ts` | Teams derive from the committed examples; 1 to 5 agents (FM-22). |
-| `components/thirty/__tests__/runStrip.test.ts` | The pure bar-fill function: done, active under and over the expected time (FM-26), skipped, failed. |
-| `app/call/__tests__/calendly.test.ts` | Slug validation for `?b=`, UTM values, once-only guard (FM-31). |
+| `components/thirty/home/__tests__/stepProgress.test.ts` | The pure bar-fill function: done, active under and over the expected time (FM-26), skipped, failed. |
+| `thirty/__tests__/callFunnel.test.ts` | Slug validation for `?b=`, UTM values, origin check (FM-07), once-only guard (FM-31). |
 
 Verify-only rows, with the reason: FM-04 to FM-12, FM-20, FM-21, FM-24, FM-25, FM-30 need a browser, a build, or network faults.
 
@@ -362,7 +362,7 @@ Verify-only rows, with the reason: FM-04 to FM-12, FM-20, FM-21, FM-24, FM-25, F
 |---|---|
 | `?variant=<design>` | Reach either design on demand (D10). |
 | `HOME_DESIGN` | Pin and junk-value walks. |
-| Mock hosts `five-agents.test`, `one-agent.test` in `src/lib/thirty/mock.ts` | FM-23. Mock mode only. |
+| Mock host `five-agents.test` in `src/lib/thirty/mock.ts` | FM-23. Mock mode only. The default mock blueprint has 3 agents, the minimum the quality check allows. |
 | `HOME_PROXY_FAULT=1`, honored only when `isMockMode()` | Makes the proxy throw, to walk FM-18. |
 | Launch configs `verify-home` (mock, Redis blanked, port 3320), `verify-home-pin` (`HOME_DESIGN=open-roles`, 3321), `verify-home-junk` (`HOME_DESIGN=garbage`, 3322), `verify-home-fault` (`HOME_PROXY_FAULT=1`, 3323) | One server per configuration. |
 

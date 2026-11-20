@@ -225,6 +225,91 @@
         "docs/prototypes/thirty-home"
       ],
       "port": 4310
+    },
+    {
+      "name": "verify-home",
+      "runtimeExecutable": "env",
+      "runtimeArgs": [
+        "THIRTY_MOCK=1",
+        "UPSTASH_REDIS_REST_URL=",
+        "UPSTASH_REDIS_REST_TOKEN=",
+        "KV_REST_API_URL=",
+        "KV_REST_API_TOKEN=",
+        "ANTHROPIC_API_KEY=",
+        "THIRTY_IP_DAILY_RUNS=50",
+        "THIRTY_DAILY_RUNS=1000",
+        "HOME_DESIGN=",
+        "npx",
+        "next",
+        "start",
+        "-p",
+        "3320"
+      ],
+      "port": 3320
+    },
+    {
+      "name": "verify-home-pin",
+      "runtimeExecutable": "env",
+      "runtimeArgs": [
+        "THIRTY_MOCK=1",
+        "UPSTASH_REDIS_REST_URL=",
+        "UPSTASH_REDIS_REST_TOKEN=",
+        "KV_REST_API_URL=",
+        "KV_REST_API_TOKEN=",
+        "ANTHROPIC_API_KEY=",
+        "THIRTY_IP_DAILY_RUNS=50",
+        "THIRTY_DAILY_RUNS=1000",
+        "HOME_DESIGN=open-roles",
+        "npx",
+        "next",
+        "start",
+        "-p",
+        "3321"
+      ],
+      "port": 3321
+    },
+    {
+      "name": "verify-home-junk",
+      "runtimeExecutable": "env",
+      "runtimeArgs": [
+        "THIRTY_MOCK=1",
+        "UPSTASH_REDIS_REST_URL=",
+        "UPSTASH_REDIS_REST_TOKEN=",
+        "KV_REST_API_URL=",
+        "KV_REST_API_TOKEN=",
+        "ANTHROPIC_API_KEY=",
+        "THIRTY_IP_DAILY_RUNS=50",
+        "THIRTY_DAILY_RUNS=1000",
+        "HOME_DESIGN=garbage",
+        "npx",
+        "next",
+        "start",
+        "-p",
+        "3322"
+      ],
+      "port": 3322
+    },
+    {
+      "name": "verify-home-fault",
+      "runtimeExecutable": "env",
+      "runtimeArgs": [
+        "THIRTY_MOCK=1",
+        "UPSTASH_REDIS_REST_URL=",
+        "UPSTASH_REDIS_REST_TOKEN=",
+        "KV_REST_API_URL=",
+        "KV_REST_API_TOKEN=",
+        "ANTHROPIC_API_KEY=",
+        "THIRTY_IP_DAILY_RUNS=50",
+        "THIRTY_DAILY_RUNS=1000",
+        "HOME_DESIGN=",
+        "HOME_PROXY_FAULT=1",
+        "npx",
+        "next",
+        "start",
+        "-p",
+        "3323"
+      ],
+      "port": 3323
     }
   ]
 }
