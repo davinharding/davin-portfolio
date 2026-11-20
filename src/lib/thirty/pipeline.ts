@@ -119,7 +119,7 @@ export type RunContext = {
   /** When the request arrived; the overall deadline counts from here. */
   requestStartedAt: number;
   /** Who to attribute the run to in analytics (browser ids, else the salted visitor hash). */
-  analytics: { distinctId: string; sessionId?: string };
+  analytics: { distinctId: string; sessionId?: string; /** Added to every event for this run, such as the homepage design. */ context?: Record<string, string> };
 };
 
 export type RunDeps = {
@@ -460,8 +460,10 @@ export async function runPipeline(ctx: RunContext, deps: RunDeps): Promise<RunOu
   // After the terminal event, so it never delays the stream; capped at 2s and never throws.
   await (deps.report ?? captureServerEvent)({
     event: "blueprint_run",
-    ...ctx.analytics,
+    distinctId: ctx.analytics.distinctId,
+    sessionId: ctx.analytics.sessionId,
     properties: {
+      ...ctx.analytics.context,
       outcome: outcome.ok ? "done" : outcome.code,
       host: ctx.host,
       slug: outcome.ok ? outcome.slug : null,
