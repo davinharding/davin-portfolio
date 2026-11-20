@@ -44,8 +44,9 @@ export function reportHomeView(design: HomeDesign): void {
   } catch {
     // Cookie access can be denied outright; the view is still reported.
   }
-  const props = homeViewProps(design, assignment);
-  const served = props.home_variant_source === "unknown" ? null : assignment;
+  // The cookie names the design on screen unless cookies are blocked or stale.
+  const served = assignment?.design === design ? assignment : null;
+  const props = homeViewProps(design, served);
 
   // Later events (a run, the call page, a booking) carry the design too.
   onPostHog((posthog) => {
