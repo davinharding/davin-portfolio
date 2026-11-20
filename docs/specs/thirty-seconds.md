@@ -313,7 +313,7 @@ One call to `claude-sonnet-5-5` with the hosted web search tool, producing a pla
 - Prompt: research the company that operates `<host>`; report what it sells, to whom, how it makes money, scale signals, and operational details; say plainly when something could not be found; return "NO_COMPANY_FOUND" when there is no evidence of a real business at this domain.
 - Handle `stop_reason: "pause_turn"` by re-sending the conversation with the assistant turn appended, at most once. Search tool errors arrive as content blocks with an error object, not exceptions; treat them as "fallback failed".
 - Stage timeout 20 seconds. Count `usage.server_tool_use.web_search_requests` at $0.01 each in the cost.
-- If the brief is `NO_COMPANY_FOUND`, shorter than 400 characters, or the call fails: `unreachable` (when nothing loaded at all) or `not_enough_info` (when a thin page loaded). Negative-cache it.
+- If the search tool returns errors: `upstream` (retryable, not cached). If the brief is `NO_COMPANY_FOUND`, shorter than 400 characters, or the search runs past its stage limit: `not_enough_info` when the site answered at all (a thin page, a bot challenge, a 403), `unreachable` only when nothing answered (connection refused, TLS failure, connect timeout). Negative-cache both. Never tell a visitor to check the spelling of a site that answered.
 - Set `source.method = "search"` and record no fetched pages; the blueprint page says "Based on web search results, because the site did not load for a bot."
 
 ## 8. The agents
@@ -517,7 +517,7 @@ All dates are UTC. `<visitor>` is the first 32 hex characters of `sha256(THIRTY_
 
 - Price table in `config.ts`, USD per million tokens: `claude-haiku-5-5` 0.10 in / 0.50 out; `claude-sonnet-5-5` 2.00 / 10.00; `claude-opus-5-5` 4.00 / 20.00. Web search: 0.01 per request. An unrecognized model id is priced at the Opus rate so the estimate errs high. Count all `usage` input fields (including cache fields, at the plain input rate) and output tokens.
 - At run start, reserve 150,000 micro-dollars ($0.15) with `INCRBY budget:<yyyy-mm>`. If the result exceeds the cap, undo the reservation and return `capacity`.
-- At run end (success or failure), adjust by `actual - reserved`.
+- At run end (success or failure), adjust by `actual - reserved`. When a model call was cut off by a stage limit or the deadline, its usage never arrives but it may still be billed: keep at least the full reservation (`max(actual, reserved)`) and log `spendUnknown`.
 - Cap: `THIRTY_MONTHLY_BUDGET_USD` (default 10). Daily fresh-run cap: `THIRTY_DAILY_RUNS` (default 40). Per-visitor: `THIRTY_IP_DAILY_RUNS` (default 3).
 
 ### 10.4 Store adapter

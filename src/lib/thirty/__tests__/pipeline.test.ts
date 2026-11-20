@@ -317,6 +317,27 @@ const failureCases: FailureCase[] = [
     refund: true,
   },
   {
+    // The site answered (a bot challenge), so a failed search is "could not read enough", not "no website".
+    code: "not_enough_info",
+    stages: () =>
+      happyStages({
+        readSite: vi.fn(async () => ({ kind: "blocked" as const, reason: "challenge" as const })),
+        searchBrief: vi.fn(async () => ({ ok: false as const, reason: "too_short" as const, usage: [] })),
+      }),
+    negative: true,
+    refund: false,
+  },
+  {
+    code: "upstream",
+    stages: () =>
+      happyStages({
+        readSite: vi.fn(async () => ({ kind: "blocked" as const, reason: "http_status" as const })),
+        searchBrief: vi.fn(async () => ({ ok: false as const, reason: "tool_error" as const, usage: [] })),
+      }),
+    negative: false,
+    refund: true,
+  },
+  {
     code: "blocked_host",
     stages: () => happyStages({ readSite: vi.fn(async () => ({ kind: "private" as const })) }),
     negative: false,
@@ -341,6 +362,53 @@ describe("runPipeline failures", () => {
     expect(await store.get(keys.negative(HOST))).toBe(c.negative ? c.code : null);
     expect(await visitorCount()).toBe(c.refund ? 0 : 1);
     expect(await dayCount()).toBe(c.refundDay ? 0 : 1);
+  });
+
+  it("ends a search that hits its stage limit as not_enough_info and keeps the reservation", async () => {
+    const stages = happyStages({
+      readSite: vi.fn(async () => ({ kind: "blocked" as const, reason: "http_status" as const })),
+      searchBrief: vi.fn(async () => ({ ok: false as const, reason: "stage_timeout" as const, usage: [] })),
+    });
+    const { outcome, events } = await run(stages);
+    expect(outcome).toMatchObject({ ok: false, code: "not_enough_info" });
+    expect(terminals(events)).toEqual([expect.objectContaining({ t: "error", code: "not_enough_info" })]);
+    // Cached, so the same slow search is not paid for again today.
+    expect(await store.get(keys.negative(HOST))).toBe("not_enough_info");
+    // The cut-off call reported no usage but may still be billed.
+    expect(await budget()).toBe(150_000);
+    expect(JSON.parse(logs.at(-1)!)).toMatchObject({ outcome: "not_enough_info", spendUnknown: true, budgetChargedUsd: 0.15 });
+  });
+
+  it("says unreachable when nothing answered and the search found nothing", async () => {
+    const stages = happyStages({
+      readSite: vi.fn(async () => ({ kind: "blocked" as const, reason: "connect" as const })),
+      searchBrief: vi.fn(async () => ({ ok: false as const, reason: "stage_timeout" as const, usage: [] })),
+    });
+    const { outcome } = await run(stages);
+    expect(outcome).toMatchObject({ ok: false, code: "unreachable" });
+  });
+
+  it("keeps the reservation when the overall deadline cuts a call off", async () => {
+    const stages = happyStages({ draftBlueprint: vi.fn(() => new Promise<never>(() => undefined)) });
+    await run(stages, { deadlineMs: 80 });
+    expect(await budget()).toBe(150_000);
+  });
+
+  it("logs an injection attempt, keeps going, and never gives the design step site text", async () => {
+    const draft = vi.fn(happyStages().draftBlueprint);
+    const stages = happyStages({
+      extractProfile: vi.fn(async () => ({
+        profile: profile({ flags: { adultOrIllegal: false, injectionAttempt: true } }),
+        usage: usage(MODELS.research),
+      })),
+      draftBlueprint: draft,
+    });
+    const { outcome } = await run(stages);
+    expect(outcome.ok).toBe(true);
+    expect(logs.some((l) => JSON.parse(l).event === "thirty_injection_attempt")).toBe(true);
+    const args = draft.mock.calls[0][0];
+    expect(Object.keys(args).sort()).toEqual(["onAgentName", "previous", "profile", "signal"]);
+    expect(JSON.stringify(args.profile)).not.toContain("text text");
   });
 
   it("does not retry the design when too little time remains", async () => {

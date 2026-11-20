@@ -17,7 +17,7 @@ import { draftBlueprint, type DesignResult, type PreviousAttempt } from "./desig
 import { errorMessage, RunError, type ErrorCode } from "./errors";
 import { FALLBACK_NOTE, stepLabel, type RunEvent, type StepId, type StepStatus } from "./events";
 import type { PageContent } from "./extract";
-import { readSite, type ReadResult, type ReadSiteInput } from "./fetchSite";
+import { readSite, type FetchFailure, type ReadResult, type ReadSiteInput } from "./fetchSite";
 import { refundGlobalRun, refundVisitorRun, releaseLock } from "./limits";
 import { checkQuality, cleanText, normalizeBlueprint } from "./quality";
 import { extractProfile, type ResearchResult } from "./research";
@@ -153,6 +153,23 @@ const REFUND_VISITOR: ReadonlySet<ErrorCode> = new Set([
   "live_disabled",
 ]);
 
+type SearchFailure = Extract<SearchResult, { ok: false }>["reason"];
+
+/** Connection-level read failures: nothing answered at that address. */
+const NO_ANSWER: ReadonlySet<FetchFailure | "challenge"> = new Set(["connect", "tls", "timeout", "aborted"]);
+
+/**
+ * The code for a failed search fallback. A search tool error is transient
+ * (retry). Otherwise a site that answered but could not be researched is
+ * "could not read enough", never "no website here". A search that runs past its
+ * stage limit counts as not enough to go on: on bot-blocked sites it tends to
+ * run long every time, and each retry would spend about as much again.
+ */
+export function fallbackFailure(reason: SearchFailure, siteAnswered: boolean): ErrorCode {
+  if (reason === "tool_error") return "upstream";
+  return siteAnswered ? "not_enough_info" : "unreachable";
+}
+
 /** DNS-level unreachable never counts against anyone. */
 class DnsUnreachable extends RunError {
   constructor() {
@@ -182,6 +199,8 @@ export async function runPipeline(ctx: RunContext, deps: RunDeps): Promise<RunOu
   let usedSearch = false;
   let settled = false;
   let slug: string | null = null;
+  /** A model call was cut off, so its cost never came back in `usage`. */
+  let spendUnknown = false;
 
   const stepStarts = new Map<StepId, number>();
   const step = (id: StepId, status: StepStatus, label = stepLabel(id, ctx.host)) => {
@@ -200,12 +219,15 @@ export async function runPipeline(ctx: RunContext, deps: RunDeps): Promise<RunOu
     if (!settled) emitter.emit(event);
   };
 
-  const runSearch = async (): Promise<string | null> => {
+  /** Returns the research brief, or throws the code for a failed fallback. */
+  const runSearch = async (siteAnswered: boolean): Promise<string> => {
     usedSearch = true;
     emit({ t: "note", text: FALLBACK_NOTE });
     const result = await stages.searchBrief(ctx.host, signal);
     usage.push(...result.usage);
-    return result.ok ? result.brief : null;
+    if (result.ok) return result.brief;
+    if (result.reason === "stage_timeout") spendUnknown = true;
+    throw new RunError(fallbackFailure(result.reason, siteAnswered));
   };
 
   const research = async (pages: PageContent[], brief?: string): Promise<Profile> => {
@@ -243,21 +265,15 @@ export async function runPipeline(ctx: RunContext, deps: RunDeps): Promise<RunOu
     let profile: Profile;
     if (read.kind === "blocked") {
       method = "search";
-      const brief = await runSearch();
-      if (!brief) throw new RunError("unreachable");
-      profile = await research([], brief);
+      profile = await research([], await runSearch(!NO_ANSWER.has(read.reason)));
     } else if (read.kind === "pages" && read.thin) {
       method = "search";
-      const brief = await runSearch();
-      if (!brief) throw new RunError("not_enough_info");
-      profile = await research(pages, brief);
+      profile = await research(pages, await runSearch(true));
     } else {
       profile = await research(pages);
       if (profile.fit === "thin") {
         method = "search";
-        const brief = await runSearch();
-        if (!brief) throw new RunError("not_enough_info");
-        profile = await research(pages, brief);
+        profile = await research(pages, await runSearch(true));
       }
     }
     if (profile.fit === "parked" || profile.fit === "not_a_company") throw new RunError("not_a_company");
@@ -376,8 +392,14 @@ export async function runPipeline(ctx: RunContext, deps: RunDeps): Promise<RunOu
   }
 
   const actualUsd = costUsd(usage);
+  // A call cut off by a stage limit or the deadline may still be billed, and
+  // its usage never arrived: keep at least the whole reservation for it.
+  if (signal.aborted) spendUnknown = true;
+  const chargedMicros = spendUnknown
+    ? Math.max(usdToMicros(actualUsd), ctx.reservation.reservedMicros)
+    : usdToMicros(actualUsd);
   try {
-    await settleBudget(store, ctx.reservation, usdToMicros(actualUsd));
+    await settleBudget(store, ctx.reservation, chargedMicros);
   } catch (err) {
     log(JSON.stringify({ event: "thirty_settle_failed", runId: ctx.runId, error: String(err) }));
   }
@@ -420,6 +442,7 @@ export async function runPipeline(ctx: RunContext, deps: RunDeps): Promise<RunOu
       tokens: { input: t.input, output: t.output },
       webSearches: t.webSearches,
       costUsd: Math.round(actualUsd * 1e6) / 1e6,
+      ...(spendUnknown ? { spendUnknown: true, budgetChargedUsd: chargedMicros / 1e6 } : {}),
       outcome: outcome.ok ? "done" : outcome.code,
     })
   );
