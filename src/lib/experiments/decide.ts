@@ -1,9 +1,9 @@
 // The proxy's decision for one request, as a pure function so every branch is
 // unit-tested without Next. src/proxy.ts applies the result.
 import { sanitizeAnalyticsId } from "@/lib/analytics/config";
+import { distinctIdFromPostHogCookie } from "@/lib/analytics/cookies";
 import {
   assignVariant,
-  distinctIdFromPostHogCookie,
   isDesign,
   VARIANT_AUTO,
   VARIANT_PARAM,

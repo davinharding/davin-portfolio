@@ -5,13 +5,13 @@
 // Spec: docs/specs/home-design-experiment.md.
 import { NextResponse, type NextRequest } from "next/server";
 import { posthogKey } from "@/lib/analytics/config";
+import { posthogCookieName } from "@/lib/analytics/cookies";
 import { decideHome } from "@/lib/experiments/decide";
 import {
   designPath,
   formatHomeCookie,
   HOME_COOKIE_MAX_AGE_SEC,
   HOME_COOKIES,
-  posthogCookieName,
   readDesignMode,
 } from "@/lib/experiments/homeDesign";
 import { isMockMode } from "@/lib/thirty/config";

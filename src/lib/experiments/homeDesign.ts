@@ -4,7 +4,7 @@
 // assignVariant() is PostHog's own multivariate hash, run on the same visitor id
 // posthog-js is bootstrapped with, so PostHog's evaluation of the flag agrees with
 // what was served without the page ever calling PostHog.
-import { sanitizeAnalyticsId } from "@/lib/analytics/config";
+import { readCookie } from "@/lib/analytics/cookies";
 
 export const HOME_FLAG_KEY = "home-design";
 
@@ -107,33 +107,6 @@ export function readDesignMode(raw: string | undefined): { mode: DesignMode; inv
   if (value === "" || value === "ab") return { mode: "ab", invalid: false };
   if (isDesign(value)) return { mode: value, invalid: false };
   return { mode: "ab", invalid: true };
-}
-
-/** posthog-js keeps its state, including the distinct id, in this cookie as URL-encoded JSON. */
-export function posthogCookieName(projectKey: string): string {
-  return `ph_${projectKey}_posthog`;
-}
-
-export function distinctIdFromPostHogCookie(raw: string | undefined): string | undefined {
-  if (!raw || raw.length > 4096) return undefined;
-  try {
-    const state: unknown = JSON.parse(decodeURIComponent(raw));
-    if (!state || typeof state !== "object") return undefined;
-    return sanitizeAnalyticsId((state as Record<string, unknown>).distinct_id);
-  } catch {
-    return undefined;
-  }
-}
-
-/** Reads one cookie from a `Cookie` header or `document.cookie` string. */
-export function readCookie(cookieString: string | null | undefined, name: string): string | undefined {
-  if (!cookieString) return undefined;
-  for (const part of cookieString.split(";")) {
-    const eq = part.indexOf("=");
-    if (eq === -1) continue;
-    if (part.slice(0, eq).trim() === name) return part.slice(eq + 1).trim();
-  }
-  return undefined;
 }
 
 export function readHomeAssignment(cookieString: string | null | undefined): HomeAssignment | null {

@@ -9,7 +9,8 @@ import {
   sanitizeAnalyticsId,
 } from "@/lib/analytics/config";
 import { setPostHog } from "@/lib/analytics/track";
-import { HOME_COOKIES, HOME_FLAG_KEY, readCookie, readHomeAssignment } from "@/lib/experiments/homeDesign";
+import { readCookie } from "@/lib/analytics/cookies";
+import { HOME_COOKIES, HOME_FLAG_KEY, readHomeAssignment } from "@/lib/experiments/homeDesign";
 
 const key = posthogKey();
 if (key) {
