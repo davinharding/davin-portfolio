@@ -88,4 +88,6 @@ Unit: `server.ts` payload, no-op without key, swallowed errors and timeout; `tra
 
 ## 8. Rollout
 
+Dashboard: [Thirty Seconds](https://us.posthog.com/project/755579/dashboard/2389633) in the davin.io project (pinned). Every tile filters to `environment = production`: visitors, blueprints drafted, model spend, runs by outcome, the homepage-to-blueprint funnel, companies looked up, failures by reason, visitors by country, traffic sources, top pages, and calls to action.
+
 Vercel env: `NEXT_PUBLIC_POSTHOG_KEY` (Production and Preview). The key is a public project token, inlined at build time. `POSTHOG_HOST` (server-only, runtime) can override where server events go. After deploy, confirm production events in project 755579, then exclude the owner's own traffic with a test-account filter if wanted.

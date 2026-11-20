@@ -26,7 +26,7 @@ A modern, responsive portfolio showcasing 8+ years of full-stack development, fr
 - **GitHub contribution calendar** pulled live from the API
 - **Particle network background** for a dynamic, polished feel
 - **Fully responsive** across desktop, tablet, and mobile
-- **PostHog** for usage analytics and session replay (project "davin.io"), plus **Vercel Analytics** for traffic insights
+- **PostHog** for usage analytics and session replay (project "davin.io", [Thirty Seconds dashboard](https://us.posthog.com/project/755579/dashboard/2389633)), plus **Vercel Analytics** for traffic insights
 
 ## 🛠 Tech Stack
 
