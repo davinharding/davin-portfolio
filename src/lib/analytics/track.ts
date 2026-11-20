@@ -11,9 +11,27 @@ const MAX_PENDING = 20;
 let posthog: PostHog | null = null;
 const pending: Array<[string, TrackProps | undefined]> = [];
 
+const waiting: Array<(instance: PostHog) => void> = [];
+
+function run(callback: (instance: PostHog) => void, instance: PostHog): void {
+  try {
+    callback(instance);
+  } catch {
+    // Ignore: analytics is best effort.
+  }
+}
+
 export function setPostHog(instance: PostHog): void {
   posthog = instance;
+  // Callbacks first, so anything they register is on the queued events.
+  for (const callback of waiting.splice(0)) run(callback, instance);
   for (const [name, props] of pending.splice(0)) capture(name, props);
+}
+
+/** Runs `callback` with the SDK now, or when it loads. Never throws; dropped if the SDK never arrives. */
+export function onPostHog(callback: (instance: PostHog) => void): void {
+  if (posthog) run(callback, posthog);
+  else if (waiting.length < MAX_PENDING) waiting.push(callback);
 }
 
 function capture(name: string, props?: TrackProps): void {
@@ -42,4 +60,11 @@ export function analyticsIds(): { ph_id?: string; ph_session?: string } {
   } catch {
     return {};
   }
+}
+
+/** Where a "Book a call" link was clicked. */
+export type CallCtaSource = "blueprint" | "error" | "header";
+
+export function trackCallCta(from: CallCtaSource): void {
+  track("blueprint_cta_call", { from });
 }

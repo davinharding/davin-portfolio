@@ -14,6 +14,11 @@ type ExampleLinksProps = {
   className?: string;
 };
 
+/** Reports that an example blueprint was opened, and from which part of the page. */
+export function trackExampleOpened(slug: string, via: "links" | "chart"): void {
+  track("example_opened", { example: slug, via });
+}
+
 export function ExampleLinks({
   examples,
   emphasized = false,
@@ -28,7 +33,7 @@ export function ExampleLinks({
           <li key={ex.slug}>
             <Link
               href={`/b/${ex.slug}`}
-              onClick={() => track("example_opened", { example: ex.slug })}
+              onClick={() => trackExampleOpened(ex.slug, "links")}
               className={cn(
                 "inline-flex items-baseline gap-1.5 rounded-md border px-3 py-1.5 transition-colors",
                 emphasized
