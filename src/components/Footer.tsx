@@ -7,12 +7,15 @@ const currentYear = new Date().getFullYear();
 const Footer: React.FC = () => {
   return (
     <footer className="bg-background border-t border-border">
-      <div className="container-narrow py-8">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="container-narrow py-3 md:py-4">
+        <div className="flex items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
             © {currentYear} Davin Harding
           </p>
           <div className="flex items-center gap-2">
+            <Button variant="ghost" asChild className="text-sm text-muted-foreground">
+              <Link href="/work">Work</Link>
+            </Button>
             <Button variant="ghost" size="icon" asChild>
               <Link
                 href="https://www.linkedin.com/in/davinharding/"

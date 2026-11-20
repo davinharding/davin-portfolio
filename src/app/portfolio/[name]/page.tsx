@@ -93,7 +93,12 @@ const PortfolioProjectDetail = async ({
   }
 
   return (
-    <ContainerLayout pageTitle={project.name} mobile={true}>
+    <ContainerLayout
+      pageTitle={project.name}
+      mobile={true}
+      backHref="/work"
+      backLabel="Back to Work"
+    >
       <div className="max-w-4xl">
         {/* Hero screenshot — leads with the most eye-catching asset */}
         {project.image && <ProjectHero project={project} />}
