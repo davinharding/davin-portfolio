@@ -213,6 +213,18 @@
         "3319"
       ],
       "port": 3319
+    },
+    {
+      "name": "thirty-prototypes",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "4310",
+        "--directory",
+        "docs/prototypes/thirty-home"
+      ],
+      "port": 4310
     }
   ]
 }

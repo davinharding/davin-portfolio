@@ -1,0 +1,947 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Drafting table · Thirty Seconds prototype 2</title>
+<!--
+  Thirty Seconds homepage, prototype 2 of 5: Drafting table.
+
+  Standalone file, same stack as the site, loaded from CDNs: React 18, Tailwind 3
+  with the site's tokens and config, and Inter. Babel compiles the JSX in the
+  browser so the component code reads like what would go in src/components/thirty.
+
+  The run is simulated in the page at 2x speed. Nothing is sent anywhere.
+  The header and footer are stand-ins for the real ones.
+-->
+<script>
+  // Same rule as the site: a saved choice wins, else follow the OS. ?theme=light|dark forces one.
+  (function () {
+    var d = document.documentElement, p = null;
+    try { p = localStorage.getItem("themePreference"); } catch (e) {}
+    var q = new URLSearchParams(location.search).get("theme");
+    if (q === "light" || q === "dark") p = q;
+    var l = p === "light" || (p !== "dark" && window.matchMedia("(prefers-color-scheme: light)").matches);
+    d.classList.toggle("light", l);
+    d.style.colorScheme = l ? "light" : "dark";
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>
+  // Mirrors tailwind.config.ts
+  tailwind.config = {
+    darkMode: ["class"],
+    theme: {
+      extend: {
+        fontFamily: { sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"] },
+        colors: {
+          border: "hsl(var(--border))",
+          input: "hsl(var(--input))",
+          ring: "hsl(var(--ring))",
+          background: "hsl(var(--background))",
+          foreground: "hsl(var(--foreground))",
+          card: { DEFAULT: "hsl(var(--card))", foreground: "hsl(var(--card-foreground))" },
+          primary: { DEFAULT: "hsl(var(--primary))", foreground: "hsl(var(--primary-foreground))" },
+          secondary: { DEFAULT: "hsl(var(--secondary))", foreground: "hsl(var(--secondary-foreground))" },
+          muted: { DEFAULT: "hsl(var(--muted))", foreground: "hsl(var(--muted-foreground))" },
+          accent: { DEFAULT: "hsl(var(--accent))", foreground: "hsl(var(--accent-foreground))" },
+        },
+        borderRadius: { lg: "var(--radius)", md: "calc(var(--radius) - 2px)", sm: "calc(var(--radius) - 4px)" },
+      },
+    },
+  };
+</script>
+<style type="text/tailwindcss">
+  /* Tokens and utilities copied from src/app/globals.css */
+  @layer base {
+    :root {
+      --background: 222.2 84% 4.9%;
+      --foreground: 210 40% 98%;
+      --card: 222.2 84% 4.9%;
+      --card-foreground: 210 40% 98%;
+      --primary: 217.2 91.2% 59.8%;
+      --primary-foreground: 222.2 84% 4.9%;
+      --secondary: 217.2 32.6% 17.5%;
+      --secondary-foreground: 210 40% 98%;
+      --muted: 217.2 32.6% 17.5%;
+      --muted-foreground: 215 20.2% 65.1%;
+      --accent: 217.2 91.2% 59.8%;
+      --accent-foreground: 222.2 84% 4.9%;
+      --border: 217.2 32.6% 17.5%;
+      --input: 217.2 32.6% 17.5%;
+      --ring: 217.2 91.2% 59.8%;
+      --radius: 0.5rem;
+      --logo-tile: #0f172a;
+      --logo-ink: #f8fafc;
+      --logo-caret: #60a5fa;
+    }
+    .light {
+      --background: 0 0% 100%;
+      --foreground: 222.2 84% 4.9%;
+      --card: 0 0% 100%;
+      --card-foreground: 222.2 84% 4.9%;
+      --primary: 217.2 91.2% 59.8%;
+      --primary-foreground: 0 0% 100%;
+      --secondary: 210 40% 96.1%;
+      --secondary-foreground: 222.2 47.4% 11.2%;
+      --muted: 210 40% 96.1%;
+      --muted-foreground: 215.4 16.3% 46.9%;
+      --accent: 217.2 91.2% 59.8%;
+      --accent-foreground: 0 0% 100%;
+      --border: 214.3 31.8% 91.4%;
+      --input: 214.3 31.8% 91.4%;
+      --ring: 217.2 91.2% 59.8%;
+      --logo-tile: #e2e8f0;
+      --logo-ink: #0f172a;
+      --logo-caret: #2563eb;
+    }
+    * {
+      @apply border-border;
+    }
+    body {
+      @apply bg-background text-foreground font-sans antialiased;
+    }
+    :focus-visible {
+      outline: 2px solid hsl(var(--ring));
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  }
+  .heading-hero {
+    @apply text-4xl md:text-6xl lg:text-7xl font-semibold tracking-tight text-foreground;
+  }
+  .text-meta {
+    @apply text-xs text-muted-foreground uppercase tracking-[0.15em];
+  }
+  .container-narrow {
+    @apply max-w-5xl mx-auto px-4 md:px-6 lg:px-8;
+  }
+  .ready .thirty-hero {
+    transition: font-size 200ms ease, margin 200ms ease;
+  }
+  [data-step]:not([data-step="idle"]) .thirty-hero {
+    @apply text-3xl md:text-4xl mb-5 md:mb-6;
+  }
+</style>
+<style>
+  /* The live page's accent glow, which follows the run step */
+  @property --stage-glow-x { syntax: "<percentage>"; inherits: false; initial-value: 50%; }
+  @property --stage-glow-y { syntax: "<percentage>"; inherits: false; initial-value: 30%; }
+  @property --stage-glow-alpha { syntax: "<number>"; inherits: false; initial-value: 0.08; }
+  .thirty-stage {
+    --stage-glow-x: 50%;
+    --stage-glow-y: 30%;
+    --stage-glow-alpha: 0.08;
+    background-image: radial-gradient(
+      ellipse 60% 50% at var(--stage-glow-x) var(--stage-glow-y),
+      hsl(var(--primary) / var(--stage-glow-alpha)),
+      transparent 70%
+    );
+    transition: --stage-glow-x 1.2s ease, --stage-glow-y 1.2s ease, --stage-glow-alpha 1.2s ease;
+  }
+  .light .thirty-stage { --stage-glow-alpha: 0.06; }
+  .thirty-stage[data-step="validate"] { --stage-glow-x: 30%; --stage-glow-alpha: 0.1; }
+  .thirty-stage[data-step="read"] { --stage-glow-x: 25%; --stage-glow-y: 45%; --stage-glow-alpha: 0.12; }
+  .thirty-stage[data-step="research"] { --stage-glow-x: 45%; --stage-glow-y: 55%; --stage-glow-alpha: 0.14; }
+  .thirty-stage[data-step="design"] { --stage-glow-x: 65%; --stage-glow-y: 50%; --stage-glow-alpha: 0.17; }
+  .thirty-stage[data-step="check"] { --stage-glow-x: 75%; --stage-glow-y: 40%; --stage-glow-alpha: 0.18; }
+  .thirty-stage[data-step="done"] { --stage-glow-x: 50%; --stage-glow-y: 40%; --stage-glow-alpha: 0.22; }
+  /* The Tailwind CDN build writes its CSS just after React renders. Hold the page until it has. */
+  #root { opacity: 0; }
+  .ready #root { opacity: 1; transition: opacity 0.3s ease; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spin { animation: spin 1s linear infinite; }
+
+  /* Drafting table: grid paper lit by the cursor, and a schematic that inks in as you type */
+  .c2-paper {
+    isolation: isolate;
+    --mx: 72%;
+    --my: 42%;
+  }
+  .c2-paper::before,
+  .c2-paper::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+      linear-gradient(hsl(var(--primary) / var(--minor)) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--primary) / var(--minor)) 1px, transparent 1px),
+      linear-gradient(hsl(var(--primary) / var(--major)) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--primary) / var(--major)) 1px, transparent 1px);
+    background-size: 24px 24px, 24px 24px, 120px 120px, 120px 120px;
+    background-position: center top;
+  }
+  .c2-paper::before { --minor: 0.035; --major: 0.07; }
+  .c2-paper::after {
+    --minor: 0.16;
+    --major: 0.3;
+    -webkit-mask-image: radial-gradient(280px circle at var(--mx) var(--my), #000, transparent);
+    mask-image: radial-gradient(280px circle at var(--mx) var(--my), #000, transparent);
+  }
+  .light .c2-paper::before { --minor: 0.06; --major: 0.11; }
+  .light .c2-paper::after { --minor: 0.22; --major: 0.4; }
+
+  .c2-construct {
+    fill: none;
+    stroke: hsl(var(--foreground) / 0.2);
+    stroke-width: 1;
+    stroke-dasharray: 3 4;
+  }
+  .c2-construct--filled { fill: hsl(var(--background)); }
+  .c2-ink {
+    fill: none;
+    stroke: hsl(var(--primary));
+    stroke-width: 1.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1 1;
+    transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+  }
+  .c2-t {
+    font: 500 7.5px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    letter-spacing: 0.08em;
+    fill: hsl(var(--muted-foreground));
+  }
+  .c2-t--strong { font-size: 9.5px; font-weight: 600; fill: hsl(var(--foreground)); }
+  .c2-t--ink { fill: hsl(var(--primary)); }
+  .c2-fade { transition: opacity 0.45s ease; }
+  .c2-pop { animation: c2-pop 0.5s ease both; }
+  @keyframes c2-pop { from { opacity: 0; transform: translateY(3px); } }
+  .c2-coords { display: none; }
+  @media (hover: hover) and (min-width: 1024px) { .c2-coords { display: block; } }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<noscript>This prototype needs JavaScript.</noscript>
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7.26.4/babel.min.js" crossorigin></script>
+<script type="text/babel" data-presets="react">
+const PROTO_N = 2;
+
+/* ==========================================================================
+   Shared scaffolding: the same in all five prototypes
+   ========================================================================== */
+const { useState, useEffect, useRef, useCallback, useMemo } = React;
+
+const cn = (...parts) => parts.filter(Boolean).join(" ");
+const clamp01 = (v) => Math.max(0, Math.min(1, v));
+const SITE = "https://www.davin.io";
+const IN_FRAME = window.self !== window.top;
+const REDUCED_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const PROTOS = [
+  { file: "01-inline.html", name: "Inline" },
+  { file: "02-drafting-table.html", name: "Drafting table" },
+  { file: "03-open-roles.html", name: "Open roles" },
+  { file: "04-the-dial.html", name: "The dial" },
+  { file: "05-constellation.html", name: "Constellation" },
+];
+
+/* ---------- Icons: the lucide shapes the site already uses ---------- */
+function Svg({ className = "h-4 w-4", children }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={cn("shrink-0", className)}
+      aria-hidden="true"
+    >
+      {children}
+    </svg>
+  );
+}
+const I = {
+  ArrowRight: (p) => <Svg {...p}><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></Svg>,
+  ChevronLeft: (p) => <Svg {...p}><path d="m15 18-6-6 6-6" /></Svg>,
+  ChevronRight: (p) => <Svg {...p}><path d="m9 18 6-6-6-6" /></Svg>,
+  Check: (p) => <Svg {...p}><path d="M20 6 9 17l-5-5" /></Svg>,
+  Circle: (p) => <Svg {...p}><circle cx="12" cy="12" r="10" /></Svg>,
+  Loader: ({ className }) => <Svg className={cn("spin", className ?? "h-4 w-4")}><path d="M21 12a9 9 0 1 1-6.219-8.56" /></Svg>,
+  Lock: (p) => <Svg {...p}><rect width="18" height="11" x="3" y="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></Svg>,
+  UserCheck: (p) => <Svg {...p}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="m16 11 2 2 4-4" /></Svg>,
+  Rotate: (p) => <Svg {...p}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></Svg>,
+  Menu: (p) => <Svg {...p}><path d="M4 6h16" /><path d="M4 12h16" /><path d="M4 18h16" /></Svg>,
+  Moon: (p) => <Svg {...p}><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></Svg>,
+  Sun: (p) => (
+    <Svg {...p}>
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+    </Svg>
+  ),
+};
+
+/* ---------- Buttons: the site's cva variants as plain strings ---------- */
+const BTN =
+  "inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50";
+const BTN_PRIMARY = "bg-primary text-primary-foreground shadow hover:bg-primary/90";
+const BTN_GHOST = "hover:bg-accent hover:text-accent-foreground";
+const BTN_OUTLINE = "border border-input bg-background text-foreground shadow-sm hover:bg-accent hover:text-accent-foreground";
+
+/* ---------- The run contract, mirroring src/lib/thirty/events.ts ---------- */
+const STEP_ORDER = ["validate", "read", "research", "design", "check"];
+
+function stepLabel(id, host) {
+  switch (id) {
+    case "validate": return "Checking the address";
+    case "read": return `Reading ${host}`;
+    case "research": return "Working out what the company does";
+    case "design": return "Designing the agent team";
+    case "check": return "Checking the blueprint";
+    default: return "Blueprint ready";
+  }
+}
+
+function looksLikeWebsite(raw) {
+  const s = raw.trim();
+  if (!s || s.length > 2048) return false;
+  return s.split(/\s+/).some((t) => /[^.\s]\.[^.\s]/.test(t));
+}
+
+function displayHost(raw) {
+  let s = raw.trim().split(/\s+/).find((t) => t.includes(".")) ?? raw.trim();
+  s = s.replace(/^[a-z][a-z0-9+.-]*:\/\//i, "").replace(/^[^@/]*@/, "");
+  s = s.split(/[/?#:]/)[0] ?? s;
+  return s.toLowerCase().replace(/^www\./, "").replace(/[.,;:!?)]+$/, "") || "your site";
+}
+
+function companyName(host) {
+  const stem = host.split(".")[0] ?? host;
+  return stem.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+}
+
+const slugify = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+
+/* ---------- Simulated run: the mock stage output from src/lib/thirty/mock.ts ---------- */
+const SPEED = 2; // simulated seconds per real second
+const RUN_TOTAL_MS = 28600;
+const STAGE_WINDOWS = {
+  validate: [0, 900],
+  read: [900, 6000],
+  research: [6000, 11000],
+  design: [11000, 26000],
+  check: [26000, 28600],
+};
+const MOCK_AGENTS = ["Rush Quote Drafter", "ToolCrib Reorder Planner", "Renewal Risk Watcher", "Support Triage Desk"];
+
+/** The same event shapes the API streams, each with the simulated time it arrives. */
+function buildTimeline(host) {
+  const name = companyName(host);
+  const step = (at, id, status) => ({ at, t: "step", id, status });
+  return [
+    step(0, "validate", "start"),
+    step(900, "validate", "done"),
+    step(900, "read", "start"),
+    { at: 1900, t: "page", path: "/", title: `${name} | Workshop tools for small manufacturers` },
+    { at: 3100, t: "page", path: "/products", title: "Products" },
+    { at: 4200, t: "page", path: "/pricing", title: "Pricing" },
+    { at: 5200, t: "page", path: "/about", title: "About us" },
+    step(6000, "read", "done"),
+    step(6000, "research", "start"),
+    { at: 9600, t: "company", name, oneLiner: "Sells workshop scheduling software and replacement tooling to small machine shops." },
+    step(11000, "research", "done"),
+    step(11000, "design", "start"),
+    ...MOCK_AGENTS.map((agent, i) => ({ at: 14400 + i * 3400, t: "agent", name: agent })),
+    step(26000, "design", "done"),
+    step(26000, "check", "start"),
+    step(RUN_TOTAL_MS, "check", "done"),
+    { at: RUN_TOTAL_MS, t: "done" },
+  ];
+}
+
+const IDLE_RUN = { phase: "idle", host: "", steps: [], agents: [], company: null, log: [], elapsedMs: 0 };
+
+function applyEvent(state, ev) {
+  const steps = state.steps.map((s) => ({ ...s, details: [...s.details] }));
+  const find = (id) => steps.find((s) => s.id === id);
+  const next = { ...state, steps, log: [...state.log, ev] };
+  if (ev.t === "step") {
+    const s = find(ev.id);
+    if (ev.status === "start") {
+      s.status = "active";
+      s.startedAt = ev.at;
+    } else {
+      s.status = "done";
+      s.ms = ev.at - s.startedAt;
+    }
+  } else if (ev.t === "page") {
+    find("read").details.push(ev.title);
+  } else if (ev.t === "company") {
+    find("research").details.push(`${ev.name}: ${ev.oneLiner}`);
+    next.company = { name: ev.name, oneLiner: ev.oneLiner };
+  } else if (ev.t === "agent") {
+    find("design").details.push(ev.name);
+    next.agents = [...state.agents, { name: ev.name }];
+  }
+  return next;
+}
+
+/** phase is "idle", "running" or "done". The live page navigates to /b/<slug> on done. */
+function useMockRun() {
+  const [run, setRun] = useState(IDLE_RUN);
+  const [error, setError] = useState(null);
+  const timer = useRef(null);
+
+  const stop = useCallback(() => {
+    if (timer.current) clearInterval(timer.current);
+    timer.current = null;
+  }, []);
+  useEffect(() => stop, [stop]);
+
+  const start = useCallback(
+    (raw) => {
+      if (timer.current) return false;
+      if (!looksLikeWebsite(raw)) {
+        setError("That does not look like a website. Try something like yourcompany.com.");
+        return false;
+      }
+      const host = displayHost(raw);
+      const timeline = buildTimeline(host);
+      const t0 = performance.now();
+      let i = 0;
+      setError(null);
+      setRun({
+        ...IDLE_RUN,
+        phase: "running",
+        host,
+        steps: STEP_ORDER.map((id) => ({ id, label: stepLabel(id, host), status: "pending", details: [] })),
+      });
+      timer.current = setInterval(() => {
+        const sim = Math.min((performance.now() - t0) * SPEED, RUN_TOTAL_MS);
+        const due = [];
+        while (i < timeline.length && timeline[i].at <= sim) due.push(timeline[i++]);
+        const finished = i >= timeline.length;
+        if (finished) stop();
+        setRun((s) => {
+          if (s.phase !== "running") return s;
+          let n = s;
+          for (const ev of due) n = applyEvent(n, ev);
+          return { ...n, elapsedMs: sim, phase: finished ? "done" : "running" };
+        });
+      }, 50);
+      return true;
+    },
+    [stop]
+  );
+
+  const reset = useCallback(() => {
+    stop();
+    setRun(IDLE_RUN);
+    setError(null);
+  }, [stop]);
+
+  const activeStep = run.steps.find((s) => s.status === "active")?.id ?? null;
+  const stageStep = run.phase === "done" ? "done" : run.phase === "running" ? activeStep ?? "validate" : "idle";
+  return { ...run, error, start, reset, activeStep, stageStep, slug: slugify(run.host.split(".")[0] ?? "") };
+}
+
+/** Focus the field on load for mouse users, as the live page does. Skipped inside the gallery's previews. */
+function useAutoFocus(ref) {
+  useEffect(() => {
+    if (IN_FRAME || !window.matchMedia("(pointer: fine)").matches) return;
+    ref.current?.focus({ preventScroll: true });
+  }, [ref]);
+}
+
+/* ---------- Page chrome: stand-ins for Header.tsx and Footer.tsx ---------- */
+function Logo() {
+  return (
+    <svg viewBox="0 0 40 40" fill="none" className="h-10 w-10" aria-hidden="true">
+      <rect width="40" height="40" rx="8" fill="var(--logo-tile)" />
+      <path d="M10 14L4 20L10 26" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M30 14L36 20L30 26" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d="M14 12V28M14 12H20.5C23.5376 12 26 14.9101 26 18.5V21.5C26 25.0899 23.5376 28 20.5 28H14"
+        stroke="var(--logo-ink)"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <rect x="17" y="18" width="2" height="4" rx="0.5" fill="var(--logo-caret)" />
+    </svg>
+  );
+}
+
+function ThemeToggle() {
+  const [light, setLight] = useState(() => document.documentElement.classList.contains("light"));
+  const toggle = () => {
+    const next = !light;
+    const d = document.documentElement;
+    d.classList.toggle("light", next);
+    d.style.colorScheme = next ? "light" : "dark";
+    try {
+      localStorage.setItem("themePreference", next ? "light" : "dark");
+    } catch (e) {}
+    setLight(next);
+  };
+  return (
+    <button
+      type="button"
+      onClick={toggle}
+      aria-label={light ? "Switch to dark theme" : "Switch to light theme"}
+      className={cn(BTN, BTN_GHOST, "h-9 w-9 text-muted-foreground")}
+    >
+      {light ? <I.Sun /> : <I.Moon />}
+    </button>
+  );
+}
+
+/** Prototype-only control: steps between the five options. Not part of any design. */
+function ProtoSwitcher() {
+  const prev = PROTOS[(PROTO_N + 3) % 5];
+  const next = PROTOS[PROTO_N % 5];
+  const link = "rounded-full p-1.5 transition-colors hover:text-foreground";
+  return (
+    <div className="flex items-center rounded-full border border-dashed border-border px-1 py-0.5 text-xs text-muted-foreground">
+      <a href={prev.file} aria-label={`Previous prototype: ${prev.name}`} className={link}>
+        <I.ChevronLeft className="h-3.5 w-3.5" />
+      </a>
+      <a href="index.html" className="px-1 transition-colors hover:text-foreground" title="All five prototypes">
+        <span className="hidden sm:inline">Prototype </span>
+        {PROTO_N}/5 · <span className="text-foreground">{PROTOS[PROTO_N - 1].name}</span>
+      </a>
+      <a href={next.file} aria-label={`Next prototype: ${next.name}`} className={link}>
+        <I.ChevronRight className="h-3.5 w-3.5" />
+      </a>
+    </div>
+  );
+}
+
+function Header() {
+  const nav = [
+    ["Work", "/work"],
+    ["Portfolio", "/portfolio"],
+    ["Experience", "/work#experience"],
+    ["Book a Call", "/call"],
+  ];
+  return (
+    <header className="fixed top-0 z-50 w-full border-b border-border bg-background/90 backdrop-blur-sm">
+      <nav aria-label="Primary" className="container-narrow flex h-16 items-center justify-between gap-3">
+        <a href={SITE} aria-label="Davin Harding, home" className="transition-opacity hover:opacity-80">
+          <Logo />
+        </a>
+        <ProtoSwitcher />
+        <div className="flex items-center gap-1">
+          <div className="hidden items-center gap-1 lg:flex">
+            {nav.map(([label, path]) => (
+              <a key={label} href={SITE + path} className={cn(BTN, BTN_GHOST, "h-9 px-4 text-muted-foreground")}>
+                {label}
+              </a>
+            ))}
+          </div>
+          <ThemeToggle />
+          <span className={cn(BTN, "h-9 w-9 text-muted-foreground lg:hidden")} aria-hidden="true">
+            <I.Menu className="h-5 w-5" />
+          </span>
+        </div>
+      </nav>
+    </header>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="border-t border-border bg-background">
+      <div className="container-narrow flex items-center justify-between gap-4 py-3 md:py-4">
+        <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} Davin Harding</p>
+        <p className="hidden text-xs text-muted-foreground sm:block">Prototype. The run is simulated at {SPEED}x speed.</p>
+      </div>
+    </footer>
+  );
+}
+
+/** Header, one full-height stage, footer: the live page's fitViewport layout. */
+function Shell({ step = "idle", glow = true, className, stageRef, children, ...rest }) {
+  return (
+    <div className="flex min-h-[100dvh] flex-col">
+      <Header />
+      <main id="main" className="flex flex-1 flex-col">
+        <section
+          ref={stageRef}
+          data-step={step}
+          aria-labelledby="home-title"
+          className={cn("relative flex flex-1 flex-col bg-background", glow && "thirty-stage", className)}
+          {...rest}
+        >
+          {children}
+        </section>
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+/* ---------- The live page's form, examples and run console ---------- */
+const EXAMPLES = [
+  { slug: "example-allbirds", name: "Allbirds", label: "direct-to-consumer apparel" },
+  { slug: "example-linear", name: "Linear", label: "B2B software" },
+  { slug: "example-sweetgreen", name: "sweetgreen", label: "multi-location restaurants" },
+];
+
+function UrlForm({ run, url, setUrl, inputRef, onFocus, onBlur }) {
+  const own = useRef(null);
+  const ref = inputRef ?? own;
+  useAutoFocus(ref);
+  const onSubmit = (e) => {
+    e.preventDefault();
+    if (!run.start(url)) ref.current?.focus();
+  };
+  return (
+    <form noValidate onSubmit={onSubmit} className="w-full">
+      <label htmlFor="blueprint-url" className="sr-only">
+        Your company's website
+      </label>
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <input
+          ref={ref}
+          id="blueprint-url"
+          name="url"
+          type="text"
+          inputMode="url"
+          autoCapitalize="off"
+          autoCorrect="off"
+          autoComplete="off"
+          spellCheck={false}
+          enterKeyHint="go"
+          maxLength={2048}
+          placeholder="yourcompany.com"
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          aria-invalid={run.error ? true : undefined}
+          aria-describedby={run.error ? "blueprint-error" : "blueprint-help"}
+          className={cn(
+            "h-12 w-full min-w-0 rounded-md border bg-background/80 px-4 text-base text-foreground shadow-sm sm:flex-1",
+            "placeholder:text-muted-foreground/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+            run.error ? "border-red-500/70" : "border-input"
+          )}
+        />
+        <button type="submit" className={cn(BTN, BTN_PRIMARY, "h-12 px-6 text-base")}>
+          Draft my blueprint
+          <I.ArrowRight />
+        </button>
+      </div>
+      {run.error ? (
+        <p id="blueprint-error" role="alert" className="mt-3 rounded-md border border-red-500/40 bg-red-500/10 p-3 text-sm text-foreground">
+          {run.error}
+        </p>
+      ) : null}
+      <p id="blueprint-help" className="mt-3 text-sm text-muted-foreground">
+        About 30 seconds. Reads your public site, nothing else.
+      </p>
+    </form>
+  );
+}
+
+function ExampleLinks({ className }) {
+  return (
+    <div className={cn("text-sm", className)}>
+      <p className="mb-2 text-muted-foreground">Or open one I ran earlier:</p>
+      <ul className="flex flex-wrap gap-2" aria-label="Example blueprints">
+        {EXAMPLES.map((ex) => (
+          <li key={ex.slug}>
+            <a
+              href={`${SITE}/b/${ex.slug}`}
+              target="_blank"
+              rel="noopener"
+              className="inline-flex items-baseline gap-1.5 rounded-md border border-border px-3 py-1.5 text-foreground/90 transition-colors hover:border-primary/50 hover:text-foreground"
+            >
+              <span className="font-medium">{ex.name}</span>
+              <span className="text-xs text-muted-foreground">{ex.label}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function StepIcon({ status }) {
+  if (status === "done") return <I.Check className="h-4 w-4 text-primary" />;
+  if (status === "active") return <I.Loader className="h-4 w-4 text-primary" />;
+  return <I.Circle className="h-4 w-4 text-muted-foreground/50" />;
+}
+
+/** What the prototype shows where the live page would navigate to the blueprint. */
+function DoneRow({ run, className }) {
+  return (
+    <div className={cn("flex flex-wrap items-center justify-between gap-3", className)}>
+      <p className="text-sm text-foreground" role="status">
+        Blueprint ready. <span className="text-muted-foreground">The live page opens /b/{run.slug} here.</span>
+      </p>
+      <button type="button" onClick={run.reset} className={cn(BTN, BTN_OUTLINE, "h-8 px-3 text-xs")}>
+        <I.Rotate className="h-3.5 w-3.5" />
+        Run it again
+      </button>
+    </div>
+  );
+}
+
+/** RunConsole.tsx as it ships today. */
+function RunConsole({ run }) {
+  const seconds = (run.elapsedMs / 1000).toFixed(1);
+  return (
+    <section aria-labelledby="run-console-title" className="w-full rounded-lg border border-border bg-card/80 p-4 text-left backdrop-blur-sm sm:p-5">
+      <div className="mb-4 flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <h2 id="run-console-title" className="break-words text-base font-semibold text-foreground">
+            Drafting a blueprint for {run.host}
+          </h2>
+          <p className="mt-1 text-xs text-muted-foreground">About 30 seconds. Reads your public site, nothing else.</p>
+        </div>
+        <p className="shrink-0 font-mono text-lg tabular-nums text-foreground">{seconds}s</p>
+      </div>
+      <ol aria-live="polite" className="space-y-2.5">
+        {run.steps.map((step) => (
+          <li key={step.id} className="flex gap-3">
+            <span className="mt-0.5">
+              <StepIcon status={step.status} />
+            </span>
+            <div className="min-w-0">
+              <p className={cn("break-words text-sm", step.status === "pending" ? "text-muted-foreground" : "text-foreground")}>{step.label}</p>
+              {step.details.length > 0 ? <p className="mt-0.5 truncate text-xs text-muted-foreground">{step.details.join(" · ")}</p> : null}
+            </div>
+          </li>
+        ))}
+      </ol>
+      {run.phase === "done" ? (
+        <DoneRow run={run} className="mt-4" />
+      ) : (
+        <div className="mt-3 flex min-h-9 items-center justify-end">
+          <button type="button" onClick={run.reset} className={cn(BTN, BTN_GHOST, "h-8 px-3 text-xs")}>
+            Cancel
+          </button>
+        </div>
+      )}
+    </section>
+  );
+}
+
+/* ==========================================================================
+   Prototype 2: Drafting table
+   ========================================================================== */
+const AGENT_X = [65, 195, 325, 455];
+const GATED = [true, true, false, true]; // which sample agents carry a gate in the schematic
+
+const box = (x, y, w, h) => `M${x} ${y}h${w}v${h}h${-w}z`;
+const ring = (cx, cy, r) => `M${cx - r} ${cy}a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0`;
+
+/** Splits an agent name over two lines of similar length. */
+function twoLines(name) {
+  const words = name.split(" ");
+  if (words.length < 2) return [name];
+  let best = 1;
+  let diff = Infinity;
+  for (let i = 1; i < words.length; i++) {
+    const d = Math.abs(words.slice(0, i).join(" ").length - words.slice(i).join(" ").length);
+    if (d < diff) {
+      diff = d;
+      best = i;
+    }
+  }
+  return [words.slice(0, best).join(" "), words.slice(best).join(" ")];
+}
+
+/** A dashed construction line that gets inked over while `p` moves from `from` to `to`. */
+function Ink({ p, from, to, d, filled }) {
+  const k = clamp01((p - from) / (to - from));
+  return (
+    <g>
+      <path d={d} className={cn("c2-construct", filled && "c2-construct--filled")} />
+      <path d={d} pathLength="1" className="c2-ink" style={{ strokeDashoffset: 1 - k, opacity: k > 0 ? 1 : 0 }} />
+    </g>
+  );
+}
+
+function Cell({ x, y, label, value, ink }) {
+  return (
+    <g>
+      <text x={x + 7} y={y + 11} className="c2-t" style={{ fontSize: 6.5 }}>{label}</text>
+      <text x={x + 7} y={y + 22} className={cn("c2-t c2-t--strong", ink && "c2-t--ink")} style={{ fontSize: 8.5 }}>{value}</text>
+    </g>
+  );
+}
+
+function Drawing({ p, host, run }) {
+  const shown = (at) => ({ opacity: p >= at ? 1 : 0 });
+  const client = host ? (host.length > 22 ? `${host.slice(0, 21)}…` : host).toUpperCase() : null;
+  const designing = run.activeStep === "design";
+  const checked = run.phase === "done" ? "PASSED" : run.activeStep === "check" ? "IN REVIEW" : run.phase === "running" ? "PENDING" : "NOT YET";
+  const time = run.phase === "idle" ? "ABOUT 30 S" : `${(run.elapsedMs / 1000).toFixed(1)} S`;
+  const today = new Date().toISOString().slice(0, 10);
+
+  return (
+    <svg
+      viewBox="0 0 520 414"
+      className="h-auto w-full"
+      role="img"
+      aria-label="Schematic of an agent team: your team at the top, four agents below it, each with read and write tools, and a human approval gate before any write."
+    >
+      {/* Your team */}
+      <Ink p={p} from={0} to={0.14} d={box(190, 24, 140, 50)} />
+      <text x="260" y="46" textAnchor="middle" className="c2-t c2-t--strong">{client ?? "YOUR TEAM"}</text>
+      <text x="260" y="61" textAnchor="middle" className="c2-t">APPROVES GATED ACTIONS</text>
+      <Ink p={p} from={0.14} to={0.2} d="M260 74V112" />
+      <Ink p={p} from={0.2} to={0.34} d="M65 112H455" />
+
+      {AGENT_X.map((cx, i) => {
+        const agent = run.agents[i];
+        const from = 0.42 + i * 0.07;
+        const lines = agent ? twoLines(agent.name.toUpperCase()) : [];
+        return (
+          <g key={cx}>
+            <Ink p={p} from={0.34} to={0.42} d={`M${cx} 112V146`} />
+            <Ink p={p} from={from} to={from + 0.1} d={box(cx - 55, 146, 110, 56)} />
+            {agent ? (
+              <g className="c2-pop">
+                {lines.map((line, j) => (
+                  <text key={line} x={cx} y={(lines.length === 1 ? 170 : 164) + j * 12} textAnchor="middle" className="c2-t c2-t--strong" style={{ fontSize: 8.5 }}>
+                    {line}
+                  </text>
+                ))}
+                <text x={cx} y="194" textAnchor="middle" className="c2-t c2-t--ink">DRAFTED</text>
+              </g>
+            ) : (
+              <g className="c2-fade" style={shown(from)}>
+                <text x={cx} y="171" textAnchor="middle" className="c2-t c2-t--strong">AGENT 0{i + 1}</text>
+                <text x={cx} y="186" textAnchor="middle" className={cn("c2-t", designing && i === run.agents.length && "c2-t--ink")}>
+                  {designing && i === run.agents.length ? "DRAFTING" : "OPEN ROLE"}
+                </text>
+              </g>
+            )}
+
+            {/* Tools: two read, one write */}
+            <Ink p={p} from={0.73} to={0.77} d={`M${cx} 202V212`} />
+            {[-31, -7, 17].map((dx, j) => (
+              <g key={dx}>
+                <Ink p={p} from={0.76 + j * 0.03} to={0.82 + j * 0.03} d={box(cx + dx, 212, 14, 14)} />
+                <text x={cx + dx + 7} y="222" textAnchor="middle" className="c2-t c2-fade" style={shown(0.86)}>
+                  {j === 2 ? "W" : "R"}
+                </text>
+              </g>
+            ))}
+
+            {GATED[i] ? <Ink p={p} from={0.86} to={0.92} d={ring(cx, 129, 4.5)} filled /> : null}
+          </g>
+        );
+      })}
+
+      {/* Callouts */}
+      <Ink p={p} from={0.9} to={0.95} d="M459 125L470 96H512" />
+      <text x="512" y="90" textAnchor="end" className="c2-t c2-fade" style={shown(0.93)}>HUMAN GATE</text>
+      <text x="10" y="246" className="c2-t c2-fade" style={shown(0.88)}>R READ · W WRITE, BEHIND THE GATE</text>
+
+      <Ink p={p} from={0.9} to={0.96} d="M10 262H510M10 256v12M510 256v12" />
+      <rect x="196" y="255" width="128" height="14" fill="hsl(var(--background))" />
+      <text x="260" y="265" textAnchor="middle" className="c2-t">ABOUT 30 S, START TO FINISH</text>
+
+      {/* Notes and title block */}
+      <text x="10" y="302" className="c2-t c2-t--strong">FIG. 1</text>
+      <text x="10" y="316" className="c2-t">AGENT TEAM, PROPOSED</text>
+      <text x="10" y="344" className="c2-t c2-t--strong" style={{ fontSize: 7.5 }}>NOTES</text>
+      <text x="10" y="358" className="c2-t">1. EVERY WRITE WAITS FOR A PERSON.</text>
+      <text x="10" y="371" className="c2-t">2. READS YOUR PUBLIC SITE, NOTHING ELSE.</text>
+      <text x="10" y="384" className="c2-t">3. DRAWN IN ABOUT THIRTY SECONDS.</text>
+
+      <Ink p={p} from={0.94} to={1} d={`${box(270, 292, 240, 112)}M270 320H510M270 348H510M270 376H510M390 320V404`} />
+      <Cell x={270} y={292} label="PROJECT" value="AGENT BLUEPRINT" />
+      <Cell x={270} y={320} label="CLIENT" value={client && client.length > 16 ? `${client.slice(0, 15)}…` : client ?? "YOUR COMPANY"} ink={Boolean(client)} />
+      <Cell x={390} y={320} label="DATE" value={today} />
+      <Cell x={270} y={348} label="DRAWN BY" value="DAVIN'S AGENTS" />
+      <Cell x={390} y={348} label="TIME" value={time} ink={run.phase !== "idle"} />
+      <Cell x={270} y={376} label="CHECKED" value={checked} ink={run.phase === "done"} />
+      <Cell x={390} y={376} label="SHEET" value="1 OF 1" />
+    </svg>
+  );
+}
+
+function App() {
+  const run = useMockRun();
+  const [url, setUrl] = useState("");
+  const stageRef = useRef(null);
+  const coordsRef = useRef(null);
+  const busy = run.phase !== "idle";
+
+  // How much of the drawing is inked: it follows what has been typed, and a run inks all of it.
+  const typed = url.trim().length;
+  const p = busy ? 1 : Math.max(0.14, Math.min(1, typed / 12));
+  const host = busy ? run.host : looksLikeWebsite(url) ? displayHost(url) : "";
+
+  // The light follows the cursor. Written straight to the element so moving the mouse never re-renders.
+  const onPointerMove = (e) => {
+    const stage = stageRef.current;
+    if (!stage) return;
+    const r = stage.getBoundingClientRect();
+    const x = e.clientX - r.left;
+    const y = e.clientY - r.top;
+    stage.style.setProperty("--mx", `${x}px`);
+    stage.style.setProperty("--my", `${y}px`);
+    if (coordsRef.current) {
+      coordsRef.current.textContent = `X ${String(Math.round(x)).padStart(4, "0")}  Y ${String(Math.round(y)).padStart(4, "0")}`;
+    }
+  };
+
+  return (
+    <Shell step={run.stageStep} glow={false} className="c2-paper" stageRef={stageRef} onPointerMove={onPointerMove}>
+      <div className="mx-auto grid w-full max-w-6xl flex-1 items-center gap-10 px-4 pb-10 pt-24 md:px-6 lg:grid-cols-2 lg:gap-14 lg:px-8">
+        <div className="min-w-0">
+          <p className="text-meta mb-4">Thirty Seconds</p>
+          <h1 id="home-title" className="thirty-hero mb-8 text-balance text-4xl font-semibold tracking-tight text-foreground md:text-5xl lg:text-6xl">
+            Your next hire is an AI agent. Davin builds it.
+          </h1>
+          {busy ? (
+            <RunConsole run={run} />
+          ) : (
+            <>
+              <UrlForm run={run} url={url} setUrl={setUrl} />
+              <ExampleLinks className="mt-6" />
+            </>
+          )}
+        </div>
+        <div className={cn("min-w-0", busy && "hidden md:block")}>
+          <Drawing p={p} host={host} run={run} />
+          <p className="mt-3 text-center font-mono text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+            {busy ? (run.phase === "done" ? "Drawing checked" : "Drafting") : typed === 0 ? "Type your address to ink the drawing" : p < 1 ? "Keep going" : "Ready to draft"}
+          </p>
+        </div>
+      </div>
+      <p ref={coordsRef} className="c2-coords pointer-events-none absolute bottom-3 left-4 font-mono text-[10px] tracking-[0.14em] text-muted-foreground/70" aria-hidden="true">
+        X 0000  Y 0000
+      </p>
+    </Shell>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+// Reveal once the generated utility classes are in effect (or after three seconds regardless).
+(function reveal(tries) {
+  const shell = document.querySelector("#root > div");
+  if ((shell && getComputedStyle(shell).display === "flex") || tries > 100) document.body.classList.add("ready");
+  else setTimeout(() => reveal(tries + 1), 30);
+})(0);
+</script>
+</body>
+</html>

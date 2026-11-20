@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Thirty Seconds homepage: five directions</title>
+<script>
+  (function () {
+    var d = document.documentElement, p = null;
+    try { p = localStorage.getItem("themePreference"); } catch (e) {}
+    var q = new URLSearchParams(location.search).get("theme");
+    if (q === "light" || q === "dark") p = q;
+    var l = p === "light" || (p !== "dark" && window.matchMedia("(prefers-color-scheme: light)").matches);
+    d.classList.toggle("light", l);
+    d.style.colorScheme = l ? "light" : "dark";
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --border: 217.2 32.6% 17.5%;
+  }
+  .light {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --border: 214.3 31.8% 91.4%;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid hsl(var(--primary)); outline-offset: 2px; border-radius: 4px; }
+  .wrap { max-width: 72rem; margin: 0 auto; padding: 3.5rem 1rem 5rem; }
+  @media (min-width: 768px) { .wrap { padding: 5rem 2rem 6rem; } }
+  .top { display: flex; align-items: flex-start; justify-content: space-between; gap: 1.5rem; }
+  .eyebrow { margin: 0 0 0.75rem; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: hsl(var(--muted-foreground)); }
+  h1 { margin: 0; font-size: clamp(2rem, 5vw, 3.25rem); font-weight: 600; letter-spacing: -0.025em; line-height: 1.08; text-wrap: balance; }
+  .lede { max-width: 42rem; margin: 1.25rem 0 0; color: hsl(var(--muted-foreground)); }
+  .theme {
+    flex: none;
+    padding: 0.45rem 0.8rem;
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.375rem;
+    background: transparent;
+    color: hsl(var(--muted-foreground));
+    font: inherit;
+    font-size: 0.8125rem;
+    cursor: pointer;
+  }
+  .theme:hover { color: hsl(var(--foreground)); border-color: hsl(var(--primary) / 0.5); }
+  .grid { display: grid; gap: 2.5rem 2rem; margin-top: 3.5rem; }
+  @media (min-width: 900px) { .grid { grid-template-columns: 1fr 1fr; } }
+  .card { min-width: 0; }
+  .shot {
+    position: relative;
+    display: block;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.625rem;
+    background: hsl(var(--background));
+    transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+  .shot:hover { border-color: hsl(var(--primary) / 0.6); transform: translateY(-2px); }
+  .shot iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1280px;
+    height: 800px;
+    border: 0;
+    transform: scale(var(--s, 0.4));
+    transform-origin: 0 0;
+    pointer-events: none;
+  }
+  .num { margin: 1.25rem 0 0; font-size: 0.75rem; font-variant-numeric: tabular-nums; color: hsl(var(--muted-foreground)); }
+  h2 { margin: 0.15rem 0 0; font-size: 1.375rem; font-weight: 600; letter-spacing: -0.01em; }
+  h2 a { text-decoration: none; }
+  h2 a:hover { color: hsl(var(--primary)); }
+  .pitch { margin: 0.4rem 0 0; }
+  dl { display: grid; grid-template-columns: 6.5rem 1fr; gap: 0.5rem 1rem; margin: 1rem 0 0; font-size: 0.875rem; }
+  dt { color: hsl(var(--muted-foreground)); }
+  dd { margin: 0; }
+  .foot { margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid hsl(var(--border)); font-size: 0.875rem; color: hsl(var(--muted-foreground)); }
+  .foot p { max-width: 46rem; margin: 0 0 0.6rem; }
+  @media (prefers-reduced-motion: reduce) { .shot { transition: none; } }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="top">
+    <div>
+      <p class="eyebrow">Thirty Seconds homepage</p>
+      <h1>Five directions for the homepage</h1>
+    </div>
+    <button type="button" class="theme" id="theme">Switch theme</button>
+  </div>
+  <p class="lede">
+    Each one is a standalone page with the same headline, field and run as the live site. Open one, type any address,
+    and press Enter to watch its version of the run. The run is simulated at 2x speed and nothing is sent anywhere.
+  </p>
+
+  <div class="grid">
+    <article class="card">
+      <a class="shot" href="01-inline.html" aria-label="Open prototype 1, Inline"><iframe src="01-inline.html" title="" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></a>
+      <p class="num">1 of 5</p>
+      <h2><a href="01-inline.html">Inline</a></h2>
+      <p class="pitch">The headline is the form. You finish the sentence with your address.</p>
+      <dl>
+        <dt>Mechanic</dt><dd>The field is set in headline type and its placeholder types out example companies. The run becomes an agent trace with a time for every stage.</dd>
+        <dt>Pick it if</dt><dd>You want the quietest page and the clearest signal that an engineer who builds agents made it.</dd>
+        <dt>To ship</dt><dd>Small. Restyle the field and render the existing run events as trace rows.</dd>
+      </dl>
+    </article>
+
+    <article class="card">
+      <a class="shot" href="02-drafting-table.html" aria-label="Open prototype 2, Drafting table"><iframe src="02-drafting-table.html" title="" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></a>
+      <p class="num">2 of 5</p>
+      <h2><a href="02-drafting-table.html">Drafting table</a></h2>
+      <p class="pitch">The page is a sheet of blueprint paper with a schematic of an agent team on it.</p>
+      <dl>
+        <dt>Mechanic</dt><dd>The grid lights up around the cursor. The schematic inks in over its construction lines as you type, and its title block fills in during the run.</dd>
+        <dt>Pick it if</dt><dd>You want the word “blueprint” to be something people see, with read, write and human-gate marks on show.</dd>
+        <dt>To ship</dt><dd>Medium. One SVG component and some CSS. The schematic needs a simpler form on phones.</dd>
+      </dl>
+    </article>
+
+    <article class="card">
+      <a class="shot" href="03-open-roles.html" aria-label="Open prototype 3, Open roles"><iframe src="03-open-roles.html" title="" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></a>
+      <p class="num">3 of 5</p>
+      <h2><a href="03-open-roles.html">Open roles</a></h2>
+      <p class="pitch">The blueprint's org chart sits on the homepage, waiting for hires.</p>
+      <dl>
+        <dt>Mechanic</dt><dd>With nothing typed it rotates through the three example teams. Type an address and it becomes your team with four open roles, which fill as agents are drafted.</dd>
+        <dt>Pick it if</dt><dd>You want visitors to see what they get before they try it. It takes over the job of the example links.</dd>
+        <dt>To ship</dt><dd>Medium. Reuses the OrgChart styles. It assumes four agents, and gate status is not streamed during a run today.</dd>
+      </dl>
+    </article>
+
+    <article class="card">
+      <a class="shot" href="04-the-dial.html" aria-label="Open prototype 4, The dial"><iframe src="04-the-dial.html" title="" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></a>
+      <p class="num">4 of 5</p>
+      <h2><a href="04-the-dial.html">The dial</a></h2>
+      <p class="pitch">A thirty-second dial that shows a run before you start one.</p>
+      <dl>
+        <dt>Mechanic</dt><dd>The hand sweeps in real time. Move around the dial, or use the arrow keys, to see what the agents do at each second. During a run it is the live timer.</dd>
+        <dt>Pick it if</dt><dd>You want the page to sell the thirty-second promise and show the stages behind it.</dd>
+        <dt>To ship</dt><dd>Medium. One SVG component. Stage lengths are estimates, and it needs a state for runs that pass thirty seconds.</dd>
+      </dl>
+    </article>
+
+    <article class="card">
+      <a class="shot" href="05-constellation.html" aria-label="Open prototype 5, Constellation"><iframe src="05-constellation.html" title="" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></a>
+      <p class="num">5 of 5</p>
+      <h2><a href="05-constellation.html">Constellation</a></h2>
+      <p class="pitch">Today's page, with scattered points that pull into a team.</p>
+      <dl>
+        <dt>Mechanic</dt><dd>Points drift and link up near the cursor. Start typing and they form an org chart under the field, which lights up agent by agent during the run.</dd>
+        <dt>Pick it if</dt><dd>You want the smallest change to what shipped today. The form and run console are untouched.</dd>
+        <dt>To ship</dt><dd>Small. One canvas component behind the existing page.</dd>
+      </dl>
+    </article>
+  </div>
+
+  <div class="foot">
+    <p>Each file is self-contained: React 18, Tailwind 3 with the site's tokens and config, and Inter, loaded from CDNs, so they need a network connection. Both themes work; the toggle is in each page's header.</p>
+    <p>The header and footer are stand-ins. The pill in the header steps between prototypes and is not part of any design.</p>
+  </div>
+</main>
+<script>
+  // Scale each 1280px-wide preview to its card.
+  var shots = document.querySelectorAll(".shot");
+  var fit = function () {
+    shots.forEach(function (s) { s.style.setProperty("--s", s.clientWidth / 1280); });
+  };
+  new ResizeObserver(fit).observe(document.body);
+  fit();
+  document.getElementById("theme").addEventListener("click", function () {
+    var d = document.documentElement, light = !d.classList.contains("light");
+    d.classList.toggle("light", light);
+    d.style.colorScheme = light ? "light" : "dark";
+    try { localStorage.setItem("themePreference", light ? "light" : "dark"); } catch (e) {}
+    document.querySelectorAll("iframe").forEach(function (f) { f.contentWindow.location.reload(); });
+  });
+</script>
+</body>
+</html>
