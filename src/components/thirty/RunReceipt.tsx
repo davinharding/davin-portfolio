@@ -76,8 +76,8 @@ export function RunReceipt({ blueprint }: { blueprint: StoredBlueprint }) {
           <ol className="space-y-1">
             {receipt.steps.map((s, i) => (
               <li key={`${s.id}-${i}`} className="flex justify-between gap-4">
-                <span className="text-foreground/90">{s.label}</span>
-                <span className="tabular-nums text-muted-foreground">{seconds(s.ms)}</span>
+                <span className="min-w-0 text-foreground/90">{s.label}</span>
+                <span className="shrink-0 tabular-nums text-muted-foreground">{seconds(s.ms)}</span>
               </li>
             ))}
           </ol>

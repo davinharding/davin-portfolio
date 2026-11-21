@@ -46,7 +46,9 @@ export function BlueprintView({ blueprint: stored }: { blueprint: StoredBlueprin
   const host = source.host;
 
   return (
-    <article className="container-narrow pt-24 pb-16">
+    // A company's host and name can be one long unbroken word (a 60-character subdomain);
+    // `anywhere` lets it wrap inside grid and flex cells too, so the page never scrolls sideways.
+    <article className="container-narrow pt-24 pb-16 [overflow-wrap:anywhere]">
       <header className="pb-8">
         <p className="text-meta mb-2">Agent blueprint for</p>
         <h1 className="heading-hero break-words">{company.name}</h1>
