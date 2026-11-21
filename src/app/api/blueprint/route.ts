@@ -7,13 +7,7 @@ export const maxDuration = 90;
 
 const handle = createBlueprintHandler({
   ...defaultDeps,
-  keepAlive: (work) => {
-    try {
-      after(() => work);
-    } catch (err) {
-      console.error("[thirty] after() unavailable", err);
-    }
-  },
+  keepAlive: (work) => after(() => work),
 });
 
 export function POST(request: Request) {

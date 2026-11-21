@@ -379,6 +379,47 @@ describe("runs", () => {
     }
   );
 
+  it("refuses a run before taking quota or budget when it cannot be kept alive", async () => {
+    const quiet = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const noAfter = () => {
+      throw new Error("after() called outside a request scope");
+    };
+    const res = await createBlueprintHandler(makeDeps({ keepAlive: noAfter }))(jsonReq({ url: "acme.test" }));
+    quiet.mockRestore();
+    expect(res.status).toBe(503);
+    expect((await errorOf(res)).code).toBe("unavailable");
+    expect(startRun).not.toHaveBeenCalled();
+    const spent = [...(store as unknown as { map: Map<string, unknown> }).map.keys()].filter(
+      (k) => k.startsWith("rl:d:") || k.startsWith("day:") || k.startsWith("budget:") || k.startsWith("lock:")
+    );
+    expect(spent).toEqual([]);
+  });
+
+  it("still serves a cache hit when the analytics event cannot be kept alive", async () => {
+    const handle = createBlueprintHandler(makeDeps());
+    await events(await handle(jsonReq({ url: "acme.test" })));
+    await Promise.all(pending);
+    const quiet = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const noAfter = () => {
+      throw new Error("after() called outside a request scope");
+    };
+    const hit = await createBlueprintHandler(makeDeps({ keepAlive: noAfter }))(jsonReq({ url: "acme.test" }));
+    quiet.mockRestore();
+    expect((await events(hit)).map((e) => e.t)).toEqual(["cached", "done"]);
+  });
+
+  it("keeps the function alive until the run settles, and releases it on an early refusal", async () => {
+    const handle = createBlueprintHandler(makeDeps({}, { ipDailyRuns: 1 }));
+    await events(await handle(jsonReq({ url: "acme.test" })));
+    expect(pending).toHaveLength(1);
+    expect(await pending[0]).toMatchObject({ ok: true });
+
+    const refused = await handle(jsonReq({ url: "other.test" }));
+    expect(refused.status).toBe(429);
+    expect(pending).toHaveLength(2);
+    await expect(pending[1]).resolves.toBeUndefined();
+  });
+
   it("fallback.test takes the search path", async () => {
     const evs = await events(await createBlueprintHandler(makeDeps())(jsonReq({ url: "fallback.test" })));
     expect(evs).toContainEqual(expect.objectContaining({ t: "note", text: expect.stringContaining("Searching the web") }));

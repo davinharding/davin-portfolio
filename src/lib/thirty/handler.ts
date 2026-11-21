@@ -246,152 +246,276 @@ async function waitForOtherRun(store: Store, host: string, deps: HandlerDeps): P
   return { kind: "error", code: "timeout" };
 }
 
+type Fail = (code: ErrorCode, host?: string | null, retryAfterSec?: number) => Response;
+
+type Accepted = {
+  mode: Mode;
+  fail: Fail;
+  url: string;
+  body: ParsedBody;
+  requestHost: string;
+};
+
+type Visit = Accepted & {
+  request: Request;
+  deps: HandlerDeps;
+  cfg: ThirtyConfig;
+  mock: boolean;
+  store: Store | null;
+  visitor: string;
+  analytics: RunContext["analytics"];
+  now: Date;
+  requestStartedAt: number;
+};
+
+type Target = {
+  host: string;
+  hostname: string;
+  extraPath?: string;
+  trigger: ReturnType<typeof mockTrigger>;
+  earlyMock: (code: ErrorCode) => boolean;
+};
+
+type Quota = { day: string; reservation: NonNullable<Awaited<ReturnType<typeof reserveBudget>>> };
+
+type Hold = { adopt: (work: Promise<unknown>) => void; release: () => void };
+
+const EARLY_MOCK_CODES = ["bad_request", "invalid_url", "blocked_host", "platform_url", "self_url", "too_fast"] as const;
+
+async function readRequest(request: Request): Promise<Response | Accepted> {
+  const contentType = (request.headers.get("content-type") ?? "").toLowerCase();
+  const mode: Mode = contentType.includes("application/x-www-form-urlencoded") ? "form" : "json";
+  const fail: Fail = (code, host, retryAfterSec) => errorResponse(mode, code, host, retryAfterSec);
+
+  if (mode === "json" && !contentType.includes("application/json")) return fail("bad_request");
+  const body = await parseBody(request, mode);
+  if (!body || typeof body.url !== "string") return fail("bad_request");
+
+  const requestHost = requestHostOf(request);
+  if (isCrossOrigin(request, requestHost)) return fail("bad_request");
+  if (body.honeypot.trim() !== "") return fail("bad_request");
+
+  return { mode, fail, url: body.url, body, requestHost };
+}
+
+function openVisit(request: Request, accepted: Accepted, deps: HandlerDeps, requestStartedAt: number): Visit {
+  const cfg = deps.config();
+  const visitor = visitorId(clientIp(request.headers), cfg.ipSalt);
+  const home = readHomeAssignment(request.headers.get("cookie"));
+  return {
+    ...accepted,
+    request,
+    deps,
+    cfg,
+    mock: deps.isMockMode(),
+    store: deps.getStore(),
+    visitor,
+    analytics: {
+      distinctId: accepted.body.phId ?? `visitor:${visitor}`,
+      sessionId: accepted.body.phSession,
+      context: home ? homeEventProps(home) : undefined,
+    },
+    now: new Date(requestStartedAt),
+    requestStartedAt,
+  };
+}
+
+async function guardFlood(v: Visit): Promise<Response | null> {
+  if (!v.store || (await checkFlood(v.store, v.visitor, v.now))) return null;
+  return v.fail("too_fast", null, Math.max(1, 60 - v.now.getUTCSeconds()));
+}
+
+function normalizeTarget(v: Visit): Response | Target {
+  const input = normalizeInput(v.url, { requestHost: v.requestHost, allowTestTld: v.mock });
+  if (!input.ok) return v.fail(input.code);
+  const { host } = input;
+  const trigger = v.mock ? mockTrigger(host) : null;
+  const earlyMock = (c: ErrorCode) => trigger === c && MOCK_PRERUN_CODES.has(c);
+  for (const c of EARLY_MOCK_CODES) {
+    if (earlyMock(c)) return v.fail(c, host, c === "too_fast" ? 30 : undefined);
+  }
+  return { host, hostname: input.hostname, extraPath: input.extraPath, trigger, earlyMock };
+}
+
+function reportInBackground(deps: HandlerDeps, event: Parameters<ReportEvent>[0]): void {
+  try {
+    deps.keepAlive(deps.report(event));
+  } catch (err) {
+    console.error("[thirty] could not keep the analytics event alive", err);
+  }
+}
+
+async function serveFromCache(v: Visit, t: Target): Promise<Response | null> {
+  const fresh = !v.deps.isProduction() && new URL(v.request.url).searchParams.get("fresh") === "1";
+  if (!v.store || fresh) return null;
+
+  const hit = await cachedSlug(v.store, t.host);
+  if (hit) {
+    reportInBackground(v.deps, {
+      event: "blueprint_cache_hit",
+      distinctId: v.analytics.distinctId,
+      sessionId: v.analytics.sessionId,
+      properties: { ...v.analytics.context, host: t.host, slug: hit.slug, form: v.mode === "form" },
+    });
+    if (v.mode === "form") return redirectToBlueprint(hit.slug);
+    return ndjson([
+      { t: "cached", slug: hit.slug, createdAt: hit.createdAt },
+      { t: "done", slug: hit.slug },
+    ]);
+  }
+
+  const neg = await v.store.get(keys.negative(t.host));
+  return neg && isErrorCode(neg) ? v.fail(neg, t.host) : null;
+}
+
+async function requireLiveStore(v: Visit, t: Target): Promise<Response | Store> {
+  if (!v.deps.isLiveEnabled() || !v.store || t.earlyMock("live_disabled")) return v.fail("live_disabled", t.host);
+  await v.store.get(keys.lock(t.host));
+  if (t.earlyMock("unavailable")) return v.fail("unavailable", t.host);
+  return v.store;
+}
+
+function holdOpen(keepAlive: HandlerDeps["keepAlive"]): Hold | null {
+  let resolve!: (value?: unknown) => void;
+  const held = new Promise<unknown>((r) => {
+    resolve = r;
+  });
+  try {
+    keepAlive(held);
+  } catch (err) {
+    console.error("[thirty] cannot keep a run alive past the response; refusing to start one", err);
+    return null;
+  }
+  return { adopt: (work) => resolve(work), release: () => resolve(undefined) };
+}
+
+async function takeQuota(v: Visit, t: Target, store: Store): Promise<Response | Quota> {
+  const day = utcDay(v.now);
+  if (t.earlyMock("rate_limited")) return v.fail("rate_limited", t.host, secondsToUtcMidnight(v.now));
+  const visitorTake = await takeVisitorRun(store, v.visitor, v.now, v.cfg.ipDailyRuns);
+  if (!visitorTake.ok) return v.fail("rate_limited", t.host, visitorTake.retryAfterSec);
+
+  const globalOk = !t.earlyMock("capacity") && (await takeGlobalRun(store, v.now, v.cfg.dailyRuns));
+  if (!globalOk) {
+    await refundVisitorRun(store, v.visitor, day);
+    return v.fail("capacity", t.host);
+  }
+  const reservation = await reserveBudget(store, v.now, v.cfg.monthlyBudgetUsd);
+  if (!reservation) {
+    await refundVisitorRun(store, v.visitor, day);
+    await refundGlobalRun(store, day);
+    return v.fail("capacity", t.host);
+  }
+  return { day, reservation };
+}
+
+async function refundQuota(v: Visit, store: Store, quota: Quota): Promise<void> {
+  await refundVisitorRun(store, v.visitor, quota.day);
+  await refundGlobalRun(store, quota.day);
+  await releaseBudget(store, quota.reservation);
+}
+
+async function waitBehindOtherRun(v: Visit, t: Target, store: Store, hold: Hold): Promise<Response> {
+  const waiting = waitForOtherRun(store, t.host, v.deps);
+  hold.adopt(waiting);
+  if (v.mode === "form") {
+    const result = await waiting;
+    return result.kind === "cached" ? redirectToBlueprint(result.slug) : v.fail(result.code, t.host);
+  }
+  const emitter = new RunEmitter();
+  emitter.emit({ t: "step", id: "validate", status: "done", label: stepLabel("validate", t.host), ms: 0 });
+  emitter.emit({ t: "step", id: "read", status: "start", label: LOCK_WAIT_LABEL });
+  void waiting.then((result) => {
+    if (result.kind === "cached") {
+      emitter.emit({ t: "cached", slug: result.slug, createdAt: result.createdAt });
+      emitter.emit({ t: "done", slug: result.slug });
+    } else {
+      emitter.emit({ t: "error", code: result.code, message: errorMessage(result.code, t.host) });
+    }
+  });
+  return streamEmitter(emitter);
+}
+
+async function startLiveRun(v: Visit, t: Target, store: Store, quota: Quota, runId: string, hold: Hold): Promise<Response> {
+  const emitter = new RunEmitter();
+  const ctx: RunContext = {
+    runId,
+    host: t.host,
+    hostname: t.hostname,
+    inputUrl: v.url.trim().slice(0, 2048),
+    extraPath: t.extraPath,
+    visitor: v.visitor,
+    day: quota.day,
+    reservation: quota.reservation,
+    requestStartedAt: v.requestStartedAt,
+    analytics: v.analytics,
+  };
+  const run = v.deps.startRun(ctx, emitter, store, v.mock).catch((err: unknown): RunOutcome => {
+    console.error("[thirty] run crashed", err);
+    if (!emitter.finished) {
+      emitter.emit({ t: "error", code: "internal", message: errorMessage("internal") });
+    }
+    return { ok: false, code: "internal", message: errorMessage("internal") };
+  });
+  hold.adopt(run);
+
+  if (v.mode === "form") {
+    const outcome = await run;
+    return outcome.ok ? redirectToBlueprint(outcome.slug) : v.fail(outcome.code, t.host);
+  }
+  return streamEmitter(emitter, t.trigger === "drop");
+}
+
+async function runHeld(v: Visit, t: Target, store: Store, hold: Hold): Promise<Response> {
+  const quota = await takeQuota(v, t, store);
+  if (quota instanceof Response) return quota;
+
+  const runId = newRunId();
+  if (!(await acquireLock(store, t.host, runId))) {
+    await refundQuota(v, store, quota);
+    return waitBehindOtherRun(v, t, store, hold);
+  }
+  return startLiveRun(v, t, store, quota, runId, hold);
+}
+
+async function checkAndRun(v: Visit): Promise<Response> {
+  const flooded = await guardFlood(v);
+  if (flooded) return flooded;
+
+  const target = normalizeTarget(v);
+  if (target instanceof Response) return target;
+
+  const cached = await serveFromCache(v, target);
+  if (cached) return cached;
+
+  const store = await requireLiveStore(v, target);
+  if (store instanceof Response) return store;
+
+  const hold = holdOpen(v.deps.keepAlive);
+  if (!hold) return v.fail("unavailable", target.host);
+  try {
+    return await runHeld(v, target, store, hold);
+  } finally {
+    hold.release();
+  }
+}
+
 export function createBlueprintHandler(deps: HandlerDeps) {
   return async function handle(request: Request): Promise<Response> {
     const requestStartedAt = deps.now();
-    const contentType = (request.headers.get("content-type") ?? "").toLowerCase();
-    const mode: Mode = contentType.includes("application/x-www-form-urlencoded") ? "form" : "json";
-    const fail = (code: ErrorCode, host?: string | null, retryAfterSec?: number) =>
-      errorResponse(mode, code, host, retryAfterSec);
+    const accepted = await readRequest(request);
+    if (accepted instanceof Response) return accepted;
 
-    if (mode === "json" && !contentType.includes("application/json")) return fail("bad_request");
-    const body = await parseBody(request, mode);
-    if (!body || typeof body.url !== "string") return fail("bad_request");
-
-    const requestHost = requestHostOf(request);
-    if (isCrossOrigin(request, requestHost)) return fail("bad_request");
-
-    if (body.honeypot.trim() !== "") return fail("bad_request");
-
-    const cfg = deps.config();
-    const mock = deps.isMockMode();
-    const store = deps.getStore();
-    const visitor = visitorId(clientIp(request.headers), cfg.ipSalt);
-    const home = readHomeAssignment(request.headers.get("cookie"));
-    const analytics = {
-      distinctId: body.phId ?? `visitor:${visitor}`,
-      sessionId: body.phSession,
-      context: home ? homeEventProps(home) : undefined,
-    };
-    const now = new Date(requestStartedAt);
-
+    const visit = openVisit(request, accepted, deps, requestStartedAt);
     try {
-      if (store && !(await checkFlood(store, visitor, now))) {
-        return fail("too_fast", null, Math.max(1, 60 - now.getUTCSeconds()));
-      }
-
-      const input = normalizeInput(body.url, { requestHost, allowTestTld: mock });
-      if (!input.ok) return fail(input.code);
-      const { host } = input;
-      const trigger = mock ? mockTrigger(host) : null;
-      const earlyMock = (c: ErrorCode) => trigger === c && MOCK_PRERUN_CODES.has(c);
-      for (const c of ["bad_request", "invalid_url", "blocked_host", "platform_url", "self_url", "too_fast"] as const) {
-        if (earlyMock(c)) return fail(c, host, c === "too_fast" ? 30 : undefined);
-      }
-
-      const fresh = !deps.isProduction() && new URL(request.url).searchParams.get("fresh") === "1";
-
-      if (store && !fresh) {
-        const hit = await cachedSlug(store, host);
-        if (hit) {
-          deps.keepAlive(
-            deps.report({
-              event: "blueprint_cache_hit",
-              distinctId: analytics.distinctId,
-              sessionId: analytics.sessionId,
-              properties: { ...analytics.context, host, slug: hit.slug, form: mode === "form" },
-            })
-          );
-          if (mode === "form") return redirectToBlueprint(hit.slug);
-          return ndjson([
-            { t: "cached", slug: hit.slug, createdAt: hit.createdAt },
-            { t: "done", slug: hit.slug },
-          ]);
-        }
-        const neg = await store.get(keys.negative(host));
-        if (neg && isErrorCode(neg)) return fail(neg, host);
-      }
-
-      if (!deps.isLiveEnabled() || !store || earlyMock("live_disabled")) return fail("live_disabled", host);
-
-      await store.get(keys.lock(host));
-      if (earlyMock("unavailable")) return fail("unavailable", host);
-
-      const day = utcDay(now);
-      if (earlyMock("rate_limited")) return fail("rate_limited", host, secondsToUtcMidnight(now));
-      const visitorTake = await takeVisitorRun(store, visitor, now, cfg.ipDailyRuns);
-      if (!visitorTake.ok) return fail("rate_limited", host, visitorTake.retryAfterSec);
-
-      const globalOk = !earlyMock("capacity") && (await takeGlobalRun(store, now, cfg.dailyRuns));
-      if (!globalOk) {
-        await refundVisitorRun(store, visitor, day);
-        return fail("capacity", host);
-      }
-      const reservation = await reserveBudget(store, now, cfg.monthlyBudgetUsd);
-      if (!reservation) {
-        await refundVisitorRun(store, visitor, day);
-        await refundGlobalRun(store, day);
-        return fail("capacity", host);
-      }
-
-      const runId = newRunId();
-      if (!(await acquireLock(store, host, runId))) {
-        await refundVisitorRun(store, visitor, day);
-        await refundGlobalRun(store, day);
-        await releaseBudget(store, reservation);
-        const waiting = waitForOtherRun(store, host, deps);
-        if (mode === "form") {
-          const result = await waiting;
-          return result.kind === "cached" ? redirectToBlueprint(result.slug) : fail(result.code, host);
-        }
-        const emitter = new RunEmitter();
-        emitter.emit({ t: "step", id: "validate", status: "done", label: stepLabel("validate", host), ms: 0 });
-        emitter.emit({ t: "step", id: "read", status: "start", label: LOCK_WAIT_LABEL });
-        void waiting.then((result) => {
-          if (result.kind === "cached") {
-            emitter.emit({ t: "cached", slug: result.slug, createdAt: result.createdAt });
-            emitter.emit({ t: "done", slug: result.slug });
-          } else {
-            emitter.emit({ t: "error", code: result.code, message: errorMessage(result.code, host) });
-          }
-        });
-        return streamEmitter(emitter);
-      }
-
-      const emitter = new RunEmitter();
-      const ctx: RunContext = {
-        runId,
-        host,
-        hostname: input.hostname,
-        inputUrl: body.url.trim().slice(0, 2048),
-        extraPath: input.extraPath,
-        visitor,
-        day,
-        reservation,
-        requestStartedAt,
-        analytics,
-      };
-      const run = deps.startRun(ctx, emitter, store, mock).catch((err: unknown): RunOutcome => {
-        console.error("[thirty] run crashed", err);
-        if (!emitter.finished) {
-          emitter.emit({ t: "error", code: "internal", message: errorMessage("internal") });
-        }
-        return { ok: false, code: "internal", message: errorMessage("internal") };
-      });
-      deps.keepAlive(run);
-
-      if (mode === "form") {
-        const outcome = await run;
-        return outcome.ok ? redirectToBlueprint(outcome.slug) : fail(outcome.code, host);
-      }
-      return streamEmitter(emitter, trigger === "drop");
+      return await checkAndRun(visit);
     } catch (err) {
       if (err instanceof StoreError) {
         console.error("[thirty] store unavailable before run", err.message);
-        return fail("unavailable");
+        return visit.fail("unavailable");
       }
       console.error("[thirty] handler failed", err);
-      return fail("internal");
+      return visit.fail("internal");
     }
   };
 }

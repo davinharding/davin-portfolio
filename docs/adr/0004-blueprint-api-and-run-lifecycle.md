@@ -11,7 +11,8 @@
 ## Decision
 
 **Request flow**
-- The handler runs the cheap checks first, in a fixed order, and nothing before the run costs money: body, same origin, honeypot, flood guard, normalize, positive cache, negative cache, live availability, store health, per-visitor daily limit, global daily cap then monthly budget, per-host lock, then the run. A request can also end as a cache hit or as a wait on someone else's run for the same host.
+- The handler runs the cheap checks first, in a fixed order, and nothing before the run costs money: body, same origin, honeypot, flood guard, normalize, positive cache, negative cache, live availability, store health, keep-alive, per-visitor daily limit, global daily cap then monthly budget, per-host lock, then the run. A request can also end as a cache hit or as a wait on someone else's run for the same host.
+- `handle()` is a short chain of named steps (`readRequest`, `guardFlood`, `normalizeTarget`, `serveFromCache`, `requireLiveStore`, `holdOpen`, `takeQuota`, `waitBehindOtherRun` / `startLiveRun`). Each returns either a `Response`, which ends the request, or the value the next step needs. The order lives in `checkAndRun` and `runHeld`.
 - Without a store the budget cannot be enforced, so a store failure stops the request before the run.
 - The form carries a honeypot field real visitors never see or fill; a filled one is a bad request.
 - The form posts natively to `/api/blueprint` when JavaScript has not loaded, so the API has a JSON mode and a form mode.
@@ -19,6 +20,7 @@
 **The run outlives the connection**
 - The run owns its own deadline and is never tied to the visitor's connection. The money is spent either way, so the result is kept and cached.
 - The route hands the run to Next's `after()`, which keeps the function alive until the run settles.
+- The keep-alive is registered before any quota or budget is taken: `holdOpen` hands `after()` a promise that the run (or the wait on another run) later settles, and that early refusals release. If `after()` cannot be registered, the request fails closed with `unavailable` before anything is spent, because a function that is not kept alive can be frozen mid-run with its money already gone. Analytics events are the exception: losing one is acceptable, so a failed keep-alive there is only logged.
 - `RunEmitter` buffers events so a subscriber that attaches late still sees the whole run. A closed connection only detaches that subscriber, and a closed or broken subscriber can never affect the run.
 
 **Streaming**
