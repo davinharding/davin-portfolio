@@ -9,8 +9,14 @@
     "finalUrl": "https://www.allbirds.com/",
     "method": "curated",
     "pages": [
-      { "url": "https://www.allbirds.com/", "title": "Allbirds homepage" },
-      { "url": "https://www.allbirds.com/pages/our-materials", "title": "Our Materials" }
+      {
+        "url": "https://www.allbirds.com/",
+        "title": "Allbirds homepage"
+      },
+      {
+        "url": "https://www.allbirds.com/pages/our-materials",
+        "title": "Our Materials"
+      }
     ]
   },
   "company": {
@@ -30,113 +36,149 @@
     "customers": "Men and women buying everyday sneakers, slip-ons, flats, and sandals online, plus shoppers who buy through other retailers."
   },
   "blueprint": {
-    "headline": "Allbirds sells the same silhouettes in several materials under a strict return policy, so the agents to build first turn returns and eligibility questions into decisions merchandising and support can act on.",
+    "headline": "Allbirds can give its merchandising, planning and support teams back hours each week and protect margin by having agents draft sale plans, size-level reorder lists, and exchange offers that a person only approves.",
     "agents": [
       {
-        "name": "Return Reason Analyst",
-        "role": "Groups every return by style, size, and material and tells merchandising which fit or material problem is driving it.",
-        "trigger": "Every Monday at 07:00, covering returns logged in the previous week",
-        "does": [
-          "Reads return reasons and free-text comments for each style, such as Tree Runner NZ versus Cruiser",
-          "Separates size complaints from material complaints by comparing the same silhouette across wool, tree, and canvas",
-          "Writes a one-page internal brief with the three biggest movers and the example comments behind each"
-        ],
-        "tools": [
-          { "name": "Return records and reasons", "access": "read", "system": "Returns and order management system" },
-          { "name": "Product catalog by style and material", "access": "read", "system": "E-commerce catalog" },
-          { "name": "Weekly brief", "access": "write", "system": "Internal docs workspace" }
-        ],
-        "humanGate": {
-          "required": false,
-          "detail": "It only reads return data and writes an internal brief. It changes no product, price, or customer record."
+        "name": "Size-Level Reorder List",
+        "role": "Builds a purchase order draft for each style and size so the inventory planner does not assemble it by hand.",
+        "value": {
+          "kind": "cuts_cost",
+          "who": "Inventory planner",
+          "today": "The planner exports sales and stock by style and size into a spreadsheet, compares them with supplier lead times, and builds the purchase order line by line.",
+          "sizing": "Number of styles x sizes per style x share of sizes that end up overstocked or sold out per season x average margin or markdown loss per pair"
         },
-        "evidence": "The site sells one silhouette in several materials (Cruiser, Canvas Cruiser, Wool Cruiser Waterproof) and runs a 30-day return window for unworn items.",
-        "impact": "Merchandising sees within a week whether a new colorway or material has a fit problem, instead of finding out from end-of-season return totals.",
-        "relatedProject": "apparelmagic-agents"
-      },
-      {
-        "name": "Return Eligibility Desk",
-        "role": "Answers return and refund questions by checking the order against the published policy and drafting the reply.",
-        "trigger": "When a support conversation is tagged as a return or refund question",
+        "impact": "Stops the overbuying of slow sizes and the sell-outs of fast ones across Wool Runner, Tree Runner NZ and the rest of the range, so less cash sits in unsold pairs and fewer sales are lost.",
+        "trigger": "Every Monday at 07:00 local, and on demand before a sale event.",
         "does": [
-          "Looks up the order: purchase date, country, whether return coverage was bought, and whether any item was Final Sale",
-          "Flags purchases made through another retailer, which must go back to that retailer",
-          "Drafts a reply that states the outcome and the exact policy condition it rests on"
+          "Reads sales and on-hand stock for each style and size",
+          "Projects cover against supplier lead time and planned sale events",
+          "Drafts a reorder list with quantities by size for each style",
+          "Flags sizes to stop reordering as ready-to-mark-down candidates"
         ],
         "tools": [
-          { "name": "Order lookup", "access": "read", "system": "Order management system" },
-          { "name": "Return policy text", "access": "read", "system": "Help center" },
-          { "name": "Reply draft", "access": "write", "system": "Help desk" },
-          { "name": "Return label request", "access": "write", "system": "Returns platform" }
+          {
+            "name": "Sales and inventory export",
+            "access": "read",
+            "system": "ecommerce platform and inventory system"
+          },
+          {
+            "name": "Supplier lead time table",
+            "access": "read",
+            "system": "purchasing spreadsheet"
+          },
+          {
+            "name": "Draft purchase order",
+            "access": "write",
+            "system": "purchasing workspace (draft only)"
+          }
         ],
         "humanGate": {
           "required": true,
-          "detail": "Every customer reply is sent by an agent after review. Any exception to policy (outside 30 days, Final Sale, worn items) needs a team lead."
+          "detail": "The planner approves every purchase order before it goes to a supplier; the agent only saves drafts."
         },
-        "evidence": "The policy has several conditions that decide each case: 30 days, unworn with tags, Final Sale excluded, optional return coverage, refunds only in the country of purchase.",
-        "impact": "Most return questions become a reviewed one-click reply, and exceptions are decided by the people allowed to make them.",
+        "evidence": "The site sells many styles (Wool Runner, Tree Breezer, Cruiser, Terralux Collection, Socks) with many size variants and SKUs per style.",
         "relatedProject": "apparelmagic-agents"
       },
       {
-        "name": "Material Claims Checker",
-        "role": "Checks new product pages and campaign copy for material and climate claims before they publish.",
-        "trigger": "When a product page or campaign draft moves to ready for review",
+        "name": "Sale Event Markdown Plan",
+        "role": "Drafts which styles and sizes to discount, by how much, and when, for Black Friday, holiday and other sales.",
+        "value": {
+          "kind": "grows_revenue",
+          "who": "Merchandising manager",
+          "today": "The merchandiser pulls stock and sell-through into a spreadsheet, picks discount levels from past sales and gut feel, and then lists each product for the site team.",
+          "sizing": "Number of sale events per year x units of aged stock per event x average price recovered per unit versus a blanket discount"
+        },
+        "impact": "Clears aging stock at the shallowest discount that still moves it and keeps full price on fast sellers, so each sale earns more per pair.",
+        "trigger": "Four weeks before each planned sale event, and on demand.",
         "does": [
-          "Finds every material or climate claim in the draft, such as plant-based, regenerative wool, or net zero carbon",
-          "Matches each claim against an approved claims register and the substantiation behind it",
-          "Returns the draft with unsupported or changed wording highlighted and the approved phrasing beside it"
+          "Reads stock cover and sell-through by style and size",
+          "Sets a proposed discount tier for each style, keeping fast sellers at full price",
+          "Drafts the sale price list and a short promo calendar by category",
+          "Estimates units and revenue per tier from past sale periods"
         ],
         "tools": [
-          { "name": "Draft product and campaign copy", "access": "read", "system": "CMS" },
-          { "name": "Approved claims register", "access": "read", "system": "Internal claims database" },
-          { "name": "Review comments", "access": "write", "system": "CMS" }
+          {
+            "name": "Sales history and stock",
+            "access": "read",
+            "system": "ecommerce platform"
+          },
+          {
+            "name": "Past sale event results",
+            "access": "read",
+            "system": "sales export"
+          },
+          {
+            "name": "Draft price list",
+            "access": "write",
+            "system": "merchandising workspace (draft only)"
+          }
         ],
         "humanGate": {
           "required": true,
-          "detail": "Nothing publishes on the agent's say-so. A sustainability or legal reviewer approves every page that contains a flagged claim."
+          "detail": "The merchandising manager approves every price change and discount tier before anything is published to the store."
         },
-        "evidence": "The site leans on material claims across the catalog: wool, tree fiber, sugarcane, Terralux described as plant-based, and M0.0NSHOT Zero described as a net zero carbon shoe.",
-        "impact": "Claims stay consistent across hundreds of pages and launches, and reviewers spend their time on genuinely new wording.",
+        "evidence": "The profile notes frequent seasonal sales including Black Friday and holiday sales, with men's and women's ranges across many categories.",
+        "relatedProject": "apparelmagic-agents"
+      },
+      {
+        "name": "Return Exchange Offer Draft",
+        "role": "Reads each return request and drafts a reply that offers the right size exchange within the policy.",
+        "value": {
+          "kind": "saves_time",
+          "who": "Customer support lead",
+          "today": "A support agent reads each return email, looks up the order, checks the 15-day window and tags, and types out the return or exchange steps.",
+          "sizing": "Return and exchange emails per week x minutes to look up the order and write the reply / 60"
+        },
+        "impact": "Cuts the hours the support team spends typing out return steps, and turns some refunds into size exchanges that keep the sale.",
+        "trigger": "When a new email about a return or exchange arrives in the support inbox.",
+        "does": [
+          "Reads the email and finds the matching order",
+          "Checks the 15-day window, unworn condition, country of purchase, and return coverage",
+          "Drafts a reply with the correct steps, and a size exchange offer where it fits",
+          "Queues the draft with the order details beside it"
+        ],
+        "tools": [
+          {
+            "name": "Support inbox",
+            "access": "read",
+            "system": "email help desk"
+          },
+          {
+            "name": "Order lookup",
+            "access": "read",
+            "system": "ecommerce platform"
+          },
+          {
+            "name": "Reply draft",
+            "access": "write",
+            "system": "help desk (draft only)"
+          }
+        ],
+        "humanGate": {
+          "required": true,
+          "detail": "Every reply to a customer is reviewed by a support agent, and any refund or exception outside the 15-day policy waits for the support lead."
+        },
+        "evidence": "The site states a 15-day return policy for unworn items with tags, customer-paid return shipping unless coverage is bought, in-country returns only, and support by email.",
         "relatedProject": "none"
-      },
-      {
-        "name": "Holiday Markdown Watcher",
-        "role": "Tracks sell-through by style and size during sales and proposes which markdowns to deepen, hold, or end.",
-        "trigger": "Daily at 06:00 while a sale such as the Black Friday Early Access event is live",
-        "does": [
-          "Reads sell-through and remaining stock for every discounted style and size",
-          "Flags sizes that will sell out before the sale ends and styles that are not moving at the current discount",
-          "Drafts a markdown change list with the reason for each line"
-        ],
-        "tools": [
-          { "name": "Sales and inventory by size", "access": "read", "system": "Inventory system" },
-          { "name": "Current sale prices", "access": "read", "system": "E-commerce catalog" },
-          { "name": "Proposed price changes", "access": "write", "system": "E-commerce catalog (draft price list)" }
-        ],
-        "humanGate": {
-          "required": true,
-          "detail": "Every price change goes to a draft price list. A merchandiser approves the list before any price changes on the site."
-        },
-        "evidence": "The site runs a Holiday Sale with Black Friday Early Access at up to 70 percent off select styles.",
-        "impact": "Markdowns follow what is actually selling by size, so popular sizes are not discounted into stockouts and slow styles do not wait for the next review.",
-        "relatedProject": "apparelmagic-agents"
       }
     ],
     "firstBuild": {
-      "agentName": "Return Reason Analyst",
-      "why": "It is read-only, the data already exists in the returns system, and its first weekly brief shows whether the other agents are worth building.",
+      "agentName": "Return Exchange Offer Draft",
+      "why": "Support hours are the easiest payoff to see, the policy is written down and fixed, and the agent only drafts replies, so risk and integration work are low.",
       "scope": [
-        "Pull 90 days of returns with reason codes and comments",
-        "Group by style, size, and material, comparing the same silhouette across materials",
-        "Write a weekly brief to one merchandising channel",
-        "Review the first four briefs with merchandising and tune the groupings"
+        "Read incoming return and exchange emails from the support inbox",
+        "Match each email to an order and check the 15-day, tags and country rules",
+        "Draft replies from approved wording with the exchange size offer",
+        "Queue drafts for agent review with order facts alongside",
+        "Track how many drafts are sent unedited"
       ]
     },
-    "nonObvious": "Because Allbirds makes the same silhouette in wool, tree fiber, canvas, and Terralux, its returns can separate a sizing problem from a material problem: if the Cruiser is returned for fit in every material, it is the last; if only one material, it is the fabric. Single-material brands cannot run that comparison.",
+    "nonObvious": "With a 15-day window, paid return shipping and refunds only to the original payment, every wrong-size return costs Allbirds twice: the refund and the shipping and handling of a pair that may come back unsellable, so turning returns into size exchanges is worth more than answering faster.",
     "caveats": [
-      "Curated by hand from the public site, not produced by a live run.",
-      "Return volumes, support tools, and order systems are not visible on the site; tools are named by category.",
-      "Wholesale and retail-partner operations were not visible beyond the note that third-party purchases return to that retailer."
+      "Sales volume, margin, and team size were not visible; sizing formulas use the owner's own records.",
+      "Assumed an ecommerce platform, inventory system and email help desk exist, but none was named.",
+      "Assumed purchasing runs on supplier lead times and spreadsheets, which the profile does not show.",
+      "Loyalty program details were not visible and were not used."
     ]
   },
   "receipt": null

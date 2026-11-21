@@ -31,17 +31,34 @@ const ToolSchema = z.object({
   system: z.string(),
 });
 
+export const VALUE_KINDS = ["saves_time", "cuts_cost", "grows_revenue"] as const;
+
+/** The case for paying for an agent, written for the decision maker. */
+const ValueSchema = z.object({
+  kind: z.enum(VALUE_KINDS),
+  who: z.string(),
+  today: z.string(),
+  sizing: z.string(),
+});
+
+// The model writes fields in schema order, so the payoff (`value`, `impact`)
+// comes before the details. `findAgentNames` in design.ts relies on `name`
+// being directly followed by `role`.
 const AgentSchema = z.object({
   name: z.string(),
   role: z.string(),
+  value: ValueSchema,
+  impact: z.string(),
   trigger: z.string(),
   does: z.array(z.string()),
   tools: z.array(ToolSchema),
   humanGate: z.object({ required: z.boolean(), detail: z.string() }),
   evidence: z.string(),
-  impact: z.string(),
   relatedProject: RelatedProject,
 });
+
+/** Blueprints stored before `value` existed (and the committed examples) have none. */
+const StoredAgentSchema = AgentSchema.extend({ value: ValueSchema.optional() });
 
 export const ModelBlueprintSchema = z.object({
   headline: z.string(),
@@ -57,12 +74,13 @@ export const ModelBlueprintSchema = z.object({
 
 export type ModelBlueprint = z.infer<typeof ModelBlueprintSchema>;
 
-/** Same shape as the model output; used to validate what we stored. */
+/** The model output's shape, with `value` optional; used to validate what we stored. */
 export const NormalizedBlueprintSchema = ModelBlueprintSchema.extend({
-  agents: z.array(AgentSchema).min(1).max(MAX_AGENTS),
+  agents: z.array(StoredAgentSchema).min(1).max(MAX_AGENTS),
 });
-export type NormalizedBlueprint = ModelBlueprint;
+export type NormalizedBlueprint = z.infer<typeof NormalizedBlueprintSchema>;
 export type NormalizedAgent = NormalizedBlueprint["agents"][number];
+export type AgentValue = z.infer<typeof ValueSchema>;
 
 const STEP_IDS = ["validate", "read", "research", "design", "check"] as const satisfies readonly StepId[];
 

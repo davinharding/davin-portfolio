@@ -22,7 +22,7 @@ import {
 } from "./limits";
 import { MOCK_MODELS, MOCK_PRERUN_CODES, mockStages, mockTrigger } from "./mock";
 import { liveStages, newRunId, RunEmitter, runPipeline, type RunContext, type RunOutcome } from "./pipeline";
-import { parseStoredBlueprint } from "./schema";
+import { parseStoredBlueprint, type StoredBlueprint } from "./schema";
 import { getStore, keys, StoreError, type Store } from "./store";
 import { normalizeInput } from "./url";
 
@@ -219,7 +219,16 @@ function isCrossOrigin(request: Request, requestHost: string): boolean {
   return false;
 }
 
-/** Returns the slug if the host has a valid cached blueprint. */
+/**
+ * A blueprint drafted before agents carried a value case is not served for a
+ * new run, so the host is drafted again with the current prompt. Its own page
+ * keeps working: only the host's pointer to it is skipped.
+ */
+export function isCurrentBlueprint(bp: StoredBlueprint): boolean {
+  return bp.blueprint.agents.every((a) => a.value);
+}
+
+/** Returns the slug if the host has a valid, current cached blueprint. */
 async function cachedSlug(store: Store, host: string): Promise<{ slug: string; createdAt: string } | null> {
   const slug = await store.get(keys.domain(host));
   if (!slug) return null;
@@ -227,6 +236,7 @@ async function cachedSlug(store: Store, host: string): Promise<{ slug: string; c
   if (!raw) return null;
   try {
     const bp = parseStoredBlueprint(JSON.parse(raw));
+    if (!isCurrentBlueprint(bp)) return null;
     return { slug: bp.slug, createdAt: bp.createdAt };
   } catch (err) {
     console.error("[thirty] cached blueprint failed validation", slug, err);
