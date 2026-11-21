@@ -12,8 +12,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 
 const Timeline: React.FC = () => {
-  const filteredData = timelineData.filter((item) => item.summary);
-
   return (
     <section
       className="section-spacing"
@@ -28,7 +26,7 @@ const Timeline: React.FC = () => {
         />
 
         <ol className="space-y-4 list-none pl-0">
-          {filteredData.map((item: TimelineElement) => (
+          {timelineData.map((item: TimelineElement) => (
             <li key={item.id}>
               <Card>
                 <CardHeader className="pb-2">
@@ -55,13 +53,11 @@ const Timeline: React.FC = () => {
                     </Badge>
                   </div>
                 </CardHeader>
-                {item.summary && (
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">
-                      {item.summary}
-                    </p>
-                  </CardContent>
-                )}
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">
+                    {item.summary}
+                  </p>
+                </CardContent>
               </Card>
             </li>
           ))}

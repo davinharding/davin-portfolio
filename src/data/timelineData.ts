@@ -2,7 +2,7 @@ export type TimelineElement = {
   id: number;
   role?: string;
   orgAndLocation?: string;
-  summary?: string;
+  summary: string;
   date: string;
   link: string;
 };
