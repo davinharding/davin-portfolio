@@ -12,8 +12,9 @@
 // checkout of the old code with another --label and the same --out.
 //
 // --judge asks a judge model, playing the paying decision maker, to score the
-// agents of old.json and new.json shown as "Blueprint A" and "Blueprint B" in a
-// per-host random order. --summary writes <out>/summary.md.
+// agents of two labels (--compare A,B; default old,new) shown as "Blueprint A"
+// and "Blueprint B" in a per-host random order. --summary writes
+// <out>/summary.md for old,new and <out>/summary-<a>-vs-<b>.md otherwise.
 //
 // It never touches Redis or the store and never goes through the pipeline or
 // the route handler. The only environment value it reads from --key-from
@@ -56,6 +57,15 @@ const label = option("--label");
 const keyFrom = path.resolve(option("--key-from") ?? ".env.local");
 const capUsd = Number(option("--cap") ?? 3);
 const judgeMode = flag("--judge");
+const compare = (option("--compare") ?? "old,new").split(",").map((s) => s.trim());
+if (compare.length !== 2 || compare[0] === compare[1] || !compare.every((l) => /^[a-z0-9-]+$/.test(l))) {
+  console.error("--compare takes two different labels, such as old,new2");
+  process.exit(2);
+}
+const [baseLabel, candLabel] = compare;
+const isDefaultPair = baseLabel === "old" && candLabel === "new";
+const judgeName = isDefaultPair ? "judge" : `judge-${baseLabel}-vs-${candLabel}`;
+const summaryName = isDefaultPair ? "summary.md" : `summary-${baseLabel}-vs-${candLabel}.md`;
 const summaryMode = flag("--summary");
 const force = flag("--force");
 const hosts = argv.filter((a) => !a.startsWith("--")).map((h) => h.toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, ""));
@@ -63,13 +73,13 @@ const hosts = argv.filter((a) => !a.startsWith("--")).map((h) => h.toLowerCase()
 function usage(): never {
   console.error(
     "Usage: blueprint-eval.mts --label <name> [--out DIR] [--key-from FILE] [--cap USD] [--force] <host...>\n" +
-      "       blueprint-eval.mts --judge [--out DIR] [--key-from FILE] [--cap USD] [host...]\n" +
-      "       blueprint-eval.mts --summary [--out DIR]"
+      "       blueprint-eval.mts --judge [--compare A,B] [--out DIR] [--key-from FILE] [--cap USD] [host...]\n" +
+      "       blueprint-eval.mts --summary [--compare A,B] [--out DIR]"
   );
   process.exit(2);
 }
 if (!summaryMode && !judgeMode && (!label || !/^[a-z0-9-]+$/.test(label) || hosts.length === 0)) usage();
-if (label === "profile" || label === "judge") usage();
+if (label === "profile" || label?.startsWith("judge")) usage();
 
 // ---------- files ----------
 
@@ -364,19 +374,19 @@ const clampScore = (n: number) => Math.min(5, Math.max(1, Math.round(n)));
 
 async function judgeHost(client: Anthropic, host: string): Promise<void> {
   const profileFile = readJson<ProfileFile>(fileFor(host, "profile"));
-  const old = readJson<VariantFile>(fileFor(host, "old"));
-  const neu = readJson<VariantFile>(fileFor(host, "new"));
-  if (!profileFile || !old?.blueprint || !neu?.blueprint) {
-    console.log(`  [${host}] needs profile.json and successful old.json and new.json; skipping`);
+  const base = readJson<VariantFile>(fileFor(host, baseLabel));
+  const cand = readJson<VariantFile>(fileFor(host, candLabel));
+  if (!profileFile || !base?.blueprint || !cand?.blueprint) {
+    console.log(`  [${host}] needs profile.json and successful ${baseLabel}.json and ${candLabel}.json; skipping`);
     return;
   }
-  if (readJson(fileFor(host, "judge")) && !force) {
-    console.log(`  [${host}] judge.json exists; skipping (use --force to redo)`);
+  if (readJson(fileFor(host, judgeName)) && !force) {
+    console.log(`  [${host}] ${judgeName}.json exists; skipping (use --force to redo)`);
     return;
   }
   guardSpend(`judging ${host}`);
-  const mapping = Math.random() < 0.5 ? { A: "old", B: "new" } : { A: "new", B: "old" };
-  const byLabel: Record<string, VariantFile> = { old, new: neu };
+  const mapping = Math.random() < 0.5 ? { A: baseLabel, B: candLabel } : { A: candLabel, B: baseLabel };
+  const byLabel: Record<string, VariantFile> = { [baseLabel]: base, [candLabel]: cand };
   const agentsA = byLabel[mapping.A].blueprint!.agents;
   const agentsB = byLabel[mapping.B].blueprint!.agents;
   const content = `<company>
@@ -419,7 +429,7 @@ Score every agent in Blueprint A, then every agent in Blueprint B, then pick one
     usage,
     estCostUsd: costUsd([usage]),
   };
-  writeJson(fileFor(host, "judge"), file);
+  writeJson(fileFor(host, judgeName), file);
   console.log(`  [${host}] prefers ${file.preferred}; $${file.estCostUsd.toFixed(4)}`);
 }
 
@@ -443,18 +453,19 @@ const fmt = (n: number, d = 2) => (Number.isFinite(n) ? n.toFixed(d) : "n/a");
 const pct = (num: number, den: number) => (den ? `${Math.round((100 * num) / den)}% (${num}/${den})` : "n/a");
 
 function writeSummary() {
-  const lines: string[] = ["# Blueprint value eval", ""];
-  const times: Record<string, number[]> = { old: [], new: [] };
-  const scores: Record<string, JudgeOutput["blueprintA"]> = { old: [], new: [] };
+  const pair = [baseLabel, candLabel];
+  const lines: string[] = [`# Blueprint value eval: ${baseLabel} vs ${candLabel}`, ""];
+  const times: Record<string, number[]> = { [baseLabel]: [], [candLabel]: [] };
+  const scores: Record<string, JudgeOutput["blueprintA"]> = { [baseLabel]: [], [candLabel]: [] };
   let judged = 0;
-  let preferNew = 0;
-  const failures: Record<string, string[]> = { old: [], new: [] };
+  let preferCand = 0;
+  const failures: Record<string, string[]> = { [baseLabel]: [], [candLabel]: [] };
 
   for (const host of listHosts()) {
     const profileFile = readJson<ProfileFile>(fileFor(host, "profile"));
     if (!profileFile) continue;
     lines.push(`## ${host} (${profileFile.profile.companyName})`, "");
-    for (const variant of ["old", "new"]) {
+    for (const variant of pair) {
       const v = readJson<VariantFile>(fileFor(host, variant));
       if (!v) {
         lines.push(`### ${variant}: not run`, "");
@@ -476,17 +487,17 @@ function writeSummary() {
       }
       lines.push("", `First build: ${v.blueprint.firstBuild.agentName}. ${v.blueprint.firstBuild.why}`, "");
     }
-    const judge = readJson<JudgeFile>(fileFor(host, "judge"));
+    const judge = readJson<JudgeFile>(fileFor(host, judgeName));
     if (judge) {
       judged++;
-      if (judge.preferred === "new") preferNew++;
-      for (const variant of ["old", "new"]) scores[variant].push(...(judge.scores[variant] ?? []));
+      if (judge.preferred === candLabel) preferCand++;
+      for (const variant of pair) scores[variant].push(...(judge.scores[variant] ?? []));
       lines.push(`Judge (A was ${judge.mapping.A}) prefers **${judge.preferred}**: ${judge.preferredWhy}`, "");
     }
   }
 
-  const head = ["", "| | old | new |", "|---|---|---|"];
-  const row = (name: string, f: (v: string) => string) => `| ${name} | ${f("old")} | ${f("new")} |`;
+  const head = ["", `| | ${baseLabel} | ${candLabel} |`, "|---|---|---|"];
+  const row = (name: string, f: (v: string) => string) => `| ${name} | ${f(baseLabel)} | ${f(candLabel)} |`;
   const avg = (key: "payoffClear" | "payoffSize" | "recognisable") => (v: string) => fmt(mean(scores[v].map((s) => s[key])));
   const share = (key: "finishedWork" | "wouldPay") => (v: string) => pct(scores[v].filter((s) => s[key]).length, scores[v].length);
   const totals = [
@@ -502,17 +513,17 @@ function writeSummary() {
     row("Design time max", (v) => `${fmt(Math.max(...times[v]) / 1000, 1)}s`),
     row("Gate failures or errors", (v) => String(failures[v].length)),
     "",
-    `Hosts preferring new: ${preferNew} of ${judged} judged.`,
+    `Hosts preferring ${candLabel}: ${preferCand} of ${judged} judged.`,
     "",
     `Recorded spend (research, both variants, judge, failed attempts): $${spentSoFar().toFixed(3)}`,
     "",
   ];
-  for (const variant of ["old", "new"]) {
+  for (const variant of pair) {
     if (failures[variant].length) totals.push(`${variant} gate failures or errors:`, ...failures[variant].map((f) => `- ${f}`), "");
   }
   lines.splice(2, 0, ...totals);
-  writeFileSync(path.join(outDir, "summary.md"), lines.join("\n"));
-  console.log(`Wrote ${path.join(outDir, "summary.md")}`);
+  writeFileSync(path.join(outDir, summaryName), lines.join("\n"));
+  console.log(`Wrote ${path.join(outDir, summaryName)}`);
 }
 
 if (summaryMode) writeSummary();
