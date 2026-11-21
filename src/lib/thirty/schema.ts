@@ -65,7 +65,7 @@ const STEP_IDS = ["validate", "read", "research", "design", "check"] as const sa
 export const CURRENT_VERSION = 1;
 
 export const StoredBlueprintSchema = z.object({
-  v: z.literal(1),
+  v: z.literal(CURRENT_VERSION),
   slug: z.string().regex(/^[a-z0-9][a-z0-9-]{2,70}$/),
   createdAt: z.string(),
   kind: z.enum(["run", "example"]),
@@ -102,14 +102,18 @@ export const StoredBlueprintSchema = z.object({
 export type StoredBlueprint = z.infer<typeof StoredBlueprintSchema>;
 export type Receipt = NonNullable<StoredBlueprint["receipt"]>;
 
-export function migrate(raw: unknown): unknown {
-  if (raw && typeof raw === "object" && "v" in raw) {
-    const v = (raw as { v: unknown }).v;
-    if (v === CURRENT_VERSION) return raw;
+export class UnsupportedVersionError extends Error {
+  constructor(readonly version: unknown) {
+    super(`Stored blueprint has version ${JSON.stringify(version)}; this build reads v${CURRENT_VERSION}`);
+    this.name = "UnsupportedVersionError";
   }
-  return raw;
 }
 
+const versionOf = (raw: unknown): unknown =>
+  raw && typeof raw === "object" ? (raw as { v?: unknown }).v : undefined;
+
 export function parseStoredBlueprint(raw: unknown): StoredBlueprint {
-  return StoredBlueprintSchema.parse(migrate(raw));
+  const version = versionOf(raw);
+  if (version !== CURRENT_VERSION) throw new UnsupportedVersionError(version);
+  return StoredBlueprintSchema.parse(raw);
 }

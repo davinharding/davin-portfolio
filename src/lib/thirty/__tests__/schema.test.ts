@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getExample } from "../examples";
-import { migrate, parseStoredBlueprint } from "../schema";
+import { parseStoredBlueprint, UnsupportedVersionError } from "../schema";
 
 describe("stored blueprint parsing", () => {
   const example = getExample("example-linear")!;
@@ -9,8 +9,11 @@ describe("stored blueprint parsing", () => {
     expect(parseStoredBlueprint(JSON.parse(JSON.stringify(example))).slug).toBe("example-linear");
   });
 
-  it("passes v1 through migrate unchanged", () => {
-    expect(migrate(example)).toEqual(example);
+  it("names the version when a record is from another schema version", () => {
+    expect(() => parseStoredBlueprint({ ...example, v: 2 })).toThrow(UnsupportedVersionError);
+    expect(() => parseStoredBlueprint({ ...example, v: 2 })).toThrow(/version 2; this build reads v1/);
+    const { v: _v, ...unversioned } = example;
+    expect(() => parseStoredBlueprint(unversioned)).toThrow(/version undefined/);
   });
 
   it("rejects records that fail validation, so the page shows its error state", () => {
