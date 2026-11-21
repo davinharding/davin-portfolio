@@ -207,14 +207,14 @@ describe("checkQuality", () => {
 });
 
 describe("committed examples", () => {
-  // The examples predate the value case, so the only checks they may fail are
-  // the ones asking for it; every other check still holds.
-  it.each(allExamples().map((e) => [e.slug, e] as const))("%s passes normalization unchanged and every pre-value check", (_slug, example) => {
+  it.each(allExamples().map((e) => [e.slug, e] as const))("%s passes normalization unchanged and the gate", (_slug, example) => {
     const normalized = normalizeBlueprint(example.blueprint);
     expect(normalized).toEqual(example.blueprint);
-    expect(normalized.agents.every((a) => !("value" in a))).toBe(true);
-    const gate = checkQuality(normalized, { companyName: example.company.name, offerings: example.company.offerings });
-    expect(gate.failures.filter((f) => !/has no value case/.test(f))).toEqual([]);
+    expect(normalized.agents.every((a) => a.value)).toBe(true);
+    expect(checkQuality(normalized, { companyName: example.company.name, offerings: example.company.offerings })).toEqual({
+      ok: true,
+      failures: [],
+    });
     expect(example.kind).toBe("example");
     expect(example.receipt).toBeNull();
     expect(example.source.method).toBe("curated");

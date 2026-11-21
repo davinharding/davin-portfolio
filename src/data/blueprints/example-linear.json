@@ -9,8 +9,14 @@
     "finalUrl": "https://linear.app/",
     "method": "curated",
     "pages": [
-      { "url": "https://linear.app/", "title": "Linear homepage" },
-      { "url": "https://linear.app/pricing", "title": "Pricing" }
+      {
+        "url": "https://linear.app/",
+        "title": "Linear homepage"
+      },
+      {
+        "url": "https://linear.app/pricing",
+        "title": "Pricing"
+      }
     ]
   },
   "company": {
@@ -31,113 +37,149 @@
     "customers": "Product and engineering teams, from free workspaces to enterprises; the site names OpenAI and Ramp and says it powers over 50,000 product teams."
   },
   "blueprint": {
-    "headline": "Linear sells intake, triage, and agents to product teams; its own agents should run sales and support on that same platform, so each internal workflow becomes a reference customers can copy.",
+    "headline": "Linear can hand its sales, growth and customer success teams back hours each week and recover lost subscription revenue by drafting the upgrade offers, quotes and renewal plays they now build by hand.",
     "agents": [
       {
-        "name": "Enterprise Security Review Drafter",
-        "role": "Drafts answers to security questionnaires for Enterprise deals from approved answers and the plan's documented controls.",
-        "trigger": "When a sales opportunity attaches a security questionnaire",
+        "name": "Free-to-Paid Upgrade Outreach List",
+        "role": "Builds a ranked list of Free workspaces nearing the 250-issue or 2-team limit, with a drafted upgrade note to Basic or Business for each, for the growth team.",
+        "value": {
+          "kind": "grows_revenue",
+          "who": "Growth or self-serve sales lead",
+          "today": "Someone exports Free workspaces from the billing and product database into a spreadsheet, eyeballs which ones are near the 250-issue or 2-team cap, and writes upgrade emails one at a time.",
+          "sizing": "Free workspaces near the 250-issue or 2-team limit per month x share that upgrade after outreach x seats per workspace x Basic or Business price per seat x 12"
+        },
+        "impact": "Free teams that are about to hit the 250-issue cap get a well-timed, personal upgrade offer instead of quietly churning or staying on $0.",
+        "trigger": "Every Monday at 07:00 local, plus on demand from the growth lead.",
         "does": [
-          "Maps each question to an approved answer covering SAML and SCIM, audit log, HIPAA compliance, and the uptime SLA",
-          "Marks questions with no approved answer instead of improvising one",
-          "Fills the buyer's format and attaches the draft to the opportunity"
+          "Pull Free workspaces with issue counts, team counts and member counts from the product usage database",
+          "Rank workspaces by how close they are to the 250-issue and 2-team limits and by active member count",
+          "Draft an upgrade note naming the limit they are approaching and the Basic or Business plan that lifts it",
+          "Hand over a ranked sheet with each draft ready to send"
         ],
         "tools": [
-          { "name": "Approved security answers", "access": "read", "system": "Internal knowledge base" },
-          { "name": "Questionnaire files", "access": "read", "system": "CRM attachments" },
-          { "name": "Completed draft", "access": "write", "system": "CRM" }
+          {
+            "name": "Workspace usage query",
+            "access": "read",
+            "system": "product usage database"
+          },
+          {
+            "name": "Plan and pricing lookup",
+            "access": "read",
+            "system": "billing system"
+          },
+          {
+            "name": "Outreach draft queue",
+            "access": "write",
+            "system": "CRM or email drafts folder"
+          }
         ],
         "humanGate": {
           "required": true,
-          "detail": "Nothing goes to a buyer until the security team signs off. Any answer marked as new or changed needs the security lead."
+          "detail": "Every outbound email waits for a growth team member to approve; the agent only saves drafts and never sends."
         },
-        "evidence": "The Enterprise plan is sold through Contact sales and is defined by controls buyers audit: SAML and SCIM, audit log, HIPAA compliance, granular admin controls, and an uptime SLA.",
-        "impact": "Enterprise deals stop waiting on the security team to retype the same answers, and every claim sent to a buyer comes from an approved source.",
+        "evidence": "The site lists a Free tier with unlimited members, 2 teams and 250 issues, and paid Basic at $10 and Business at $16 per user per month billed yearly.",
         "relatedProject": "apparelmagic-agents"
       },
       {
-        "name": "Support Request Linker",
-        "role": "Connects each support conversation to the matching customer request and existing issue, so product sees demand with the account attached.",
-        "trigger": "When a conversation arrives through Zendesk, Intercom, Slack intake, or email intake",
+        "name": "Enterprise Quote and Security Answer Pack",
+        "role": "Drafts a priced Enterprise or Business proposal and answers the security questionnaire for a sales rep from the buyer's request.",
+        "value": {
+          "kind": "saves_time",
+          "who": "Sales rep or account executive",
+          "today": "A rep copies seat counts into a pricing sheet, hunts through past proposals for similar deals, and pastes answers to security questions from old questionnaires and the DPA.",
+          "sizing": "Enterprise and Business deals quoted per month x hours a rep spends on each quote and questionnaire"
+        },
+        "impact": "A rep gets a nearly finished proposal and questionnaire back the same day instead of spending an afternoon assembling it.",
+        "trigger": "When a rep submits a Contact sales lead record or asks in the sales channel.",
         "does": [
-          "Finds the existing issue or customer request that matches the conversation",
-          "Attaches the account and plan to that customer request, or proposes a new one",
-          "Drafts the reply telling the customer whether the item is planned, in progress, or not yet scheduled"
+          "Read the lead's seat count, segment and requested plan from the CRM",
+          "Price the Basic, Business or Enterprise options for that seat count with annual billing",
+          "Fill the security questionnaire from approved prior answers and the published DPA, Privacy, Terms and AUP",
+          "Assemble a proposal draft with open questions marked for the rep"
         ],
         "tools": [
-          { "name": "Support conversations", "access": "read", "system": "Zendesk and Intercom" },
-          { "name": "Issues and customer requests", "access": "read", "system": "Linear" },
-          { "name": "Customer request link", "access": "write", "system": "Linear" },
-          { "name": "Reply draft", "access": "write", "system": "Zendesk and Intercom" }
+          {
+            "name": "Lead and deal lookup",
+            "access": "read",
+            "system": "CRM"
+          },
+          {
+            "name": "Approved answer library",
+            "access": "read",
+            "system": "shared document store"
+          },
+          {
+            "name": "Proposal draft writer",
+            "access": "write",
+            "system": "document editor"
+          }
         ],
         "humanGate": {
           "required": true,
-          "detail": "Links to existing requests apply automatically because they are reversible. Every customer reply, and any statement about timing, is sent by a support engineer."
+          "detail": "A rep reviews every proposal; any discount, custom term or answer not found in the approved library goes to sales leadership or legal before it is sent."
         },
-        "evidence": "The site sells Customer requests, Slack and email intake, and Zendesk and Intercom integrations, the same intake path its own support would use.",
-        "impact": "Prioritization reflects which accounts asked for what, and customers get accurate status replies without support digging through the backlog.",
-        "relatedProject": "mission-control"
-      },
-      {
-        "name": "Changelog Drafter",
-        "role": "Drafts changelog entries from what actually shipped in each release.",
-        "trigger": "When a release is marked complete in Releases",
-        "does": [
-          "Reads the issues and merged pull requests in the release",
-          "Groups user-facing changes and drops internal-only work",
-          "Drafts entries in the existing changelog voice, noting which plans each feature is on"
-        ],
-        "tools": [
-          { "name": "Release contents", "access": "read", "system": "Linear Releases" },
-          { "name": "Merged pull requests", "access": "read", "system": "GitHub" },
-          { "name": "Changelog draft", "access": "write", "system": "Website CMS (draft state)" }
-        ],
-        "humanGate": {
-          "required": true,
-          "detail": "Drafts only. An editor approves and publishes every changelog entry; plan availability is checked by product marketing."
-        },
-        "evidence": "The site publishes a Changelog, ships features tiered across Free, Basic, Business, and Enterprise, and offers Releases and a GitHub integration.",
-        "impact": "The changelog keeps pace with shipping, and plan availability is stated correctly in every entry.",
-        "relatedProject": "openclaw-ops"
-      },
-      {
-        "name": "Business Plan Fit Scout",
-        "role": "Finds workspaces whose usage matches the problems Business plan features solve and briefs the account owner.",
-        "trigger": "Every weekday at 08:00",
-        "does": [
-          "Reads workspace usage for teams on Free and Basic",
-          "Matches patterns such as heavy triage load or many requests arriving from Slack to Business features like Triage Intelligence, Slack intake, and Issue SLAs",
-          "Writes a short internal brief per account with the evidence"
-        ],
-        "tools": [
-          { "name": "Workspace usage metrics", "access": "read", "system": "Product analytics" },
-          { "name": "Account and plan", "access": "read", "system": "CRM" },
-          { "name": "Account brief", "access": "write", "system": "CRM notes" }
-        ],
-        "humanGate": {
-          "required": false,
-          "detail": "It writes internal notes only. Any outreach to the customer is written and sent by a person."
-        },
-        "evidence": "The pricing page separates plans by concrete features: Triage on Free, while Triage Intelligence, Insights, Linear Asks, Issue SLAs, and Slack intake are Business features.",
-        "impact": "Upgrade conversations start from the customer's real workflow instead of a seat count.",
+        "evidence": "The site has a Contact sales option, an Enterprise tier, Enterprise and Startup pages, and published legal policies including Privacy, Terms, DPA and AUP.",
         "relatedProject": "none"
+      },
+      {
+        "name": "Renewal Save Plan for Business Accounts",
+        "role": "Prepares a renewal brief with drafted outreach for each paid account whose seats or activity are dropping, for account managers.",
+        "value": {
+          "kind": "cuts_cost",
+          "who": "Customer success or account manager",
+          "today": "Account managers compare seat counts and activity in billing and usage exports by hand before renewals and write save emails from scratch.",
+          "sizing": "Accounts renewing per quarter x share showing seat or activity decline x seats lost x per-seat price x 12"
+        },
+        "impact": "Accounts that are shrinking get a tailored save plan before renewal, so seat revenue stops leaking out unnoticed.",
+        "trigger": "Every Monday at 08:00 local for accounts renewing in the next 60 days.",
+        "does": [
+          "Compare current seats and active users against the prior term for each upcoming renewal",
+          "Identify accounts with falling seat counts or inactive teams",
+          "Draft a save email and talking points for each account",
+          "Hand over a renewal sheet sorted by revenue at risk"
+        ],
+        "tools": [
+          {
+            "name": "Seat and renewal lookup",
+            "access": "read",
+            "system": "billing system"
+          },
+          {
+            "name": "Activity query",
+            "access": "read",
+            "system": "product usage database"
+          },
+          {
+            "name": "Email draft writer",
+            "access": "write",
+            "system": "CRM drafts"
+          }
+        ],
+        "humanGate": {
+          "required": true,
+          "detail": "Account managers approve every message and any discount offer before anything reaches a customer."
+        },
+        "evidence": "Pricing is per user per month billed yearly on Basic and Business, so seat count at renewal drives revenue.",
+        "relatedProject": "apparelmagic-agents"
       }
     ],
     "firstBuild": {
-      "agentName": "Support Request Linker",
-      "why": "Linking is reversible, replies are already reviewed by support, and it runs on Linear's own Customer requests, so it is a reference implementation from day one.",
+      "agentName": "Free-to-Paid Upgrade Outreach List",
+      "why": "It brings in new subscription revenue from accounts that already use the product, relies on data Linear already holds, and only creates drafts, so risk and integration work are low.",
       "scope": [
-        "Ingest Zendesk and Intercom conversations through the existing integrations",
-        "Propose a link to an existing customer request with a confidence note",
-        "Auto-apply links above a reviewed confidence threshold; queue the rest for support",
-        "Draft status replies for support to send"
+        "Read Free workspace issue, team and member counts from the usage database",
+        "Score workspaces against the 250-issue and 2-team limits",
+        "Draft one upgrade note per top workspace for Basic or Business",
+        "Deliver a weekly ranked sheet to the growth lead",
+        "Add an approval step so nothing is sent without sign-off"
       ]
     },
-    "nonObvious": "Linear's best sales asset for its agent platform is its own operations. If its support, security reviews, and changelog run on Linear Agent, Loops, and Customer requests, each internal agent becomes a working template for the 50,000 teams the site mentions, and any rough edge is found by Linear before a customer finds it.",
+    "nonObvious": "Linear's Free plan caps issues and teams but not members, so a large team can run on $0 for a long time; the accounts closest to the cap with many active members are the best upgrade targets, not the biggest logos.",
     "caveats": [
-      "Curated by hand from the public site, not produced by a live run.",
-      "Linear's internal sales, support, and analytics tools are not visible; CRM and analytics are named by category.",
-      "Assumed Linear's own support uses the Zendesk and Intercom paths it sells; the site does not say so."
+      "Internal systems such as the CRM, billing and usage database were not visible; categories are assumed.",
+      "Enterprise pricing and discount rules were not shown.",
+      "Renewal dates and seat history are assumed to be available in billing data.",
+      "No sales team size or deal volume was given, so sizing is left as formulas."
     ]
   },
   "receipt": null
