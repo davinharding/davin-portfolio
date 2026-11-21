@@ -563,19 +563,6 @@ a.team-slot:hover {
   from { opacity: 0; transform: translateY(3px); }
 }
 
-@supports (height: 100dvh) {
-  .min-h-screen-mobile {
-    min-height: 100dvh;
-  }
-}
-
-@supports not (height: 100dvh) {
-  .min-h-screen-mobile {
-    min-height: 100vh;
-    min-height: -webkit-fill-available;
-  }
-}
-
 .heading-hero {
   @apply text-4xl md:text-6xl lg:text-7xl font-semibold tracking-tight text-foreground;
 }
@@ -602,6 +589,7 @@ a.team-slot:hover {
 
 .yarl__root {
   --yarl__slide_captions_container_background: rgba(2, 6, 23, 0.8);
+  --yarl__button_filter: none;
   font-family: inherit;
 }
 
@@ -610,11 +598,10 @@ a.team-slot:hover {
 }
 
 .yarl__button {
-  filter: none;
   transition: all 0.2s ease;
 }
 
-.yarl__button:hover {
+.yarl__toolbar .yarl__button:hover {
   transform: scale(1.1);
   filter: drop-shadow(0 0 12px rgba(59, 130, 246, 0.5));
 }
@@ -626,28 +613,18 @@ a.team-slot:hover {
 
 .yarl__navigation_prev,
 .yarl__navigation_next {
-  padding: 12px;
-  background: rgba(2, 6, 23, 0.6);
-  border-radius: 50%;
+  --yarl__navigation_button_padding: 8px;
+  --yarl__button_background_color: rgba(2, 6, 23, 0.6);
+  --yarl__button_border: 1px solid rgba(59, 130, 246, 0.2);
+  --yarl__button_filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.3));
+  border-radius: 12px;
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(59, 130, 246, 0.2);
 }
 
 .yarl__navigation_prev:hover,
 .yarl__navigation_next:hover {
-  background: rgba(59, 130, 246, 0.2);
-  border-color: rgba(59, 130, 246, 0.5);
-}
-
-.yarl__navigation_prev,
-.yarl__navigation_next {
-  transform: none !important;
-  border-radius: 12px !important;
-}
-.yarl__navigation_prev:hover,
-.yarl__navigation_next:hover {
-  transform: none !important;
-  background-color: rgba(59, 130, 246, 0.15) !important;
+  --yarl__button_background_color: rgba(59, 130, 246, 0.15);
+  --yarl__button_border: 1px solid rgba(59, 130, 246, 0.5);
 }
 
 .yarl__toolbar {
@@ -660,19 +637,21 @@ a.team-slot:hover {
   height: 28px;
 }
 
-.yarl__counter_container {
+.yarl__counter {
+  --yarl__counter_padding: 0 16px;
+  --yarl__counter_filter: none;
   font-size: 14px;
   font-weight: 500;
-  padding: 8px 16px;
   border-radius: 9999px;
-  background: rgba(2, 6, 23, 0.8) !important;
+  background-color: rgba(2, 6, 23, 0.8);
   border: 1px solid rgba(59, 130, 246, 0.3);
   backdrop-filter: blur(8px);
 }
 
 .yarl__thumbnails_container {
-  padding: 16px;
-  background: linear-gradient(to top, rgba(2, 6, 23, 0.95), transparent) !important;
+  --yarl__thumbnails_container_background_color: transparent;
+  --yarl__thumbnails_container_padding: 16px;
+  background-image: linear-gradient(to top, rgba(2, 6, 23, 0.95), transparent);
 }
 
 .yarl__thumbnails_thumbnail {
