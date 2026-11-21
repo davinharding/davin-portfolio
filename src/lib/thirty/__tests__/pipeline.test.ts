@@ -351,6 +351,30 @@ const failureCases: FailureCase[] = [
   },
 ];
 
+describe("unusable research output", () => {
+  const researchCost = (2000 * 0.1 + 400 * 0.5) / 1e6;
+
+  it.each([
+    ["refusal", "declined", true, false],
+    ["parse", "internal", false, true],
+    ["max_tokens", "internal", false, true],
+  ] as const)("a %s ends as %s and still charges the research call", async (reason, code, negative, refund) => {
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const { outcome } = await run(
+      happyStages({
+        extractProfile: vi.fn(async () => {
+          throw new ModelOutputError(reason, usage(MODELS.research, 2000, 400));
+        }),
+      })
+    );
+    errSpy.mockRestore();
+    expect(outcome).toMatchObject({ ok: false, code });
+    expect(await budget()).toBe(Math.round(researchCost * 1e6));
+    expect(Boolean(await store.get(keys.negative(HOST)))).toBe(negative);
+    expect(await visitorCount()).toBe(refund ? 0 : 1);
+  });
+});
+
 describe("runPipeline failures", () => {
   it.each(failureCases.map((c, i) => [`${c.code} #${i}`, c] as const))("%s", async (_name, c) => {
     const errSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);

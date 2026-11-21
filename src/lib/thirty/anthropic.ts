@@ -8,6 +8,9 @@ import Anthropic, {
   RateLimitError,
   APIError,
 } from "@anthropic-ai/sdk";
+import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
+import type { JSONOutputFormat, Message } from "@anthropic-ai/sdk/resources/messages/messages";
+import type { z } from "zod";
 import { priceFor, WEB_SEARCH_USD } from "./config";
 import { RunError, type ErrorCode } from "./errors";
 
@@ -68,11 +71,41 @@ export function totals(records: UsageRecord[]) {
 export class ModelOutputError extends Error {
   constructor(
     readonly reason: "refusal" | "max_tokens" | "parse" | "empty",
-    readonly usage: UsageRecord | null
+    readonly usage: UsageRecord
   ) {
     super(`Model output unusable: ${reason}`);
     this.name = "ModelOutputError";
   }
+}
+
+export function jsonSchemaFormat(schema: z.ZodType): JSONOutputFormat {
+  const { type, schema: jsonSchema } = zodOutputFormat(schema);
+  return { type, schema: jsonSchema };
+}
+
+export type StructuredOutput<T> = { value: T; usage: UsageRecord; text: string };
+
+export function readStructuredOutput<T>(
+  model: string,
+  message: Pick<Message, "stop_reason" | "usage" | "content">,
+  schema: z.ZodType<T>
+): StructuredOutput<T> {
+  const usage = toUsageRecord(model, message.usage);
+  if (message.stop_reason === "refusal") throw new ModelOutputError("refusal", usage);
+  if (message.stop_reason === "max_tokens") throw new ModelOutputError("max_tokens", usage);
+  const text = message.content
+    .flatMap((block) => (block.type === "text" ? [block.text] : []))
+    .join("");
+  if (!text.trim()) throw new ModelOutputError("empty", usage);
+  let data: unknown;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    throw new ModelOutputError("parse", usage);
+  }
+  const parsed = schema.safeParse(data);
+  if (!parsed.success) throw new ModelOutputError("parse", usage);
+  return { value: parsed.data, usage, text };
 }
 
 export function mapRunError(err: unknown, deadlineHit: boolean): ErrorCode {

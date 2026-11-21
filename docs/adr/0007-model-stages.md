@@ -21,6 +21,8 @@ A run reads a stranger's website and asks models to describe the company and des
 
 **Structured output and the gate**
 - The model-facing Zod schemas carry no numeric or length limits, because structured outputs support only a subset of JSON Schema. `quality.ts` enforces limits instead.
+- The SDK is given a plain JSON schema (`jsonSchemaFormat`), never the auto-parsing format, so it never throws on model output. `readStructuredOutput` checks `stop_reason` first (`refusal`, `max_tokens`), then parses the text with the Zod schema (`empty`, `parse`). Every failure is a `ModelOutputError` that carries the call's real usage, so the spend reaches budget settlement (ADR 0006).
+- Only a real refusal becomes `declined`, which is negative-cached. A truncated or malformed answer is our problem, so it maps to `internal` and the visitor is refunded.
 - Normalization repairs and never fails. The quality gate after it is deterministic. Design gets one retry when the gate fails and time allows.
 
 **Errors**
@@ -41,6 +43,6 @@ A run reads a stranger's website and asks models to describe the company and des
 ## Where
 
 - `src/lib/thirty/research.ts`, `design.ts`, `searchFallback.ts`, `prompts.ts`
-- `src/lib/thirty/schema.ts`, `quality.ts`, `extract.ts`, `anthropic.ts` (`mapRunError`)
+- `src/lib/thirty/schema.ts`, `quality.ts`, `extract.ts`, `anthropic.ts` (`jsonSchemaFormat`, `readStructuredOutput`, `ModelOutputError`, `mapRunError`)
 - `src/lib/thirty/pipeline.ts` (`fallbackFailure`)
 - `src/lib/thirty/projectCatalog.ts`, `src/components/thirty/BlueprintView.tsx`
