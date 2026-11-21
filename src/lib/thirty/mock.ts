@@ -111,8 +111,8 @@ export function mockBlueprint(host: string): ModelBlueprint {
         value: {
           kind: "grows_revenue",
           who: "the estimators who answer Rush Quote Desk requests",
-          today: "Typically an estimator digs through past jobs by hand before pricing each rush request.",
-          sizing: "Rush requests per week, times the hours an estimator spends pricing each one.",
+          today: "An estimator digs through past job folders and the machine-hour sheet by hand before pricing each rush request.",
+          sizing: "Rush requests lost each month to slow replies, times the average rush job value.",
         },
         impact: "Rush requests get a reviewed price the same day instead of waiting in a shared inbox.",
         trigger: "When a Rush Quote Desk form is submitted",
@@ -139,7 +139,7 @@ export function mockBlueprint(host: string): ModelBlueprint {
         value: {
           kind: "cuts_cost",
           who: "the account managers who run ToolCrib Subscriptions",
-          today: "Typically each monthly ToolCrib order repeats the last one regardless of upcoming jobs.",
+          today: "Each monthly ToolCrib order is copied from last month's order sheet regardless of upcoming jobs.",
           sizing: "Inserts over-shipped or rushed each month, times their cost and shipping.",
         },
         impact: "Customers stop running out of inserts mid-job, and over-shipping drops.",
@@ -166,8 +166,8 @@ export function mockBlueprint(host: string): ModelBlueprint {
         value: {
           kind: "saves_time",
           who: "the customer success team",
-          today: "Typically customer success checks every new account by hand to find the stuck ones.",
-          sizing: "New accounts per month, times the minutes spent checking each one.",
+          today: "Customer success opens every new account's activity log by hand to find the stuck ones.",
+          sizing: "New accounts per month, times the hours spent checking each one.",
         },
         impact: "The new customer success hires spend their time on the accounts that need them.",
         trigger: "Every weekday at 08:00",
