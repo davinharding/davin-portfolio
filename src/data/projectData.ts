@@ -142,6 +142,25 @@ export const getPublishedProjects = (): Project[] =>
 export const projectPath = (name: string): string =>
   `/portfolio/${encodeURIComponent(name)}`;
 
+const decodeSegment = (segment: string): string | null => {
+  try {
+    return decodeURIComponent(segment);
+  } catch {
+    return null;
+  }
+};
+
+export const findProjectBySegment = (
+  segment: string,
+  list: Project[] = projects
+): Project | undefined => {
+  const decoded = decodeSegment(segment);
+  return (
+    list.find((p) => p.name === segment) ??
+    list.find((p) => p.name === decoded)
+  );
+};
+
 export const projects: Project[] = [
   {
     image: AmiArchitecture,

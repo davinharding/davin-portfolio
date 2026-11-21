@@ -16,6 +16,7 @@ The portfolio lists projects at `/work` and `/portfolio`, in the header dropdown
 **URLs**
 - `projectPath()` is the only place the URL scheme lives. It uses `encodeURIComponent`, because `encodeURI` would leave `&`, `?`, `#` and `+` unescaped and break routing.
 - `generateStaticParams` returns raw, decoded names. Next.js encodes segments itself, and pre-encoding causes double encoding (`AI%2520Designer`), so client navigations to the single-encoded URL would 404.
+- The `[name]` param is not decoded the same way everywhere: at request time Next.js 16 passes it still percent-encoded (`ApparelMagic%20AI%20Agents`), while prerendering passes the raw name from `generateStaticParams`. `findProjectBySegment` matches the raw value first, then the value decoded exactly once, so both work and a name containing a literal `%xx` is never decoded twice. A malformed escape matches nothing (404).
 - Every published detail page is prerendered at build time, so navigations are served as static HTML and prefetching works end to end.
 
 **Performance**
@@ -29,6 +30,6 @@ The portfolio lists projects at `/work` and `/portfolio`, in the header dropdown
 
 ## Where
 
-- `src/data/projectData.ts` (`draft`, `getPublishedProjects`, `projectPath`)
+- `src/data/projectData.ts` (`draft`, `getPublishedProjects`, `projectPath`, `findProjectBySegment`)
 - `src/app/portfolio/[name]/page.tsx`, `ProjectGallery.tsx`, `LightboxModal.tsx`
 - `src/components/ProjectCard.tsx`, `WaveParticlesAlt.tsx`, `thirty/LegacyHashRedirect.tsx`

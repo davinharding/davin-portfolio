@@ -8,10 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
+  findProjectBySegment,
   getPublishedProjects,
   projectPath,
-  projects,
-  type Project,
 } from "@/data/projectData";
 
 import { ProjectGallery } from "./ProjectGallery";
@@ -32,7 +31,7 @@ export async function generateMetadata({
   params: RouteParamsPromise;
 }): Promise<Metadata> {
   const { name } = await params;
-  const project = findProject(name);
+  const project = findProjectBySegment(name);
   if (!project) return { title: "Project Not Found" };
   const ogImage = project.image?.src;
   const path = projectPath(project.name);
@@ -59,21 +58,13 @@ export async function generateMetadata({
   };
 }
 
-function findProject(rawName: string): Project | undefined {
-  let decoded = rawName;
-  try {
-    decoded = decodeURIComponent(rawName);
-  } catch {}
-  return projects.find((p) => p.name === decoded);
-}
-
 const PortfolioProjectDetail = async ({
   params,
 }: {
   params: RouteParamsPromise;
 }) => {
   const { name } = await params;
-  const project = findProject(name);
+  const project = findProjectBySegment(name);
 
   if (!project) {
     notFound();
