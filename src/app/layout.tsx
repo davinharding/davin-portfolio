@@ -5,7 +5,6 @@ import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import LoadingAnimation from "@/components/LoadingAnimation";
-import SilenceScriptWarning from "@/components/SilenceScriptWarning";
 import { THEME_COLORS, themeBootScript } from "@/lib/theme";
 
 const inter = Inter({
@@ -132,7 +131,6 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className}>
-        <SilenceScriptWarning />
         <ThemeProvider>
           <LoadingAnimation />
           {process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS ? (

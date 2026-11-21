@@ -27,8 +27,8 @@ The site has a light and a dark theme, an animated splash, and a day/night revea
 - A CSS failsafe animation reveals the page even if the script never runs. If hydration is so slow that the failsafe has started, the script lets it finish rather than restarting with a dock.
 - Repeat visits in a session skip the splash (the boot script adds `loader-done`), and so do visitors who prefer reduced motion. No failsafe animation means CSS is hiding the splash.
 
-**React's script-tag warning**
-- React logs a dev-only "Encountered a script tag" warning for these inline scripts, though they run correctly from the SSR HTML. `SilenceScriptWarning` filters it. This is a workaround, tracked in [#9](https://github.com/davinharding/davin-portfolio/issues/9).
+**Inline scripts stay in the server layout**
+- The boot script and the JSON-LD block are rendered by the root layout, a server component, so React hydrates them from the SSR HTML and never creates them on the client. React's dev-only "Encountered a script tag" warning fires only for scripts it creates on the client (JSON-LD is exempt as a data block), so it does not fire here and nothing needs silencing. Moving either script into a client component would bring the warning back, and on the client such a script would not run.
 
 ## Consequences
 
@@ -38,5 +38,5 @@ The site has a light and a dark theme, an animated splash, and a day/night revea
 ## Where
 
 - `src/lib/theme.ts`, `src/lib/themeFx.ts`, `src/app/layout.tsx`
-- `src/components/ThemeProvider.tsx`, `ThemeToggle.tsx`, `ThemeIcon.tsx`, `Header.tsx`, `LoadingAnimation.tsx`, `SilenceScriptWarning.tsx`
+- `src/components/ThemeProvider.tsx`, `ThemeToggle.tsx`, `ThemeIcon.tsx`, `Header.tsx`, `LoadingAnimation.tsx`
 - `src/app/globals.css` (`.splash*`, `.theme-*`, `.theme-fx*`)
