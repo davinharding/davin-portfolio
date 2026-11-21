@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Lock, PenLine, Eye, ShieldCheck } from "lucide-react";
-import type { NormalizedAgent } from "@/lib/thirty/schema";
+import type { AgentValue, NormalizedAgent } from "@/lib/thirty/schema";
 import { slugify } from "./OrgChart";
 
 export type RelatedProjectLink = { href: string; projectName: string; relevance: string };
@@ -10,6 +10,12 @@ type AgentCardProps = {
   index: number;
   related: RelatedProjectLink | null;
   isFirstBuild: boolean;
+};
+
+export const VALUE_KIND_LABELS: Record<AgentValue["kind"], string> = {
+  saves_time: "Saves time",
+  cuts_cost: "Cuts cost",
+  grows_revenue: "Grows revenue",
 };
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
@@ -22,6 +28,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
 export function AgentCard({ agent, index, related, isFirstBuild }: AgentCardProps) {
+  const { value } = agent;
   return (
     <article
       id={`agent-${slugify(agent.name)}`}
@@ -41,9 +48,24 @@ export function AgentCard({ agent, index, related, isFirstBuild }: AgentCardProp
           {agent.name}
         </h3>
         <p className="text-body mt-1">{agent.role}</p>
+        {value ? (
+          <div className="mt-4 border-l-2 border-primary pl-3">
+            <span className="inline-block rounded-full border border-primary/50 bg-primary/10 px-2 py-0.5 text-xs text-foreground">
+              {VALUE_KIND_LABELS[value.kind]}
+            </span>
+            <p className="mt-2 text-base font-medium leading-snug text-foreground">{agent.impact}</p>
+          </div>
+        ) : null}
       </header>
 
       <dl className="grid gap-4">
+        {value ? (
+          <>
+            <Field label="Who it helps">{value.who}</Field>
+            <Field label="How this is usually done today">{value.today}</Field>
+            <Field label="How to size it">{value.sizing}</Field>
+          </>
+        ) : null}
         <Field label="Trigger">{agent.trigger}</Field>
         <Field label="What it does">
           <ul className="list-disc pl-5 space-y-1 marker:text-primary">
@@ -90,7 +112,7 @@ export function AgentCard({ agent, index, related, isFirstBuild }: AgentCardProp
           </span>
         </Field>
         <Field label="Why this one">{agent.evidence}</Field>
-        <Field label="Expected impact">{agent.impact}</Field>
+        {value ? null : <Field label="Expected impact">{agent.impact}</Field>}
       </dl>
 
       {related ? (
