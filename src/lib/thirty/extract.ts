@@ -1,4 +1,3 @@
-// Server-only. HTML to readable text, metadata, and sub-page selection.
 import { parse, type HTMLElement } from "node-html-parser";
 import { LIMITS } from "./config";
 
@@ -71,7 +70,6 @@ export function extractPage(body: string, url: string, contentType = "text/html"
   return { url, title, description, siteName, ogDescription, headings, text, links };
 }
 
-/** Text that would actually help the research step. */
 export function usableChars(page: PageContent): number {
   return page.text.length + page.description.length + page.ogDescription.length;
 }
@@ -125,15 +123,10 @@ function scoreLink(path: string, text: string): number {
     if (re.test(p)) score += weight;
     if (re.test(t.replace(/\s+/g, "-"))) score += weight / 2;
   }
-  // Prefer shallow paths: /about over /about/team/leadership/board.
   score -= Math.max(0, p.split("/").filter(Boolean).length - 1);
   return score;
 }
 
-/**
- * Picks up to `max` same-host pages worth reading, best first. `extraPath`
- * (from the visitor's input) always comes first.
- */
 export function selectSubpages(
   links: PageContent["links"],
   pageUrl: string,
@@ -169,7 +162,6 @@ export function selectSubpages(
     const ext = /\.([a-z0-9]{1,5})$/i.exec(path)?.[1]?.toLowerCase();
     if (ext && ext !== "html" && ext !== "htm") continue;
     if (EXCLUDE.test(path.toLowerCase())) continue;
-    // Blog indexes and posts rarely describe the business.
     if (/^\/(blog|news|articles|posts)(\/|$)/i.test(path)) continue;
     const score = scoreLink(path, link.text);
     if (score <= 0) continue;
@@ -184,7 +176,6 @@ export function selectSubpages(
   return picked.slice(0, max);
 }
 
-/** Caps the whole bundle, homepage first, so later pages are trimmed before earlier ones. */
 export function capBundle(pages: PageContent[], cap = LIMITS.bundleCharCap): PageContent[] {
   let remaining = cap;
   const out: PageContent[] = [];
@@ -197,7 +188,6 @@ export function capBundle(pages: PageContent[], cap = LIMITS.bundleCharCap): Pag
   return out;
 }
 
-/** Sniffs a charset from `<meta charset>` or an http-equiv content type in the first 2 KB. */
 export function sniffMetaCharset(head: string): string | null {
   const m =
     /<meta[^>]+charset\s*=\s*["']?\s*([a-z0-9_.:-]+)/i.exec(head) ??

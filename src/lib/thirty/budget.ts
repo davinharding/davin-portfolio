@@ -1,4 +1,3 @@
-// Server-only. Monthly spend ceiling: reserve at run start, settle at run end.
 import { RESERVE_MICROS } from "./config";
 import { utcMonth } from "./limits";
 import { keys, type Store } from "./store";
@@ -11,7 +10,6 @@ export function usdToMicros(usd: number): number {
   return Math.round(usd * 1_000_000);
 }
 
-/** Returns the reservation, or null when it would exceed the monthly cap. */
 export async function reserveBudget(
   store: Store,
   now: Date,
@@ -29,7 +27,6 @@ export async function reserveBudget(
   return { monthKey, reservedMicros: reserveMicros };
 }
 
-/** Replaces the reservation with the actual spend (which may be more or less). */
 export async function settleBudget(
   store: Store,
   reservation: Reservation,

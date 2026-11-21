@@ -12,7 +12,6 @@ import {
 } from "../homeDesign";
 import { POSTHOG_VECTORS } from "./posthogVectors";
 
-/** PostHog's algorithm written a second way (BigInt, node:crypto) to check the Web Crypto version. */
 function reference(id: string, flagKey = "home-design"): string {
   const hex = createHash("sha1").update(`${flagKey}.${id}variant`).digest("hex").slice(0, 15);
   const value = Number(BigInt(`0x${hex}`)) / Number(BigInt("0xfffffffffffffff"));

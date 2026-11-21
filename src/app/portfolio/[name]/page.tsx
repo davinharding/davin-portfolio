@@ -8,10 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
+  findProjectBySegment,
   getPublishedProjects,
   projectPath,
-  projects,
-  type Project,
 } from "@/data/projectData";
 
 import { ProjectGallery } from "./ProjectGallery";
@@ -20,14 +19,7 @@ import { ProjectHero } from "./ProjectHero";
 type RouteParams = { name: string };
 type RouteParamsPromise = Promise<RouteParams>;
 
-// Pre-render every published portfolio detail page at build time so
-// navigations are served as static HTML and prefetching works end-to-end.
-// Draft projects are skipped here (and are absent from listings/sitemap), but
-// their detail route still resolves so they can be previewed by direct URL.
 export function generateStaticParams(): RouteParams[] {
-  // Return raw (decoded) names — Next.js URL-encodes segments when building
-  // static paths. Pre-encoding here causes double-encoding (e.g. "AI Designer"
-  // → "AI%2520Designer") so client navigations to the single-encoded URL 404.
   return getPublishedProjects().map((project) => ({
     name: project.name,
   }));
@@ -39,7 +31,7 @@ export async function generateMetadata({
   params: RouteParamsPromise;
 }): Promise<Metadata> {
   const { name } = await params;
-  const project = findProject(name);
+  const project = findProjectBySegment(name);
   if (!project) return { title: "Project Not Found" };
   const ogImage = project.image?.src;
   const path = projectPath(project.name);
@@ -47,8 +39,6 @@ export async function generateMetadata({
     title: project.title,
     description: project.previewDescription,
     alternates: { canonical: path },
-    // Draft projects are accessible by direct URL for preview but should
-    // never be indexed or followed by crawlers.
     ...(project.draft && {
       robots: { index: false, follow: false, nocache: true },
     }),
@@ -68,25 +58,13 @@ export async function generateMetadata({
   };
 }
 
-function findProject(rawName: string): Project | undefined {
-  // Next.js auto-decodes route params, but decode defensively in case a request
-  // arrives with a still-encoded segment (e.g. middleware, custom proxy).
-  let decoded = rawName;
-  try {
-    decoded = decodeURIComponent(rawName);
-  } catch {
-    // Malformed escape — fall back to the raw value.
-  }
-  return projects.find((p) => p.name === decoded);
-}
-
 const PortfolioProjectDetail = async ({
   params,
 }: {
   params: RouteParamsPromise;
 }) => {
   const { name } = await params;
-  const project = findProject(name);
+  const project = findProjectBySegment(name);
 
   if (!project) {
     notFound();
@@ -100,10 +78,8 @@ const PortfolioProjectDetail = async ({
       backLabel="Back to Work"
     >
       <div className="max-w-4xl">
-        {/* Hero screenshot — leads with the most eye-catching asset */}
         {project.image && <ProjectHero project={project} />}
 
-        {/* Links */}
         <div className="flex flex-wrap gap-2 mb-6">
           {project.liveLink && (
             <Button asChild size="sm">
@@ -156,7 +132,6 @@ const PortfolioProjectDetail = async ({
           </div>
         ) : null}
 
-        {/* Tech Stack */}
         <div className="flex flex-wrap gap-2 mb-8">
           {project.projectTags.map((tag, idx) => (
             <Badge key={idx} variant="secondary">
@@ -167,7 +142,6 @@ const PortfolioProjectDetail = async ({
 
         <Separator className="mb-8" />
 
-        {/* Description */}
         {project.description && (
           <div className="prose prose-invert prose-slate max-w-none mb-12">
             {project.description.split("|").map((paragraph, idx) => (
@@ -194,7 +168,6 @@ const PortfolioProjectDetail = async ({
           </div>
         ) : null}
 
-        {/* Additional screenshots — hero already shows image #1 */}
         {project.image2 && <ProjectGallery project={project} skip={1} />}
       </div>
     </ContainerLayout>

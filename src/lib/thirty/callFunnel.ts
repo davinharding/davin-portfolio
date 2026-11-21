@@ -1,21 +1,15 @@
-// Client-safe. The last step of the funnel: the Calendly embed on /call. Carries
-// the visitor's homepage design and blueprint into Calendly, and turns Calendly's
-// embed messages into analytics events.
 import type { HomeDesign } from "@/lib/experiments/homeDesign";
 import { isValidSlug } from "./slugFormat";
 
 export const CALENDLY_URL = "https://calendly.com/davinharding/1-on-1-discovery-call";
-/** Embed messages are trusted only from here. */
 export const CALENDLY_ORIGIN = "https://calendly.com";
 
 const SLUG_PARAM = "b";
 
-/** The call page, remembering which blueprint the visitor came from. */
 export function callPath(slug?: string): string {
   return slug && isValidSlug(slug) ? `/call?${SLUG_PARAM}=${slug}` : "/call";
 }
 
-/** The blueprint slug in the call page's query string, if it is a real one. */
 export function blueprintSlugFromSearch(search: string): string | undefined {
   const slug = new URLSearchParams(search).get(SLUG_PARAM);
   return slug && isValidSlug(slug) ? slug : undefined;
@@ -29,7 +23,6 @@ export type CalendlyUtm = {
   utmTerm: string;
 };
 
-/** Shown with each booking in Calendly: which design and which blueprint led to it. */
 export function calendlyUtm(design: HomeDesign | null, slug?: string): CalendlyUtm {
   return {
     utmSource: "davin.io",
@@ -40,7 +33,6 @@ export function calendlyUtm(design: HomeDesign | null, slug?: string): CalendlyU
   };
 }
 
-/** The booking page as a plain link, for when the embed does not load. */
 export function calendlyLink(utm: CalendlyUtm): string {
   const url = new URL(CALENDLY_URL);
   url.searchParams.set("utm_source", utm.utmSource);
@@ -59,19 +51,12 @@ const CALL_EVENTS: Record<string, CallEvent> = {
   "calendly.event_scheduled": "call_booked",
 };
 
-/** The properties every call event carries. */
 export function callEventProps(slug?: string): Record<string, string> {
   return slug ? { blueprint_slug: slug } : {};
 }
 
-/** Reported at most once per page load: Calendly announces both more than once (the calendar view twice on load). */
 const ONCE_PER_PAGE: ReadonlySet<CallEvent> = new Set(["call_calendar_viewed", "call_booked"]);
 
-/**
- * Returns a handler for window messages. It reports Calendly's own messages and
- * nothing else, and reports the calendar view and the booking at most once each
- * however often they are announced. Calendly's event and invitee links are never passed on.
- */
 export function createCallTracker(
   report: (event: CallEvent, props: Record<string, string>) => void,
   slug?: string

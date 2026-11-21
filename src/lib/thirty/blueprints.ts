@@ -1,4 +1,3 @@
-// Server-only. Loads a blueprint for the /b/[slug] page.
 import { unstable_cache } from "next/cache";
 import { cache } from "react";
 import { getExample } from "./examples";
@@ -13,26 +12,14 @@ export class BlueprintUnavailableError extends Error {
   }
 }
 
-/**
- * Blueprints are immutable, so the raw stored value is cached for 5 minutes
- * and repeat views of a page skip Redis. Errors are not cached. (This wrapper
- * also lets the Upstash client's `cache: "no-store"` fetch resolve if the page
- * is ever statically rendered again.)
- */
 const readStoredBlueprint = unstable_cache(
   async (slug: string) => getStore()?.get(keys.blueprint(slug)) ?? null,
   ["thirty-blueprint"],
   { revalidate: 300 }
 );
 
-/**
- * Returns the blueprint, or null when it does not exist. Throws
- * BlueprintUnavailableError when the store fails or stored data is invalid,
- * which the route's error boundary turns into a retry page.
- */
 export const loadBlueprint = cache(async (slug: string): Promise<StoredBlueprint | null> => {
   if (!isValidSlug(slug)) return null;
-  // Examples are committed files and never looked up in Redis.
   if (isExampleSlug(slug)) return getExample(slug);
   if (!getStore()) return null;
   let raw: string | null;

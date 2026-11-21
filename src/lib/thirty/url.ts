@@ -1,15 +1,9 @@
-// Input normalization and host rules (spec section 6). Pure; no Node APIs.
-
 export type NormalizeErrorCode = "invalid_url" | "blocked_host" | "platform_url" | "self_url";
 
 export type NormalizedInput = {
-  /** Hostname without a leading `www.`; the cache key. */
   host: string;
-  /** The hostname as entered (may keep `www.`). */
   hostname: string;
-  /** Always `https://<hostname>/`. */
   startUrl: string;
-  /** A non-root path the visitor supplied, read as an extra page. */
   extraPath?: string;
 };
 
@@ -18,9 +12,7 @@ export type NormalizeResult =
   | { ok: false; code: NormalizeErrorCode };
 
 export type HostRuleOptions = {
-  /** The current request host, which counts as this site. */
   requestHost?: string | null;
-  /** Mock mode accepts `.test` hosts so every UI path can be exercised. */
   allowTestTld?: boolean;
 };
 
@@ -41,7 +33,6 @@ const BLOCKED_SUFFIXES = [
 
 const SELF_HOSTS = ["davin.io", "www.davin.io"];
 
-/** Hosts (and their subdomains) where the visitor does not own the page. */
 export const PLATFORM_HOSTS = [
   "linkedin.com",
   "facebook.com",
@@ -78,11 +69,6 @@ function matchesHostOrSubdomain(hostname: string, base: string): boolean {
   return hostname === base || hostname.endsWith(`.${base}`);
 }
 
-/**
- * Google and Amazon in any country, with any subdomain: `google.co.uk`,
- * `maps.google.com.au`, `smile.amazon.de`. The suffix must look like a country
- * domain, so `amazon.acme.com` stays a company site.
- */
 function isCountryVariantPlatform(hostname: string): boolean {
   return /(^|\.)(google|amazon)\.(com|[a-z]{2}|(co|com)\.[a-z]{2})$/.test(hostname);
 }
@@ -96,7 +82,6 @@ export function isPlatformHost(hostname: string): boolean {
 
 export function isIpLiteral(hostname: string): boolean {
   if (hostname.startsWith("[") || hostname.includes(":")) return true;
-  // The URL parser canonicalizes numeric forms (0x7f.1, 2130706433) to dotted quads.
   return /^\d{1,3}(\.\d{1,3}){3}$/.test(hostname);
 }
 
@@ -118,10 +103,6 @@ function isSelfHost(hostname: string, requestHost?: string | null): boolean {
   return false;
 }
 
-/**
- * Host rules shared by the input check and every redirect hop. `hostname` must
- * already be lowercased by the URL parser (IDNs arrive as punycode).
- */
 export function checkHost(
   rawHostname: string,
   opts: HostRuleOptions = {}
@@ -129,24 +110,19 @@ export function checkHost(
   const hostname = rawHostname.replace(/\.$/, "");
   if (!hostname) return "invalid_url";
   if (isIpLiteral(hostname)) return "blocked_host";
-  // After the URL parser, a real hostname is ASCII letters, digits, dots, and hyphens.
   if (!/^[a-z0-9.-]+$/.test(hostname)) return "invalid_url";
   if (hostname.length > 253) return "invalid_url";
   const labels = hostname.split(".");
   if (labels.some((l) => l.length === 0 || l.length > 63)) return "invalid_url";
   if (labels.length < 2) return "blocked_host";
   const tld = labels[labels.length - 1];
-  if (tld === "test" && opts.allowTestTld) {
-    // Mock-mode trigger hosts; nothing is fetched for them.
-  } else if (BLOCKED_SUFFIXES.includes(tld)) {
-    return "blocked_host";
-  }
+  const allowedTestTld = tld === "test" && opts.allowTestTld;
+  if (!allowedTestTld && BLOCKED_SUFFIXES.includes(tld)) return "blocked_host";
   if (isSelfHost(hostname, opts.requestHost)) return "self_url";
   if (isPlatformHost(hostname)) return "platform_url";
   return null;
 }
 
-/** Scheme and port rules for a parsed URL. */
 export function checkUrlShape(url: URL): "invalid_url" | null {
   if (url.protocol !== "http:" && url.protocol !== "https:") return "invalid_url";
   if (url.username || url.password) return "invalid_url";
@@ -182,12 +158,8 @@ export function normalizeInput(raw: unknown, opts: HostRuleOptions = {}): Normal
   const email = /^[^\s@/:]+@([^\s@/]+)$/.exec(s);
   if (email) s = email[1];
 
-  if (/^[a-z][a-z0-9+.-]*:\/\//i.test(s)) {
-    // Has an explicit scheme; validated below.
-  } else {
+  if (!/^[a-z][a-z0-9+.-]*:\/\//i.test(s)) {
     const schemeLike = /^([a-z][a-z0-9+.-]*):/i.exec(s);
-    // `javascript:`, `mailto:`, `data:` have no dot before the colon;
-    // `acme.com:8080` does and is a host with a port.
     if (schemeLike && !schemeLike[1].includes(".")) return { ok: false, code: "invalid_url" };
     s = `https://${s}`;
   }

@@ -5,7 +5,6 @@ import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import LoadingAnimation from "@/components/LoadingAnimation";
-import SilenceScriptWarning from "@/components/SilenceScriptWarning";
 import { THEME_COLORS, themeBootScript } from "@/lib/theme";
 
 const inter = Inter({
@@ -121,11 +120,6 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={inter.variable}>
       <head>
-        {/* Applies the theme (saved choice, else the OS setting) and skips the
-            splash for repeat visits before first paint: no flash.
-            React 19 logs a dev-only "Encountered a script tag" warning for these,
-            but the scripts execute correctly from the SSR HTML. The warning is
-            filtered in dev by `SilenceScriptWarning` mounted below. */}
         <script
           // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: themeBootScript }}
@@ -137,7 +131,6 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className}>
-        <SilenceScriptWarning />
         <ThemeProvider>
           <LoadingAnimation />
           {process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS ? (

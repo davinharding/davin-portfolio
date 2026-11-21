@@ -7,7 +7,6 @@ import { trackCallCta } from "@/lib/analytics/track";
 import { callPath } from "@/lib/thirty/callFunnel";
 
 type CallCtaProps = {
-  /** The blueprint this link sits on, so the booking can be traced back to it. */
   slug: string;
   label?: string;
 };

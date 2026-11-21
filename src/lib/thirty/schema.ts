@@ -1,6 +1,3 @@
-// Server-only. Zod schemas for the model-facing outputs and stored blueprints.
-// The model-facing schemas carry no numeric or length constraints (structured
-// outputs support a limited JSON Schema subset); quality.ts enforces limits.
 import { z } from "zod";
 import { PROJECT_KEYS } from "./projectCatalog";
 import { MAX_AGENTS, type StepId } from "./events";
@@ -33,7 +30,6 @@ const ToolSchema = z.object({
 
 export const VALUE_KINDS = ["saves_time", "cuts_cost", "grows_revenue"] as const;
 
-/** The case for paying for an agent, written for the decision maker. */
 const ValueSchema = z.object({
   kind: z.enum(VALUE_KINDS),
   who: z.string(),
@@ -41,9 +37,6 @@ const ValueSchema = z.object({
   sizing: z.string(),
 });
 
-// The model writes fields in schema order, so the payoff (`value`, `impact`)
-// comes before the details. `findAgentNames` in design.ts relies on `name`
-// being directly followed by `role`.
 const AgentSchema = z.object({
   name: z.string(),
   role: z.string(),
@@ -57,7 +50,6 @@ const AgentSchema = z.object({
   relatedProject: RelatedProject,
 });
 
-/** Blueprints stored before `value` existed (and the committed examples) have none. */
 const StoredAgentSchema = AgentSchema.extend({ value: ValueSchema.optional() });
 
 export const ModelBlueprintSchema = z.object({
@@ -74,7 +66,6 @@ export const ModelBlueprintSchema = z.object({
 
 export type ModelBlueprint = z.infer<typeof ModelBlueprintSchema>;
 
-/** The model output's shape, with `value` optional; used to validate what we stored. */
 export const NormalizedBlueprintSchema = ModelBlueprintSchema.extend({
   agents: z.array(StoredAgentSchema).min(1).max(MAX_AGENTS),
 });
@@ -87,7 +78,7 @@ const STEP_IDS = ["validate", "read", "research", "design", "check"] as const sa
 export const CURRENT_VERSION = 1;
 
 export const StoredBlueprintSchema = z.object({
-  v: z.literal(1),
+  v: z.literal(CURRENT_VERSION),
   slug: z.string().regex(/^[a-z0-9][a-z0-9-]{2,70}$/),
   createdAt: z.string(),
   kind: z.enum(["run", "example"]),
@@ -124,18 +115,18 @@ export const StoredBlueprintSchema = z.object({
 export type StoredBlueprint = z.infer<typeof StoredBlueprintSchema>;
 export type Receipt = NonNullable<StoredBlueprint["receipt"]>;
 
-/**
- * Upgrades an older stored blueprint to the current shape. v1 is current, so
- * this is the identity; future schema versions add cases here.
- */
-export function migrate(raw: unknown): unknown {
-  if (raw && typeof raw === "object" && "v" in raw) {
-    const v = (raw as { v: unknown }).v;
-    if (v === CURRENT_VERSION) return raw;
+export class UnsupportedVersionError extends Error {
+  constructor(readonly version: unknown) {
+    super(`Stored blueprint has version ${JSON.stringify(version)}; this build reads v${CURRENT_VERSION}`);
+    this.name = "UnsupportedVersionError";
   }
-  return raw;
 }
 
+const versionOf = (raw: unknown): unknown =>
+  raw && typeof raw === "object" ? (raw as { v?: unknown }).v : undefined;
+
 export function parseStoredBlueprint(raw: unknown): StoredBlueprint {
-  return StoredBlueprintSchema.parse(migrate(raw));
+  const version = versionOf(raw);
+  if (version !== CURRENT_VERSION) throw new UnsupportedVersionError(version);
+  return StoredBlueprintSchema.parse(raw);
 }

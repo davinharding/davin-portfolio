@@ -1,4 +1,3 @@
-// Server-only. Client construction, usage accounting, and SDK error mapping.
 import Anthropic, {
   APIConnectionError,
   APIUserAbortError,
@@ -9,18 +8,19 @@ import Anthropic, {
   RateLimitError,
   APIError,
 } from "@anthropic-ai/sdk";
+import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
+import type { JSONOutputFormat, Message } from "@anthropic-ai/sdk/resources/messages/messages";
+import type { z } from "zod";
 import { priceFor, WEB_SEARCH_USD } from "./config";
 import { RunError, type ErrorCode } from "./errors";
 
 let client: Anthropic | undefined;
 
-/** One shared client; `new Anthropic()` reads ANTHROPIC_API_KEY. */
 export function getAnthropic(): Anthropic {
   client ??= new Anthropic();
   return client;
 }
 
-/** The subset of the SDK's Usage object we account for. */
 export type UsageLike = {
   input_tokens?: number | null;
   output_tokens?: number | null;
@@ -36,7 +36,6 @@ export type UsageRecord = {
   webSearches: number;
 };
 
-/** Cache reads and writes are counted at the plain input rate so the estimate errs high. */
 export function toUsageRecord(model: string, usage: UsageLike | null | undefined): UsageRecord {
   const u = usage ?? {};
   return {
@@ -69,21 +68,46 @@ export function totals(records: UsageRecord[]) {
   );
 }
 
-/** Thrown by a stage when the model returned an unusable response. */
 export class ModelOutputError extends Error {
   constructor(
     readonly reason: "refusal" | "max_tokens" | "parse" | "empty",
-    readonly usage: UsageRecord | null
+    readonly usage: UsageRecord
   ) {
     super(`Model output unusable: ${reason}`);
     this.name = "ModelOutputError";
   }
 }
 
-/**
- * Maps any error thrown during a run to a visitor-facing code. Most specific
- * class first: several SDK classes inherit from each other.
- */
+export function jsonSchemaFormat(schema: z.ZodType): JSONOutputFormat {
+  const { type, schema: jsonSchema } = zodOutputFormat(schema);
+  return { type, schema: jsonSchema };
+}
+
+export type StructuredOutput<T> = { value: T; usage: UsageRecord; text: string };
+
+export function readStructuredOutput<T>(
+  model: string,
+  message: Pick<Message, "stop_reason" | "usage" | "content">,
+  schema: z.ZodType<T>
+): StructuredOutput<T> {
+  const usage = toUsageRecord(model, message.usage);
+  if (message.stop_reason === "refusal") throw new ModelOutputError("refusal", usage);
+  if (message.stop_reason === "max_tokens") throw new ModelOutputError("max_tokens", usage);
+  const text = message.content
+    .flatMap((block) => (block.type === "text" ? [block.text] : []))
+    .join("");
+  if (!text.trim()) throw new ModelOutputError("empty", usage);
+  let data: unknown;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    throw new ModelOutputError("parse", usage);
+  }
+  const parsed = schema.safeParse(data);
+  if (!parsed.success) throw new ModelOutputError("parse", usage);
+  return { value: parsed.data, usage, text };
+}
+
 export function mapRunError(err: unknown, deadlineHit: boolean): ErrorCode {
   if (err instanceof RunError) return err.code;
   if (deadlineHit) return "timeout";
@@ -93,8 +117,8 @@ export function mapRunError(err: unknown, deadlineHit: boolean): ErrorCode {
     return "live_disabled";
   }
   if (err instanceof RateLimitError) return "upstream";
-  if (err instanceof InternalServerError) return "upstream"; // includes 529 overloaded
-  if (err instanceof APIConnectionError) return "upstream"; // includes connection timeouts
+  if (err instanceof InternalServerError) return "upstream";
+  if (err instanceof APIConnectionError) return "upstream";
   if (err instanceof BadRequestError) {
     console.error("[thirty] Anthropic rejected the request shape:", err.message);
     return "internal";

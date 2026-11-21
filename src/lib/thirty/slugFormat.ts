@@ -1,5 +1,3 @@
-// Client-safe: what a blueprint slug looks like. Generation lives in slug.ts (server-only).
-
 export const SLUG_RE = /^[a-z0-9][a-z0-9-]{2,70}$/;
 export const EXAMPLE_PREFIX = "example-";
 

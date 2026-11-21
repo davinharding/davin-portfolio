@@ -1,8 +1,5 @@
 "use client";
 
-// The run behind every homepage design: the field's value, the request and its
-// event stream, errors, cancel, focus, and the timer. Designs differ only in how
-// they draw this state.
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { ERRORS, errorMessage, isErrorCode, type ErrorCode, type NextStep } from "@/lib/thirty/errors";
@@ -63,12 +60,10 @@ export function useBlueprintRun() {
   const [elapsedMs, setElapsedMs] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [hydrated, setHydrated] = useState(false);
-  /** Bumped whenever focus should return to the field once the form has rendered. */
   const [focusInput, setFocusInput] = useState(0);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
-  /** Any element inside the page's `data-thirty-stage` section. */
   const rootRef = useRef<HTMLDivElement>(null);
   const honeypotRef = useRef<HTMLInputElement>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -93,7 +88,6 @@ export function useBlueprintRun() {
     };
   }, []);
 
-  // Focus the field once the splash is gone, on fine pointers only, without scrolling.
   useEffect(() => {
     if (!window.matchMedia("(pointer: fine)").matches) return;
     const root = document.documentElement;
@@ -125,7 +119,6 @@ export function useBlueprintRun() {
     };
   }, []);
 
-  /** Stops any run in flight and shows the form again. */
   const resetToIdle = useCallback(() => {
     abandonRun({ abort: abortRef, cancelled: cancelledRef, busy: busyRef });
     setPhase("idle");
@@ -134,7 +127,6 @@ export function useBlueprintRun() {
     setStatusLine(null);
   }, []);
 
-  // Returning through the back-forward cache shows a fresh form.
   useEffect(() => {
     const onShow = (e: PageTransitionEvent) => {
       if (!e.persisted) return;
@@ -149,12 +141,10 @@ export function useBlueprintRun() {
     if (focusInput > 0) inputRef.current?.focus();
   }, [focusInput]);
 
-  // Move focus to the run view's heading when the run starts.
   useEffect(() => {
     if (phase === "submitting") headingRef.current?.focus({ preventScroll: true });
   }, [phase]);
 
-  // Timer: real elapsed time, ticking once a second under reduced motion.
   useEffect(() => {
     if (phase !== "running" && phase !== "submitting") return;
     const tick = () => setElapsedMs(Date.now() - startRef.current);
@@ -163,7 +153,6 @@ export function useBlueprintRun() {
     return () => clearInterval(id);
   }, [phase, reducedMotion]);
 
-  // The page background reacts to the active step through a data attribute.
   useEffect(() => {
     const stage = rootRef.current?.closest<HTMLElement>("[data-thirty-stage]");
     if (!stage) return;
@@ -272,9 +261,7 @@ export function useBlueprintRun() {
                 typeof data.error?.retryAfterSec === "number" ? data.error.retryAfterSec : undefined,
             };
           }
-        } catch {
-          // A platform error page, not our JSON: keep the generic message.
-        }
+        } catch {}
         if (!cancelledRef.current) showError(err);
         return;
       }
@@ -313,9 +300,7 @@ export function useBlueprintRun() {
             applyEvent(event);
           }
         }
-      } catch {
-        // Falls through to the lost-connection state below.
-      } finally {
+      } catch {} finally {
         clearTimeout(watchdog);
         reader.cancel().catch(() => undefined);
       }
@@ -362,23 +347,16 @@ export function useBlueprintRun() {
     busy,
     url,
     setUrl,
-    /** The host being drafted, as the server last named it. */
     host,
     steps,
     activeStep,
-    /** Agent names in the order they were drafted. */
     agents,
-    /** True once the design step has finished, so no more agents will arrive. */
     teamComplete,
-    /** The agent slots the homepage designs draw. */
     slots: agentSlots(agents, { busy, designing: activeStep === "design", teamComplete }),
-    /** The field's value as a host, once it looks like a website. */
     typedHost: looksLikeWebsite(url) ? displayHost(url) : null,
     company,
     error,
-    /** What the UI should offer after the current error. */
     next,
-    /** The last error points the visitor at the example blueprints. */
     offersExamples: next.includes("examples"),
     retryNote: error ? formatRetry(error.code, error.retryAfterSec) : null,
     statusLine,
@@ -391,9 +369,7 @@ export function useBlueprintRun() {
     rootRef,
     honeypotRef,
     onSubmit,
-    /** Starts a run for the field's current value. */
     retry: () => void start(url),
-    /** Undefined once the run can no longer be cancelled. */
     cancel: phase === "navigating" ? undefined : cancel,
   };
 }

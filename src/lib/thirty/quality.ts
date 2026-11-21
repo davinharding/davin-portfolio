@@ -1,4 +1,3 @@
-// Server-only. Normalization (repair, never fail) and the deterministic gate.
 import { PROJECT_KEYS } from "./projectCatalog";
 import { VALUE_KINDS, type AgentValue, type ModelBlueprint, type NormalizedBlueprint } from "./schema";
 
@@ -25,8 +24,6 @@ export const ARRAY_CAPS = { agents: 5, does: 4, tools: 6, scope: 5, caveats: 5 }
 
 const CONTROL = new RegExp("[\\u0000-\\u0008\\u000B-\\u001F\\u007F-\\u009F\\u200B-\\u200F\\u2028-\\u202E\\u2060-\\u206F]", "g");
 
-/** Trims, strips control characters and angle-bracket markup, collapses whitespace, caps length. */
-/** The page prefixes "Needs approval." / "Runs unattended.", so drop a repeat of that label. */
 function stripGateLabel(detail: string): string {
   const rest = detail.replace(/^(runs unattended|needs approval)\s*[:.,;-]*\s*/i, "");
   if (rest === detail || rest === "") return detail;
@@ -60,10 +57,6 @@ function cleanList(values: unknown, cap: number, maxItems: number): string[] {
 const RELATED = new Set<string>([...PROJECT_KEYS, "none"]);
 const KINDS = new Set<string>(VALUE_KINDS);
 
-/**
- * Cleans an agent's value case. Blueprints stored before `value` existed have
- * none, and stay without one so they normalize unchanged.
- */
 function normalizeValue(raw: unknown): AgentValue | undefined {
   if (!raw || typeof raw !== "object") return undefined;
   const v = raw as Record<string, unknown>;
@@ -123,7 +116,6 @@ export function normalizeBlueprint(raw: NormalizedBlueprint): NormalizedBlueprin
   };
 }
 
-/** Every string in the blueprint, for grounding and contact-detail checks. */
 export function blueprintStrings(bp: NormalizedBlueprint): string[] {
   const out: string[] = [bp.headline, bp.nonObvious, bp.firstBuild.agentName, bp.firstBuild.why];
   out.push(...bp.firstBuild.scope, ...bp.caveats);

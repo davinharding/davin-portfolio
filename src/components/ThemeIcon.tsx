@@ -2,8 +2,6 @@
 
 import { useId } from "react";
 
-// Sun that morphs into a crescent moon. Driven purely by the `light` class on
-// <html> (see .theme-icon in globals.css), so it is right from first paint.
 const RAYS = Array.from({ length: 8 }, (_, i) => i * 45);
 
 export default function ThemeIcon({ className = "" }: { className?: string }) {

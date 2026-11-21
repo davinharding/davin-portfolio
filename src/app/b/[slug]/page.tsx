@@ -7,9 +7,6 @@ import { isValidSlug } from "@/lib/thirty/slug";
 
 type Params = Promise<{ slug: string }>;
 
-// Rendered per request so a store outage reaches error.tsx: an ISR page whose
-// first render throws is served as a bare 500 instead. Repeat views still skip
-// Redis, because loadBlueprint caches the stored value for 5 minutes.
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {

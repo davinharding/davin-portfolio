@@ -1,8 +1,3 @@
-// Hand-written summaries of agent-relevant published projects. Kept separate
-// from projectData.ts (which imports images) so scripts and tests can load it.
-// Summaries and relevance lines restate only what projectData.ts says.
-// Visitors see only `relevance`, never model-written claims about this work.
-
 export const PROJECT_KEYS = [
   "apparelmagic-agents",
   "vibecation",
@@ -19,9 +14,7 @@ export type ProjectKey = (typeof PROJECT_KEYS)[number];
 export type CatalogEntry = {
   key: ProjectKey;
   projectName: string;
-  /** For the model: the agent pattern this project demonstrates. */
   summary: string;
-  /** Shown to visitors next to the link. Fixed text. */
   relevance: string;
 };
 
@@ -96,7 +89,6 @@ export function getCatalogEntry(key: string): CatalogEntry | undefined {
   return PROJECT_CATALOG.find((entry) => entry.key === key);
 }
 
-/** The catalog as the design step sees it: keys and pattern summaries only. */
 export function catalogForPrompt(): string {
   return PROJECT_CATALOG.map((e) => `- ${e.key}: ${e.summary}`).join("\n");
 }

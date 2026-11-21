@@ -59,14 +59,10 @@ const Header: React.FC<IHeaderProps> = ({ page }) => {
         <Link
           href="/"
           aria-label="Davin Harding — Home"
-          // From the prop, not the path: the homepage is prerendered at /home/<design>
-          // and rewritten to `/`, so the path differs between server and browser.
           aria-current={page === "index" ? "page" : undefined}
           className="transition-opacity hover:opacity-80"
           prefetch
         >
-          {/* Both marks are rendered and the html `light` class picks one, so
-              the right logo shows from first paint with no hydration swap. */}
           <span data-splash-target className="relative block h-10 w-10">
             <Image
               src="/logo.svg"
@@ -89,7 +85,6 @@ const Header: React.FC<IHeaderProps> = ({ page }) => {
           </span>
         </Link>
 
-        {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-1">
           <Button
             variant="ghost"
@@ -102,7 +97,6 @@ const Header: React.FC<IHeaderProps> = ({ page }) => {
             </Link>
           </Button>
 
-          {/* Portfolio Dropdown */}
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
               <Button
@@ -161,7 +155,6 @@ const Header: React.FC<IHeaderProps> = ({ page }) => {
           <ThemeMenu />
         </div>
 
-        {/* Mobile Navigation */}
         <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
           <SheetTrigger asChild className="md:hidden">
             <Button variant="ghost" size="icon" aria-label="Open navigation menu">

@@ -20,8 +20,6 @@ type LightboxCSSProperties = CSSProperties & {
   [key: `--yarl__${string}`]: string;
 };
 
-// The Zoom plugin derives its max zoom from slide.width/height, so slides
-// without dimensions fall back to the built-in renderer, which measures them.
 function NextJsImage({ slide, offset, rect, zoom = 1 }: RenderSlideProps) {
   if (!isImageSlide(slide) || !slide.width || !slide.height) return undefined;
 
@@ -120,30 +118,11 @@ export function LightboxModal({
           "--yarl__color_backdrop": "rgba(2, 6, 23, 0.95)",
           "--yarl__color_button": "hsl(217.2 91.2% 59.8%)",
           "--yarl__color_button_active": "hsl(217.2 91.2% 69.8%)",
-          "--yarl__thumbnails_thumbnail_border": "hsl(217.2 32.6% 17.5%)",
-          "--yarl__thumbnails_thumbnail_active_border":
+          "--yarl__thumbnails_thumbnail_border_color": "hsl(217.2 32.6% 17.5%)",
+          "--yarl__thumbnails_thumbnail_active_border_color":
             "hsl(217.2 91.2% 59.8%)",
-          "--yarl__thumbnails_container_background_color":
-            "rgba(2, 6, 23, 0.8)",
-          "--yarl__counter_container_background_color": "rgba(2, 6, 23, 0.7)",
         } as LightboxCSSProperties,
         toolbar: { backgroundColor: "transparent" },
-        navigationPrev: {
-          color: "hsl(217.2 91.2% 59.8%)",
-          filter: "drop-shadow(0 0 8px rgba(59, 130, 246, 0.3))",
-          transform: "none",
-          transition: "background-color 0.2s ease",
-          borderRadius: "12px",
-          padding: "8px",
-        },
-        navigationNext: {
-          color: "hsl(217.2 91.2% 59.8%)",
-          filter: "drop-shadow(0 0 8px rgba(59, 130, 246, 0.3))",
-          transform: "none",
-          transition: "background-color 0.2s ease",
-          borderRadius: "12px",
-          padding: "8px",
-        },
       }}
       controller={{
         closeOnBackdropClick: true,

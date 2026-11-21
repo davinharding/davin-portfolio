@@ -1,6 +1,3 @@
-// Server-only. Mock mode (THIRTY_MOCK=1, never in production): the real
-// orchestrator, store, limits, lock, and budget, with these stages standing in
-// for the network and the model. `<code>.test` hosts trigger specific outcomes.
 import { ModelOutputError, type UsageRecord } from "./anthropic";
 import { isErrorCode, RunError, type ErrorCode } from "./errors";
 import type { PageContent } from "./extract";
@@ -13,7 +10,6 @@ export const MOCK_MODELS: Models = {
   search: "mock-search",
 };
 
-/** The error code a mock host asks for, if any (`not-a-company.test` → `not_a_company`). */
 export function mockTrigger(host: string): ErrorCode | "slow" | "fallback" | "drop" | "five-agents" | null {
   if (!host.endsWith(".test")) return null;
   const label = host.slice(0, -".test".length).split(".").pop() ?? "";
@@ -22,7 +18,6 @@ export function mockTrigger(host: string): ErrorCode | "slow" | "fallback" | "dr
   return isErrorCode(code) ? code : null;
 }
 
-/** Codes the API route returns before the run starts, at the check where they occur. */
 export const MOCK_PRERUN_CODES: ReadonlySet<ErrorCode> = new Set([
   "bad_request",
   "invalid_url",
@@ -198,7 +193,6 @@ export function mockBlueprint(host: string): ModelBlueprint {
   };
 }
 
-/** `five-agents.test`: the most agents a blueprint can have, to exercise the widest layouts. */
 function fiveAgentBlueprint(host: string): ModelBlueprint {
   const base = mockBlueprint(host);
   const extra = (name: string, role: string): ModelBlueprint["agents"][number] => ({
@@ -239,7 +233,6 @@ function genericBlueprint(): ModelBlueprint {
   };
 }
 
-/** Stage implementations with realistic delays; `totalMs` spreads across the run. */
 export function mockStages(host: string, totalMs: number): Stages {
   const trigger = mockTrigger(host);
   const scale = trigger === "slow" ? 40_000 / Math.max(1, totalMs) : 1;

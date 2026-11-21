@@ -1,5 +1,3 @@
-// Server-only. When the site will not load for a bot, one hosted web search
-// call produces a plain-text brief that goes through the same research step.
 import type Anthropic from "@anthropic-ai/sdk";
 import type { ContentBlock, Message, MessageParam } from "@anthropic-ai/sdk/resources/messages/messages";
 import { LIMITS } from "./config";
@@ -15,7 +13,6 @@ export type SearchInput = {
   model: string;
   host: string;
   signal: AbortSignal;
-  /** Stage limit; defaults to 20 seconds. */
   stageMs?: number;
 };
 
@@ -27,7 +24,6 @@ function briefText(content: ContentBlock[]): string {
     .trim();
 }
 
-/** True when the model searched and every search came back as an error block. */
 function allSearchesFailed(content: ContentBlock[]): boolean {
   const results = content.filter(
     (b): b is Extract<ContentBlock, { type: "web_search_tool_result" }> =>
@@ -46,8 +42,6 @@ export async function searchBrief(input: SearchInput): Promise<SearchResult> {
   try {
     return await runSearch(input, signal, usage);
   } catch (err) {
-    // The search stage's own time limit counts as a failed fallback. The run's
-    // overall deadline and provider errors propagate to the pipeline.
     if (stage.aborted && !input.signal.aborted) return { ok: false, reason: "stage_timeout", usage };
     throw err;
   }
@@ -65,7 +59,6 @@ async function runSearch(input: SearchInput, signal: AbortSignal, usage: UsageRe
   const content: ContentBlock[] = [...response.content];
 
   if (response.stop_reason === "pause_turn") {
-    // The server paused a long tool loop; resend with its turn appended, once.
     response = await input.client.messages.create(
       {
         model: input.model,

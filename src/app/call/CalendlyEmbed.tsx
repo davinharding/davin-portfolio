@@ -26,8 +26,6 @@ function Spinner() {
 }
 
 export function CalendlyEmbed() {
-  // Which blueprint and homepage design led here. Read after mount, because the
-  // page is prerendered and both live in the browser (the query string and a cookie).
   const [context, setContext] = useState<{ slug?: string; utm: CalendlyUtm } | null>(null);
 
   useEffect(() => {

@@ -6,13 +6,11 @@ import { HomeView } from "./HomeView";
 
 type HomeStageProps = {
   design: HomeDesign;
-  /** The accent glow that follows the run step. Off for designs with their own background. */
   glow?: boolean;
   className?: string;
   children: React.ReactNode;
 };
 
-/** The frame every homepage design sits in: header, one full-height stage, footer. */
 export function HomeStage({ design, glow = true, className, children }: HomeStageProps) {
   return (
     <Layout page="index" fitViewport>

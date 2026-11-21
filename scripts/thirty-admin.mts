@@ -1,7 +1,3 @@
-// Admin commands against the production store (Redis env vars required).
-//   npm run thirty:admin -- get <slug>
-//   npm run thirty:admin -- delete <slug>
-//   npm run thirty:admin -- stats
 import { monthSpendMicros } from "../src/lib/thirty/budget";
 import { getConfig, hasRedisEnv } from "../src/lib/thirty/config";
 import { utcDay, utcMonth } from "../src/lib/thirty/limits";

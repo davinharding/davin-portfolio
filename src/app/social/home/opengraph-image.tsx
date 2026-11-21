@@ -1,8 +1,6 @@
 import { ImageResponse } from "next/og";
 import { HEADLINE, HOME_SOCIAL_IMAGE } from "@/lib/thirty/homeCopy";
 
-// The homepage's link preview. homeMetadata points at this route by URL; it is not
-// colocated with a page, so no page inherits it on its own.
 export const alt = HOME_SOCIAL_IMAGE.alt;
 export const size = { width: HOME_SOCIAL_IMAGE.width, height: HOME_SOCIAL_IMAGE.height };
 export const contentType = "image/png";
@@ -12,7 +10,6 @@ const MUTED = "#94a3b8";
 const BLUE = "#3b82f6";
 const CARET = "#60a5fa";
 
-/** The header's <D> mark, from public/logo.svg. */
 function Logo({ px }: { px: number }) {
   return (
     <svg width={px} height={px} viewBox="0 0 40 40" fill="none">
@@ -31,7 +28,6 @@ function Logo({ px }: { px: number }) {
   );
 }
 
-/** The homepage's org chart in miniature: you on top, three open agent roles below. */
 function TeamSketch() {
   const roles = [1, 2, 3];
   return (
@@ -49,7 +45,6 @@ function TeamSketch() {
         <div style={{ fontSize: 24, color: INK }}>Your team</div>
         <div style={{ fontSize: 17, color: MUTED, marginTop: 4 }}>Approves every gated action</div>
       </div>
-      {/* Stem, then a rail across the three roles, then a drop to each. */}
       <div style={{ width: 2, height: 28, background: "rgba(148,163,184,0.45)" }} />
       <div style={{ width: 252, height: 2, background: "rgba(148,163,184,0.45)" }} />
       <div style={{ display: "flex", justifyContent: "space-between", width: 360 }}>

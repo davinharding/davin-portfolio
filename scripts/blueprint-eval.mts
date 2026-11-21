@@ -1,25 +1,3 @@
-// Compares two versions of the blueprint design stage on the same company profiles.
-//
-//   npx tsx scripts/blueprint-eval.mts --label new [--out DIR] [--key-from FILE] [--force] host1 host2 ...
-//   npx tsx scripts/blueprint-eval.mts --judge [--out DIR] [--key-from FILE] [host ...]
-//   npx tsx scripts/blueprint-eval.mts --summary [--out DIR]
-//
-// Run mode reads each site and extracts its Profile with the real read and
-// research stages, caching it to <out>/<host>/profile.json so every variant sees
-// the exact same profile. It then drafts a blueprint with the production model
-// and effort, normalizes it, runs the gate once (no retry), and writes
-// <out>/<host>/<label>.json. To get a baseline, run this same script from a
-// checkout of the old code with another --label and the same --out.
-//
-// --judge asks a judge model, playing the paying decision maker, to score the
-// agents of two labels (--compare A,B; default old,new) shown as "Blueprint A"
-// and "Blueprint B" in a per-host random order. --summary writes
-// <out>/summary.md for old,new and <out>/summary-<a>-vs-<b>.md otherwise.
-//
-// It never touches Redis or the store and never goes through the pipeline or
-// the route handler. The only environment value it reads from --key-from
-// (default .env.local) is ANTHROPIC_API_KEY. --cap (default 3) stops any paid
-// call once the spend recorded under --out reaches that many US dollars.
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import Anthropic from "@anthropic-ai/sdk";
@@ -35,8 +13,6 @@ import type { Profile } from "../src/lib/thirty/schema";
 import { searchBrief } from "../src/lib/thirty/searchFallback";
 
 const JUDGE_MODEL = "claude-opus-5-5";
-
-// ---------- arguments ----------
 
 const argv = process.argv.slice(2);
 function option(name: string): string | undefined {
@@ -80,8 +56,6 @@ function usage(): never {
 }
 if (!summaryMode && !judgeMode && (!label || !/^[a-z0-9-]+$/.test(label) || hosts.length === 0)) usage();
 if (label === "profile" || label?.startsWith("judge")) usage();
-
-// ---------- files ----------
 
 const hostDir = (host: string) => path.join(outDir, host);
 const fileFor = (host: string, name: string) => path.join(hostDir(host), `${name}.json`);
@@ -128,7 +102,6 @@ type VariantFile = {
   blueprint: ReturnType<typeof normalizeBlueprint> | null;
 };
 
-/** Everything already spent under --out, from the usage each file recorded. */
 function spentSoFar(): number {
   let usd = 0;
   for (const host of listHosts()) {
@@ -148,9 +121,6 @@ function guardSpend(next: string) {
   }
 }
 
-// ---------- key ----------
-
-/** Puts ANTHROPIC_API_KEY, and nothing else, from the key file into the environment. */
 function loadApiKey() {
   if (process.env.ANTHROPIC_API_KEY) return;
   if (!existsSync(keyFrom)) {
@@ -168,8 +138,6 @@ function loadApiKey() {
     process.exit(2);
   }
 }
-
-// ---------- run mode ----------
 
 async function getProfile(client: Anthropic, host: string): Promise<ProfileFile | null> {
   const cached = readJson<ProfileFile>(fileFor(host, "profile"));
@@ -228,7 +196,6 @@ async function getProfile(client: Anthropic, host: string): Promise<ProfileFile 
   return file;
 }
 
-/** The company fields the pipeline passes to the gate. */
 function gateContext(profile: Profile) {
   return {
     companyName: cleanText(profile.companyName, 80),
@@ -263,7 +230,6 @@ async function runDesign(client: Anthropic, host: string, profile: Profile): Pro
     const designMs = Math.round(performance.now() - started);
     const usage = err instanceof ModelOutputError ? err.usage : null;
     const error = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
-    // A failed call is still billed for what it streamed; err high when unknown.
     const estCostUsd = usage ? costUsd([usage]) : costUsd([{ model: cfg.modelBlueprint, input: 6000, output: 8000, webSearches: 0 }]);
     return { ...base, ok: false, error, designMs, usage, estCostUsd, gate: null, blueprint: null };
   }
@@ -284,7 +250,6 @@ async function runMode() {
     if (!profileFile) continue;
     const out = await runDesign(client, host, profileFile.profile);
     if (existing && !existing.ok) {
-      // Keep the failed attempt's cost on record so the spend total stays honest.
       writeJson(fileFor(host, `${label}-failed-${Date.now()}`), existing);
     }
     writeJson(fileFor(host, label!), out);
@@ -293,8 +258,6 @@ async function runMode() {
   }
   console.log(`Recorded spend under ${outDir}: $${spentSoFar().toFixed(3)}`);
 }
-
-// ---------- judge mode ----------
 
 const AgentScore = z.object({
   name: z.string(),
@@ -341,7 +304,6 @@ Then say which blueprint you would rather buy (preferred, "A" or "B") and why in
 type ShownAgent = Record<string, unknown>;
 type StoredAgent = NonNullable<VariantFile["blueprint"]>["agents"][number];
 
-/** Name, role, what it does, and every payoff field the agent has. */
 function showAgent(a: StoredAgent): ShownAgent {
   const shown: ShownAgent = { name: a.name, role: a.role };
   if (a.value) {
@@ -439,8 +401,6 @@ async function runJudge() {
   for (const host of hosts.length ? hosts : listHosts()) await judgeHost(client, host);
   console.log(`Recorded spend under ${outDir}: $${spentSoFar().toFixed(3)}`);
 }
-
-// ---------- summary mode ----------
 
 const mean = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : NaN);
 function median(xs: number[]): number {

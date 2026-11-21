@@ -2,12 +2,6 @@
 
 import { useEffect, useRef, useCallback } from "react";
 
-// Floating gradient orbs with glow effect.
-// Performance contract:
-//  - skipped entirely on small screens (< 640 CSS px)
-//  - respects prefers-reduced-motion
-//  - pauses via IntersectionObserver when scrolled off-screen
-//  - pauses when the tab is hidden
 const WaveParticlesAlt: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>(0);
@@ -46,9 +40,7 @@ const WaveParticlesAlt: React.FC = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Skip on tiny viewports — particles add CPU/GPU load with little visual benefit
     if (typeof window !== "undefined" && window.innerWidth < 640) return;
-    // Respect reduced-motion preference
     if (
       typeof window !== "undefined" &&
       window.matchMedia &&

@@ -8,15 +8,12 @@ export type ExampleLinkItem = { slug: string; name: string; label: string };
 
 type ExampleLinksProps = {
   examples: readonly ExampleLinkItem[];
-  /** The last run error points here (live runs unavailable, or not a company): draw more attention. */
   offered?: boolean;
   className?: string;
 };
 
-/** The lead-in when an error offers the examples instead of a run. */
 export const EXAMPLES_OFFERED_LEAD = "These show the same thing:";
 
-/** Reports that an example blueprint was opened, and from which part of the page. */
 export function trackExampleOpened(slug: string, via: "links" | "chart"): void {
   track("example_opened", { example: slug, via });
 }

@@ -1,5 +1,3 @@
-// Server-only. The agent teams from the committed example blueprints, for the
-// Open roles design's chart. Derived, so the homepage never drifts from the examples.
 import { allExamples } from "./examples";
 
 export type SampleTeam = {

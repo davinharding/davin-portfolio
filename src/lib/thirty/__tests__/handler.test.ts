@@ -190,7 +190,6 @@ describe("runs", () => {
     const cached = await events(again);
     expect(cached.map((e) => e.t)).toEqual(["cached", "done"]);
     expect(startRun).toHaveBeenCalledTimes(1);
-    // Cache hits do not count against the visitor: one fresh run, one count.
     const counts = [...(store as unknown as { map: Map<string, { value: string }> }).map.entries()]
       .filter(([k]) => k.startsWith("rl:d:"))
       .map(([, v]) => v.value);
@@ -283,7 +282,6 @@ describe("runs", () => {
     expect(err.retryAfterSec).toBeGreaterThan(0);
     const cached = await events(await handle(jsonReq({ url: "a.test" })));
     expect(cached.map((e) => e.t)).toEqual(["cached", "done"]);
-    // A different visitor is unaffected.
     const other = await handle(jsonReq({ url: "d.test" }, { ip: "9.9.9.9" }));
     expect(other.status).toBe(200);
   });
@@ -347,7 +345,6 @@ describe("runs", () => {
     const handle = createBlueprintHandler(makeDeps());
     await store.set(keys.lock("acme.test"), "someone-else", { ex: 100 });
     const resP = handle(jsonReq({ url: "acme.test" }));
-    // The other run finishes and caches its blueprint.
     setTimeout(async () => {
       const other = await createBlueprintHandler(makeDeps())(formReq({ url: "seed.test" }, { ip: "7.7.7.7" }));
       const slug = other.headers.get("location")!.replace("/b/", "");
@@ -361,8 +358,7 @@ describe("runs", () => {
       expect.objectContaining({ t: "cached", slug: "acme-test-zzzzzzzz" }),
       { t: "done", slug: "acme-test-zzzzzzzz" },
     ]);
-    expect(startRun).toHaveBeenCalledTimes(1); // only the seed run
-    // The waiting visitor's count and the reservation were released.
+    expect(startRun).toHaveBeenCalledTimes(1);
     const budget = Number(await store.get(keys.budget(new Date().toISOString().slice(0, 7))));
     expect(budget).toBe(0);
   });
@@ -412,6 +408,47 @@ describe("runs", () => {
       expect(evs.filter((e) => e.t === "error")).toHaveLength(1);
     }
   );
+
+  it("refuses a run before taking quota or budget when it cannot be kept alive", async () => {
+    const quiet = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const noAfter = () => {
+      throw new Error("after() called outside a request scope");
+    };
+    const res = await createBlueprintHandler(makeDeps({ keepAlive: noAfter }))(jsonReq({ url: "acme.test" }));
+    quiet.mockRestore();
+    expect(res.status).toBe(503);
+    expect((await errorOf(res)).code).toBe("unavailable");
+    expect(startRun).not.toHaveBeenCalled();
+    const spent = [...(store as unknown as { map: Map<string, unknown> }).map.keys()].filter(
+      (k) => k.startsWith("rl:d:") || k.startsWith("day:") || k.startsWith("budget:") || k.startsWith("lock:")
+    );
+    expect(spent).toEqual([]);
+  });
+
+  it("still serves a cache hit when the analytics event cannot be kept alive", async () => {
+    const handle = createBlueprintHandler(makeDeps());
+    await events(await handle(jsonReq({ url: "acme.test" })));
+    await Promise.all(pending);
+    const quiet = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const noAfter = () => {
+      throw new Error("after() called outside a request scope");
+    };
+    const hit = await createBlueprintHandler(makeDeps({ keepAlive: noAfter }))(jsonReq({ url: "acme.test" }));
+    quiet.mockRestore();
+    expect((await events(hit)).map((e) => e.t)).toEqual(["cached", "done"]);
+  });
+
+  it("keeps the function alive until the run settles, and releases it on an early refusal", async () => {
+    const handle = createBlueprintHandler(makeDeps({}, { ipDailyRuns: 1 }));
+    await events(await handle(jsonReq({ url: "acme.test" })));
+    expect(pending).toHaveLength(1);
+    expect(await pending[0]).toMatchObject({ ok: true });
+
+    const refused = await handle(jsonReq({ url: "other.test" }));
+    expect(refused.status).toBe(429);
+    expect(pending).toHaveLength(2);
+    await expect(pending[1]).resolves.toBeUndefined();
+  });
 
   it("fallback.test takes the search path", async () => {
     const evs = await events(await createBlueprintHandler(makeDeps())(jsonReq({ url: "fallback.test" })));

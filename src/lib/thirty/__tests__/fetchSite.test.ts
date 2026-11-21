@@ -20,7 +20,6 @@ function netError(code: string) {
   return Object.assign(new TypeError("fetch failed"), { cause: { code } });
 }
 
-/** A transport keyed by URL; unknown URLs fail like DNS misses. */
 function transport(routes: Record<string, () => Response | Promise<Response>>) {
   const calls: string[] = [];
   const impl: FetchLike = async (url) => {
@@ -132,7 +131,7 @@ describe("fetchPage", () => {
   });
 
   it("decodes with the header charset, then the meta charset", async () => {
-    const latin1 = new Uint8Array([0x63, 0x61, 0x66, 0xe9]); // "café" in ISO-8859-1
+    const latin1 = new Uint8Array([0x63, 0x61, 0x66, 0xe9]);
     const viaHeader = transport({
       "https://acme.com/": () => respond(latin1, { headers: { "content-type": "text/html; charset=iso-8859-1" } }),
     });
@@ -247,8 +246,6 @@ describe("readSite", () => {
 });
 
 describe("guardedFetch", () => {
-  // net.connect never calls `lookup` for an IP literal, so the transport
-  // itself has to refuse them. No socket is opened by these calls.
   it.each(["http://127.0.0.1/", "http://169.254.169.254/latest/meta-data", "http://[::1]/", "http://8.8.8.8/"])(
     "refuses the IP literal %s without connecting",
     async (url) => {

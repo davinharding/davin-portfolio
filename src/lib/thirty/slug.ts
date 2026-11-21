@@ -1,4 +1,3 @@
-// Server-only.
 import { randomBytes } from "node:crypto";
 
 import { EXAMPLE_PREFIX } from "./slugFormat";
@@ -13,7 +12,6 @@ function base32(bytes: Uint8Array, length: number): string {
   return out;
 }
 
-/** `<host with dots as hyphens, max 40>-<8 random base32 chars>`. */
 export function makeSlug(host: string, random: (n: number) => Uint8Array = randomBytes): string {
   let stem = host
     .toLowerCase()
@@ -22,7 +20,6 @@ export function makeSlug(host: string, random: (n: number) => Uint8Array = rando
     .slice(0, 40)
     .replace(/-+$/, "");
   if (!stem) stem = "site";
-  // The example- prefix is reserved for committed examples.
   if (`${stem}-`.startsWith(EXAMPLE_PREFIX)) stem = `x-${stem}`.slice(0, 40).replace(/-+$/, "");
   return `${stem}-${base32(random(8), 8)}`;
 }

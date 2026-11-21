@@ -1,9 +1,5 @@
 import type { ResolvedTheme } from "@/lib/theme";
 
-// Decorative layer for the day/night reveal: a glowing horizon on the edge of
-// the reveal, plus a field of stars for night. Styles are
-// in globals.css under "Day/night reveal"; this only builds the elements.
-
 const REVEAL_MS = 900;
 const LIFETIME_MS = 2200;
 const STAR_COUNT = 70;
@@ -24,7 +20,6 @@ function addStars(layer: HTMLElement, origin: { x: number; y: number }, radius: 
   for (let i = 0; i < STAR_COUNT; i++) {
     const x = Math.random() * w;
     const y = Math.random() * h;
-    // Each star lights up just as the edge of the night sweeps over it
     const reach = Math.hypot(x - origin.x, y - origin.y) / radius;
     const delay = Math.round(REVEAL_MS * Math.pow(reach, 0.8));
     layer.append(

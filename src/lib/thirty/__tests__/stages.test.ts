@@ -1,6 +1,5 @@
 import type Anthropic from "@anthropic-ai/sdk";
 import {
-  AnthropicError,
   APIConnectionError,
   APIUserAbortError,
   AuthenticationError,
@@ -20,6 +19,20 @@ import { searchBrief } from "../searchFallback";
 
 const signal = new AbortController().signal;
 const baseUsage = { input_tokens: 100, output_tokens: 50, cache_creation_input_tokens: 10, cache_read_input_tokens: 5 };
+
+const reply = (stop_reason: string, body: string) => ({
+  stop_reason,
+  usage: baseUsage,
+  content: body ? [{ type: "text", text: body }] : [],
+});
+
+const UNUSABLE = [
+  ["refused", "refusal", "refusal", ""],
+  ["truncated", "max_tokens", "max_tokens", '{"companyName":"Ac'],
+  ["non-JSON", "parse", "end_turn", "I cannot help with that."],
+  ["off-schema", "parse", "end_turn", '{"companyName":42}'],
+  ["empty", "empty", "end_turn", ""],
+] as const;
 
 function client(messages: Record<string, unknown>): Anthropic {
   return { messages } as unknown as Anthropic;
@@ -45,31 +58,28 @@ describe("research", () => {
     expect(out).toContain("‹/website_content›");
   });
 
-  it("calls messages.parse with the structured output shape and returns the profile", async () => {
-    const parse = vi.fn(async () => ({ stop_reason: "end_turn", usage: baseUsage, parsed_output: mockProfile("acme.com") }));
-    const r = await extractProfile({ client: client({ parse }), model: "claude-haiku-5-5", host: "acme.com", pages: [page], signal });
+  it("calls messages.create with the structured output shape and returns the profile", async () => {
+    const create = vi.fn(async () => reply("end_turn", JSON.stringify(mockProfile("acme.com"))));
+    const r = await extractProfile({ client: client({ create }), model: "claude-haiku-5-5", host: "acme.com", pages: [page], signal });
     expect(r.profile.companyName).toBe("Acme");
     expect(r.usage).toEqual({ model: "claude-haiku-5-5", input: 115, output: 50, webSearches: 0 });
-    const [params, options] = parse.mock.calls[0] as unknown as [Record<string, unknown>, Record<string, unknown>];
+    const [params, options] = create.mock.calls[0] as unknown as [Record<string, unknown>, Record<string, unknown>];
     expect(params.model).toBe("claude-haiku-5-5");
     expect(params.max_tokens).toBe(2000);
     expect(params.output_config).toMatchObject({ effort: "low", format: { type: "json_schema" } });
+    expect(params.output_config).not.toHaveProperty("format.parse");
     for (const banned of ["temperature", "top_p", "top_k", "thinking", "tool_choice"]) expect(params).not.toHaveProperty(banned);
     expect((params.messages as Array<{ role: string }>).at(-1)?.role).toBe("user");
     expect(options).toMatchObject({ signal, timeout: 15_000, maxRetries: 1 });
   });
 
-  it("treats a refusal or an unparseable answer as a refusal", async () => {
-    const refused = vi.fn(async () => ({ stop_reason: "refusal", usage: baseUsage, parsed_output: null }));
-    await expect(
-      extractProfile({ client: client({ parse: refused }), model: "m", host: "acme.com", pages: [], signal })
-    ).rejects.toMatchObject({ reason: "refusal" });
-    const broken = vi.fn(async () => {
-      throw new AnthropicError("Failed to parse structured output");
-    });
-    await expect(
-      extractProfile({ client: client({ parse: broken }), model: "m", host: "acme.com", pages: [], signal })
-    ).rejects.toBeInstanceOf(ModelOutputError);
+  it.each(UNUSABLE)("reports %s output as %s and keeps the call's usage", async (_label, reason, stop, body) => {
+    const create = vi.fn(async () => reply(stop, body));
+    const err = await extractProfile({ client: client({ create }), model: "m", host: "acme.com", pages: [], signal }).catch(
+      (e: unknown) => e
+    );
+    expect(err).toBeInstanceOf(ModelOutputError);
+    expect(err).toMatchObject({ reason, usage: { model: "m", input: 115, output: 50 } });
   });
 });
 
@@ -142,8 +152,7 @@ describe("search fallback", () => {
 
 type Listener = (...args: unknown[]) => void;
 
-/** A stand-in for MessageStream that replays text deltas, then resolves or rejects finalMessage. */
-function fakeStream(deltas: string[], final: () => Promise<unknown>, snapshot?: Record<string, unknown>) {
+function fakeStream(deltas: string[], final: () => Promise<unknown>) {
   const listeners: Record<string, Listener[]> = {};
   return {
     on(event: string, fn: Listener) {
@@ -154,7 +163,6 @@ function fakeStream(deltas: string[], final: () => Promise<unknown>, snapshot?: 
       let acc = "";
       for (const d of deltas) {
         acc += d;
-        listeners.streamEvent?.forEach((fn) => fn({}, snapshot ?? {}));
         listeners.text?.forEach((fn) => fn(d, acc));
       }
       return final();
@@ -176,7 +184,7 @@ describe("design", () => {
   it("streams with structured output, emits each agent name once, and returns the parsed blueprint", async () => {
     const chunks = json.match(/.{1,40}/g)!;
     const stream = vi.fn(() =>
-      fakeStream(chunks, async () => ({ stop_reason: "end_turn", usage: baseUsage, parsed_output: bp }))
+      fakeStream(chunks, async () => reply("end_turn", json))
     );
     const names: string[] = [];
     const r = await draftBlueprint({
@@ -197,7 +205,7 @@ describe("design", () => {
   });
 
   it("sends the previous draft and the failed checks on a retry, ending on a user turn", async () => {
-    const stream = vi.fn(() => fakeStream([], async () => ({ stop_reason: "end_turn", usage: baseUsage, parsed_output: bp })));
+    const stream = vi.fn(() => fakeStream([], async () => reply("end_turn", json)));
     await draftBlueprint({
       client: client({ stream }),
       model: "m",
@@ -211,36 +219,30 @@ describe("design", () => {
     expect(params.messages[2].content).toContain("Only 2 agents");
   });
 
-  it("checks stop_reason: refusal and max_tokens", async () => {
-    for (const [stop, reason] of [
-      ["refusal", "refusal"],
-      ["max_tokens", "max_tokens"],
-    ] as const) {
-      const stream = vi.fn(() => fakeStream([], async () => ({ stop_reason: stop, usage: baseUsage, parsed_output: null })));
-      await expect(
-        draftBlueprint({ client: client({ stream }), model: "m", effort: "low", profile: mockProfile("a.com"), signal })
-      ).rejects.toMatchObject({ reason });
-    }
+  it.each(UNUSABLE)("reports a %s draft as %s and keeps the call's usage", async (_label, reason, stop, body) => {
+    const stream = vi.fn(() => fakeStream([body], async () => reply(stop, body)));
+    const err = await draftBlueprint({
+      client: client({ stream }),
+      model: "m",
+      effort: "low",
+      profile: mockProfile("a.com"),
+      signal,
+    }).catch((e: unknown) => e);
+    expect(err).toBeInstanceOf(ModelOutputError);
+    expect(err).toMatchObject({ reason, usage: { model: "m", input: 115, output: 50 } });
   });
 
-  it("reads the stop reason from the snapshot when the SDK's parse throws", async () => {
-    const stream = vi.fn(() =>
-      fakeStream(
-        ['{"head'],
-        async () => {
-          throw new AnthropicError("Failed to parse structured output");
-        },
-        { stop_reason: "refusal", usage: baseUsage }
-      )
-    );
-    await expect(
-      draftBlueprint({ client: client({ stream }), model: "m", effort: "low", profile: mockProfile("a.com"), signal })
-    ).rejects.toMatchObject({ reason: "refusal" });
+  it("asks the SDK for a plain JSON schema so it never parses the output itself", async () => {
+    const stream = vi.fn(() => fakeStream([], async () => reply("end_turn", json)));
+    await draftBlueprint({ client: client({ stream }), model: "m", effort: "low", profile: mockProfile("a.com"), signal });
+    const [params] = stream.mock.calls[0] as unknown as [{ output_config: { format: Record<string, unknown> } }];
+    expect(params.output_config.format.type).toBe("json_schema");
+    expect(params.output_config.format).not.toHaveProperty("parse");
   });
 
   it("a throwing progress callback never fails the draft", async () => {
     const stream = vi.fn(() =>
-      fakeStream(json.match(/.{1,40}/g)!, async () => ({ stop_reason: "end_turn", usage: baseUsage, parsed_output: bp }))
+      fakeStream(json.match(/.{1,40}/g)!, async () => reply("end_turn", json))
     );
     const r = await draftBlueprint({
       client: client({ stream }),
@@ -276,7 +278,8 @@ describe("usage and errors", () => {
     expect(mapRunError(new BadRequestError(400, undefined, "x", h), false)).toBe("internal");
     expect(mapRunError(new APIUserAbortError(), false)).toBe("timeout");
     expect(mapRunError(new Error("anything"), true)).toBe("timeout");
-    expect(mapRunError(new ModelOutputError("refusal", null), false)).toBe("declined");
+    expect(mapRunError(new ModelOutputError("refusal", toUsageRecord("m", baseUsage)), false)).toBe("declined");
+    expect(mapRunError(new ModelOutputError("parse", toUsageRecord("m", baseUsage)), false)).toBe("internal");
     expect(mapRunError(new Error("anything"), false)).toBe("internal");
     quiet.mockRestore();
   });

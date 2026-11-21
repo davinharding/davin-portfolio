@@ -6,7 +6,6 @@ import { SectionHeading } from "./SectionHeading";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-// Organize skills into categories
 const skillCategories: { title: string; skills: string[] }[] = [
   {
     title: "AI & Agentic Systems",
@@ -49,7 +48,6 @@ const skillCategories: { title: string; skills: string[] }[] = [
   },
 ];
 
-// Get skill data by name
 const getSkillByName = (name: string): SkillData | undefined => {
   return skillBadgeData.find((skill) => skill.name === name);
 };

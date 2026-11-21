@@ -7,15 +7,7 @@ export const maxDuration = 90;
 
 const handle = createBlueprintHandler({
   ...defaultDeps,
-  // The run must finish and be cached even after the visitor disconnects.
-  keepAlive: (work) => {
-    try {
-      after(() => work);
-    } catch (err) {
-      // Outside a request scope (should not happen here); the promise still runs.
-      console.error("[thirty] after() unavailable", err);
-    }
-  },
+  keepAlive: (work) => after(() => work),
 });
 
 export function POST(request: Request) {
