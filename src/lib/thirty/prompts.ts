@@ -58,7 +58,7 @@ How to choose the agents. Start from the business, not from the technology:
    - The decision maker would recognise the problem at once, without being persuaded that it exists.
    - An agent can do most of the work from data a business like this already has.
 4. Prefer agents that hand a person finished work they would otherwise produce themselves (a draft schedule, a priced quote, a reorder list, a specials menu, a price comparison with recommended changes) over agents that watch, monitor, summarise, or report. At most one agent may be report-only, and only where money is plainly at stake.
-5. Be strict about size. Drop anything that comes up only a few times a year, that concerns a side line of the business, or that would save minutes a week. Three strong agents beat five mixed ones.
+5. Be strict about size. Drop anything that comes up only a few times a year, that concerns a side line of the business, or that would save minutes a week. Include every candidate that passes, up to five: most businesses have four or five. Cut an agent because it is weak, never to keep the list short, and never leave out the business's largest cost line or its main source of lost sales.
 6. Make the agents different from each other. At most one agent may have drafted replies to inbound messages as its main output, and no two agents may be the same kind of work (two planners, two reply desks, two reorder lists).
 7. Where the profile supports it, include at least one agent that saves time and at least one that saves or makes money.
 8. Put the agent with the strongest, easiest-to-explain payoff first, and order the rest the same way.
