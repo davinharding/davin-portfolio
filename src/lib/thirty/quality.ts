@@ -1,4 +1,3 @@
-// Server-only. Normalization (repair, never fail) and the deterministic gate.
 import { PROJECT_KEYS } from "./projectCatalog";
 import type { ModelBlueprint, NormalizedBlueprint } from "./schema";
 
@@ -22,8 +21,6 @@ export const ARRAY_CAPS = { agents: 5, does: 4, tools: 6, scope: 5, caveats: 5 }
 
 const CONTROL = new RegExp("[\\u0000-\\u0008\\u000B-\\u001F\\u007F-\\u009F\\u200B-\\u200F\\u2028-\\u202E\\u2060-\\u206F]", "g");
 
-/** Trims, strips control characters and angle-bracket markup, collapses whitespace, caps length. */
-/** The page prefixes "Needs approval." / "Runs unattended.", so drop a repeat of that label. */
 function stripGateLabel(detail: string): string {
   const rest = detail.replace(/^(runs unattended|needs approval)\s*[:.,;-]*\s*/i, "");
   if (rest === detail || rest === "") return detail;
@@ -100,7 +97,6 @@ export function normalizeBlueprint(raw: ModelBlueprint): NormalizedBlueprint {
   };
 }
 
-/** Every string in the blueprint, for grounding and contact-detail checks. */
 export function blueprintStrings(bp: NormalizedBlueprint): string[] {
   const out: string[] = [bp.headline, bp.nonObvious, bp.firstBuild.agentName, bp.firstBuild.why];
   out.push(...bp.firstBuild.scope, ...bp.caveats);

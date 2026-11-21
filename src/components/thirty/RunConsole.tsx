@@ -30,7 +30,6 @@ function StepIcon({ status }: { status: ConsoleStepStatus }) {
   }
 }
 
-/** The run as a list of steps with what each one found. Takes the form's place while a run is on screen. */
 export function RunConsole({ run }: { run: BlueprintRun }) {
   const { host, steps, elapsedMs, reducedMotion, statusLine, slow, cancel } = run;
   const seconds = reducedMotion ? Math.floor(elapsedMs / 1000).toFixed(1) : (elapsedMs / 1000).toFixed(1);
@@ -50,7 +49,6 @@ export function RunConsole({ run }: { run: BlueprintRun }) {
           >
             Drafting a blueprint for {host}
           </h2>
-          {/* Compact screens skip the reminder (the form just said it) to keep the run on one screen. */}
           <p className={cn("text-xs text-muted-foreground mt-1", !slow && "compact:hidden")}>
             {slow ? SLOW_RUN_NOTE : RUN_PROMISE}
           </p>
@@ -89,7 +87,6 @@ export function RunConsole({ run }: { run: BlueprintRun }) {
                       </li>
                     ))}
                   </ul>
-                  {/* Compact screens keep every detail visible on one line so the run fits one screen. */}
                   <p className="mt-0.5 hidden truncate text-xs text-muted-foreground compact:block">
                     {step.details.join(" · ")}
                   </p>

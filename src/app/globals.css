@@ -2,16 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Splash intro. Server-rendered and CSS-driven so it plays from first paint:
-   a cursor blinks, the D draws around it, the brackets open, then
-   LoadingAnimation.tsx docks the mark onto the header logo. */
 .splash {
-  /* Mirrors public/logo.svg so the mark lands on the header logo unchanged */
   --splash-tile: #0f172a;
   --splash-ink: #f8fafc;
   --splash-caret: #60a5fa;
   --splash-bracket: #3b82f6;
-  /* Extra time the cursor blinks on its own before the D starts drawing */
   --splash-lead: 0.7s;
   position: fixed;
   inset: 0;
@@ -19,18 +14,15 @@
   display: grid;
   place-items: center;
   pointer-events: none;
-  /* Failsafe: reveal the page even if the script never runs */
   animation: splash-failsafe 0.4s ease 3.6s forwards;
 }
 
-/* Mirrors public/logo-light.svg */
 .light .splash {
   --splash-tile: #e2e8f0;
   --splash-ink: #0f172a;
   --splash-caret: #2563eb;
 }
 
-/* Repeat visits (class added by the inline script in <head>) skip the splash */
 html.loader-done .splash {
   display: none;
 }
@@ -48,7 +40,6 @@ html.loader-done .splash {
   transition: opacity 0.45s ease;
 }
 
-/* Dot grid, masked so it fades out toward the edges */
 .splash__backdrop::before {
   content: "";
   position: absolute;
@@ -61,7 +52,6 @@ html.loader-done .splash {
   animation: splash-fade-in 0.9s ease 0.2s forwards;
 }
 
-/* Glow that blooms behind the mark as the brackets open */
 .splash__backdrop::after {
   content: "";
   position: absolute;
@@ -106,7 +96,6 @@ html.loader-done .splash {
   opacity: 0;
 }
 
-/* Stem and bowl both start at the top-left corner and meet at the bottom */
 .splash__letter {
   stroke: var(--splash-ink);
   stroke-width: 2.5;
@@ -136,7 +125,6 @@ html.loader-done .splash {
   font-size: 0.75rem;
   font-weight: 500;
   letter-spacing: 0.42em;
-  /* Offsets the trailing letter-spacing so the text stays optically centered */
   text-indent: 0.42em;
   text-transform: uppercase;
   white-space: nowrap;
@@ -146,8 +134,6 @@ html.loader-done .splash {
   animation: splash-name 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) calc(0.9s + var(--splash-lead)) forwards;
 }
 
-/* Docking: the mark flies to the header logo (offsets measured in
-   LoadingAnimation.tsx) while the page is revealed underneath. */
 .splash--docking {
   animation: none;
   opacity: 0;
@@ -200,7 +186,6 @@ html.loader-done .splash {
 }
 
 @layer base {
-  /* Smoothly transition only theme-affected surfaces, not every node in the DOM */
   html.theme-transition,
   html.theme-transition body,
   html.theme-transition .theme-surface {
@@ -263,7 +248,6 @@ html.loader-done .splash {
   body {
     @apply bg-background text-foreground;
   }
-  /* Respect users who prefer reduced motion */
   @media (prefers-reduced-motion: reduce) {
     html {
       scroll-behavior: auto;
@@ -277,7 +261,6 @@ html.loader-done .splash {
       scroll-behavior: auto !important;
     }
   }
-  /* Visible focus ring for keyboard users on every interactive element */
   :focus-visible {
     outline: 2px solid hsl(var(--ring));
     outline-offset: 2px;
@@ -285,8 +268,6 @@ html.loader-done .splash {
   }
 }
 
-/* Thirty Seconds homepage: a restrained accent glow that moves with the run.
-   BlueprintLauncher sets data-step on the stage; only custom properties change. */
 @property --stage-glow-x {
   syntax: "<percentage>";
   inherits: false;
@@ -334,8 +315,6 @@ html.loader-done .splash {
   }
 }
 
-/* While the run console is on screen the headline steps down so the run fits
-   one screen. The stage is data-step="idle" whenever the form shows. */
 .thirty-hero {
   transition: font-size 200ms ease, margin 200ms ease;
 }
@@ -348,7 +327,6 @@ html.loader-done .splash {
   }
 }
 
-/* Blueprint org chart: a vertical rail on narrow screens, a tree from md up. */
 .org-chart__agents {
   --org-gap: 0.75rem;
   position: relative;
@@ -421,11 +399,6 @@ html.loader-done .splash {
   }
 }
 
-/* ---------------------------------------------------------------------------
-   Homepage designs (docs/specs/home-design-experiment.md)
-   --------------------------------------------------------------------------- */
-
-/* Open roles: on the homepage the chart is a two-column grid on phones, not a rail. */
 @media (max-width: 767px) {
   .org-chart__agents--grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -442,7 +415,6 @@ html.loader-done .splash {
   }
 }
 
-/* Open roles: one role in the chart, open until the run fills it. */
 .team-slot {
   display: block;
   height: 100%;
@@ -483,8 +455,6 @@ a.team-slot:hover {
   from { opacity: 0; transform: translateY(4px); }
 }
 
-/* Drafting table: grid paper, with a brighter patch that follows the cursor
-   (--paper-x and --paper-y are set by DraftingTableContent). */
 .drafting-paper {
   isolation: isolate;
   --paper-x: 72%;
@@ -532,8 +502,6 @@ a.team-slot:hover {
   }
 }
 
-/* Drafting table: the schematic. Every line is a dashed construction line with
-   a solid ink line over it; BlueprintDrawing sets how much ink is drawn. */
 .drafting-construct {
   fill: none;
   stroke: hsl(var(--foreground) / 0.2);
@@ -577,8 +545,6 @@ a.team-slot:hover {
 .drafting-t--ink {
   fill: hsl(var(--primary));
 }
-/* The phone layout is drawn at a smaller scale, so its type is set larger: at
-   least 10 px on screen in a 328 px container (drawingScale.ts). */
 .drafting-drawing--narrow .drafting-t,
 .drafting-drawing--narrow .drafting-t--label {
   font-size: 9.5px;
@@ -597,7 +563,6 @@ a.team-slot:hover {
   from { opacity: 0; transform: translateY(3px); }
 }
 
-/* Mobile viewport height fix - accounts for browser UI */
 @supports (height: 100dvh) {
   .min-h-screen-mobile {
     min-height: 100dvh;
@@ -611,7 +576,6 @@ a.team-slot:hover {
   }
 }
 
-/* Typography utilities */
 .heading-hero {
   @apply text-4xl md:text-6xl lg:text-7xl font-semibold tracking-tight text-foreground;
 }
@@ -628,7 +592,6 @@ a.team-slot:hover {
   @apply text-xs md:text-sm text-muted-foreground uppercase tracking-[0.15em];
 }
 
-/* Container utilities */
 .container-narrow {
   @apply max-w-5xl mx-auto px-4 md:px-6 lg:px-8;
 }
@@ -637,7 +600,6 @@ a.team-slot:hover {
   @apply py-16 md:py-24;
 }
 
-/* Lightbox custom styles */
 .yarl__root {
   --yarl__slide_captions_container_background: rgba(2, 6, 23, 0.8);
   font-family: inherit;
@@ -677,7 +639,6 @@ a.team-slot:hover {
   border-color: rgba(59, 130, 246, 0.5);
 }
 
-/* Lightbox arrow fixes */
 .yarl__navigation_prev,
 .yarl__navigation_next {
   transform: none !important;
@@ -738,7 +699,6 @@ a.team-slot:hover {
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
-/* Zoom cursor */
 .yarl__slide:hover {
   cursor: zoom-in;
 }
@@ -747,7 +707,6 @@ a.team-slot:hover {
   cursor: zoom-out;
 }
 
-/* Animation for lightbox opening */
 @keyframes lightboxFadeIn {
   from {
     opacity: 0;
@@ -763,7 +722,6 @@ a.team-slot:hover {
   animation: lightboxFadeIn 0.3s ease-out;
 }
 
-/* Calendly embed: hide internal scrollbar and remove the inline-iframe baseline gap */
 .calendly-wrapper {
   overflow: hidden;
   font-size: 0;
@@ -786,17 +744,11 @@ a.team-slot:hover {
   height: 0 !important;
 }
 
-/* ---------------------------------------------------------------------------
-   Theme chrome
-   --------------------------------------------------------------------------- */
-
-/* Header logo: both marks are in the DOM, the html class picks one */
 html.light .theme-logo-dark,
 html:not(.light) .theme-logo-light {
   visibility: hidden;
 }
 
-/* Sun ⇄ crescent moon. Dark (default) shows the moon. */
 .theme-icon {
   overflow: visible;
 }
@@ -828,12 +780,6 @@ html.light .theme-icon__rays {
   transform: none;
 }
 
-/* ---------------------------------------------------------------------------
-   Day/night reveal (driven by ThemeProvider.tsx + lib/themeFx.ts)
-   The new theme spreads out as a circle from the toggle, its edge lit like a
-   horizon: a soft warm dawn line for day, stars wink on as night sweeps past.
-   --------------------------------------------------------------------------- */
-
 html[data-theme-transition]::view-transition-old(root),
 html[data-theme-transition]::view-transition-new(root) {
   animation: none;
@@ -862,18 +808,17 @@ html[data-theme-transition]::view-transition-new(root) {
 }
 
 .theme-fx--day {
-  --fx-glow: 251 191 36; /* amber-400 */
-  --fx-glow-inner: 254 243 199; /* amber-100 */
-  --fx-edge: 0.45; /* gentler than night: a bright edge reads loud on a light page */
+  --fx-glow: 251 191 36;
+  --fx-glow-inner: 254 243 199;
+  --fx-edge: 0.45;
 }
 
 .theme-fx--night {
-  --fx-glow: 96 165 250; /* blue-400, the site's primary */
-  --fx-glow-inner: 139 92 246; /* violet-500 */
+  --fx-glow: 96 165 250;
+  --fx-glow-inner: 139 92 246;
   --fx-edge: 0.9;
 }
 
-/* Glowing band riding the edge of the reveal, in lockstep with its clip-path */
 .theme-fx__horizon {
   position: absolute;
   left: calc(var(--fx-x) - var(--fx-r));
@@ -907,7 +852,6 @@ html[data-theme-transition]::view-transition-new(root) {
   }
 }
 
-/* Night: stars light up as the edge sweeps over them (delay set per star) */
 .theme-fx__star {
   position: absolute;
   width: var(--size);

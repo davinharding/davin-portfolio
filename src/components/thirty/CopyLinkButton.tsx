@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { Check, Link2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-/** Copies the page URL; falls back to a selected read-only field when the clipboard is unavailable. */
 export function CopyLinkButton({ fallbackUrl }: { fallbackUrl: string }) {
   const [url, setUrl] = useState(fallbackUrl);
   const [state, setState] = useState<"idle" | "copied" | "manual">("idle");

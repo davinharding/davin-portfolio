@@ -1,5 +1,3 @@
-// Server-only. One small key-value interface over Upstash Redis, with an
-// in-memory implementation for local development and tests.
 import { Redis } from "@upstash/redis";
 import { hasRedisEnv, isMockMode, isProduction, LIMITS } from "./config";
 
@@ -7,7 +5,6 @@ export type SetOptions = { ex?: number; nx?: boolean };
 
 export interface Store {
   get(key: string): Promise<string | null>;
-  /** Returns false when `nx` is set and the key already exists. */
   set(key: string, value: string, opts?: SetOptions): Promise<boolean>;
   del(key: string): Promise<void>;
   incr(key: string): Promise<number>;
@@ -78,7 +75,6 @@ export class MemoryStore implements Store {
     if (entry) entry.expiresAt = this.now() + seconds * 1000;
   }
 
-  /** Test helper. */
   clear() {
     this.map.clear();
   }
@@ -93,7 +89,6 @@ export class UpstashStore implements Store {
     const token =
       e.KV_REST_API_URL && e.KV_REST_API_TOKEN ? e.KV_REST_API_TOKEN : e.UPSTASH_REDIS_REST_TOKEN;
     if (!url || !token) throw new StoreError("Redis environment is not configured");
-    // Values stay raw strings; we parse JSON ourselves.
     return new UpstashStore(new Redis({ url, token, automaticDeserialization: false }));
   }
 
@@ -144,7 +139,6 @@ function withTimeout<T>(promise: Promise<T>, ms: number, op: string): Promise<T>
     .finally(() => clearTimeout(timer));
 }
 
-/** Wraps every call with a timeout and normalizes failures to StoreError. */
 export class GuardedStore implements Store {
   constructor(
     private readonly inner: Store,
@@ -173,19 +167,11 @@ export class GuardedStore implements Store {
   }
 }
 
-// Module state survives dev hot reloads and is shared between the API route
-// and page renders in one server process.
 const globalForStore = globalThis as unknown as {
   __thirtyMemoryMap?: Map<string, Entry>;
   __thirtyStore?: Store | null;
 };
 
-/**
- * Returns the configured store: the in-memory store in mock mode (so local mock
- * runs never write fixtures or use up the daily cap in a shared Redis), Upstash
- * when its env exists, the in-memory store outside production, otherwise null
- * (live runs are then disabled).
- */
 export function getStore(): Store | null {
   if (globalForStore.__thirtyStore !== undefined) return globalForStore.__thirtyStore;
   let store: Store | null = null;
@@ -198,7 +184,6 @@ export function getStore(): Store | null {
   return store;
 }
 
-/** Test hook: replace (or reset with undefined) the process-wide store. */
 export function setStoreForTesting(store: Store | null | undefined) {
   globalForStore.__thirtyStore = store;
 }

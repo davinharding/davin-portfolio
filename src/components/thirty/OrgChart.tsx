@@ -2,7 +2,6 @@ import type { CSSProperties } from "react";
 import { Lock, UserCheck } from "lucide-react";
 import type { NormalizedAgent } from "@/lib/thirty/schema";
 
-/** The lock on an agent that needs a person's approval before it acts. */
 export function GateBadge() {
   return (
     <span

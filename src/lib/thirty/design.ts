@@ -1,5 +1,3 @@
-// Server-only. Blueprint drafting with the blueprint model, streamed so agent
-// names can be shown as they are written. Sees only the structured profile.
 import type Anthropic from "@anthropic-ai/sdk";
 import { AnthropicError, APIError } from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
@@ -10,10 +8,6 @@ import { catalogForPrompt } from "./projectCatalog";
 import { DESIGN_SYSTEM, designRetryMessage, designUserMessage } from "./prompts";
 import { ModelBlueprintSchema, type ModelBlueprint, type Profile } from "./schema";
 
-/**
- * Finds complete agent names in partial JSON. An agent's `name` is followed by
- * its `role`, which tools never have, so tool names are not picked up.
- */
 export function findAgentNames(partialJson: string): string[] {
   const names: string[] = [];
   const re = /"name"\s*:\s*"((?:[^"\\]|\\.)*)"\s*,\s*"role"/g;
@@ -22,9 +16,7 @@ export function findAgentNames(partialJson: string): string[] {
     try {
       const name = (JSON.parse(`"${m[1]}"`) as string).trim();
       if (name && !names.includes(name)) names.push(name);
-    } catch {
-      // A malformed escape mid-stream; the final parse is the authority.
-    }
+    } catch {}
   }
   return names;
 }
@@ -87,18 +79,13 @@ export async function draftBlueprint(input: DesignInput): Promise<DesignResult> 
         seen.add(name);
         input.onAgentName(name);
       }
-    } catch {
-      // Progress display must never fail the run.
-    }
+    } catch {}
   });
 
   let message: Awaited<ReturnType<typeof stream.finalMessage>>;
   try {
     message = await stream.finalMessage();
   } catch (err) {
-    // The SDK parses structured output inside finalMessage and throws a plain
-    // AnthropicError when the text does not match. Read the stop reason from
-    // the last snapshot to tell a refusal from a truncated or malformed draft.
     if (err instanceof AnthropicError && !(err instanceof APIError) && snapshot) {
       const usage = toUsageRecord(input.model, snapshot.usage);
       if (snapshot.stop_reason === "refusal") throw new ModelOutputError("refusal", usage);

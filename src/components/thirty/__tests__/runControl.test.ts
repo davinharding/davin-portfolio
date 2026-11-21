@@ -7,8 +7,6 @@ describe("abandonRun", () => {
     const refs = { abort: { current: controller }, cancelled: { current: false }, busy: { current: true } };
     abandonRun(refs);
     expect(controller.signal.aborted).toBe(true);
-    // FM-09: the back-forward cache restore once aborted without this mark, and the
-    // aborted stream then showed "Lost the connection" instead of a fresh form.
     expect(refs.cancelled.current).toBe(true);
     expect(refs.busy.current).toBe(false);
   });

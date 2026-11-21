@@ -1,6 +1,3 @@
-// Answers from PostHog's own flags endpoint, captured by the agreement test in
-// docs/specs/home-design-experiment.md (section 11.3). They pin assignVariant()
-// to what PostHog computes. Written by scripts/home-design-agreement.mts.
 export const POSTHOG_VECTORS: { flagKey: string; pairs: ReadonlyArray<readonly [id: string, variant: string]> } = {
   flagKey: "home-design-selftest",
   pairs: [

@@ -68,7 +68,6 @@ const config: Config = {
   },
   plugins: [
     require("tailwindcss-animate"),
-    // Phones and short windows, where the homepage run console must stay compact to fit one screen.
     plugin(({ addVariant }) => addVariant("compact", "@media (max-width: 639px), (max-height: 820px)")),
   ],
 };

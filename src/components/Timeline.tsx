@@ -12,7 +12,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 
 const Timeline: React.FC = () => {
-  // Defensive filter so a future "marker" entry without a summary doesn't render
   const filteredData = timelineData.filter((item) => item.summary);
 
   return (

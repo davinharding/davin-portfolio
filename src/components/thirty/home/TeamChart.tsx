@@ -12,17 +12,11 @@ import type { BlueprintRun } from "../useBlueprintRun";
 
 const ROTATE_MS = 4200;
 
-/**
- * The blueprint's org chart, on the homepage. With nothing typed it shows teams
- * from earlier runs. Once an address is typed it is the visitor's own team with
- * open roles, which fill as the run drafts each agent.
- */
 export function TeamChart({ run, teams }: { run: BlueprintRun; teams: readonly SampleTeam[] }) {
   const [index, setIndex] = useState(0);
   const [pinned, setPinned] = useState(false);
   const [inside, setInside] = useState(false);
 
-  // An error that points at the examples brings the sample teams back, whatever is typed.
   const wantsSamples = run.url.trim() === "" || run.offersExamples;
   const mode = run.busy ? "run" : wantsSamples && teams.length > 0 ? "sample" : "yours";
   const team = teams[index % Math.max(1, teams.length)];
@@ -91,7 +85,6 @@ export function TeamChart({ run, teams }: { run: BlueprintRun; teams: readonly S
               Open the {team.company} blueprint
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
             </Link>
-            {/* Without JavaScript the buttons above do nothing, so list every example. */}
             <noscript>
               <ul className="flex w-full flex-wrap gap-x-4 gap-y-1">
                 {teams.map((t) => (

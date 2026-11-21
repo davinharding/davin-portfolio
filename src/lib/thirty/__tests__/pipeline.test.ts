@@ -143,7 +143,6 @@ describe("runPipeline happy path", () => {
     expect(saved.receipt.models).toEqual({ research: MODELS.research, blueprint: MODELS.blueprint });
     expect(saved.receipt.tokens).toEqual({ input: 4000, output: 3000 });
     expect(saved.receipt.steps.map((s: { id: string }) => s.id)).toEqual(["validate", "read", "research", "design", "check"]);
-    // Haiku 1000 in / 500 out + Sonnet 3000 in / 2500 out
     const expected = (1000 * 0.1 + 500 * 0.5 + 3000 * 2 + 2500 * 10) / 1e6;
     expect(saved.receipt.estCostUsd).toBeCloseTo(expected, 6);
 
@@ -325,7 +324,6 @@ const failureCases: FailureCase[] = [
     refund: true,
   },
   {
-    // The site answered (a bot challenge), so a failed search is "could not read enough", not "no website".
     code: "not_enough_info",
     stages: () =>
       happyStages({
@@ -365,7 +363,6 @@ describe("runPipeline failures", () => {
     expect(events[events.length - 1]).toBe(term[0]);
     expect(await store.get(keys.lock(HOST))).toBeNull();
     expect(await store.get(keys.domain(HOST))).toBeNull();
-    // The reservation is replaced by the actual spend, never left open.
     expect(await budget()).toBeLessThan(150_000);
     expect(await store.get(keys.negative(HOST))).toBe(c.negative ? c.code : null);
     expect(await visitorCount()).toBe(c.refund ? 0 : 1);
@@ -380,9 +377,7 @@ describe("runPipeline failures", () => {
     const { outcome, events } = await run(stages);
     expect(outcome).toMatchObject({ ok: false, code: "not_enough_info" });
     expect(terminals(events)).toEqual([expect.objectContaining({ t: "error", code: "not_enough_info" })]);
-    // Cached, so the same slow search is not paid for again today.
     expect(await store.get(keys.negative(HOST))).toBe("not_enough_info");
-    // The cut-off call reported no usage but may still be billed.
     expect(await budget()).toBe(150_000);
     expect(JSON.parse(logs.at(-1)!)).toMatchObject({ outcome: "not_enough_info", spendUnknown: true, budgetChargedUsd: 0.15 });
   });

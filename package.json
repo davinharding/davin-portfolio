@@ -6,11 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint . --ext .ts,.tsx --max-warnings=0",
+    "lint": "eslint . --ext .ts,.tsx,.js,.mjs,.mts --rulesdir eslint-rules --max-warnings=0 && node scripts/comment-baseline.mjs --check-css",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "thirty:examples": "tsx --env-file-if-exists=.env.local scripts/thirty-examples.mts",
-    "thirty:admin": "tsx --env-file-if-exists=.env.local scripts/thirty-admin.mts"
+    "thirty:admin": "tsx --env-file-if-exists=.env.local scripts/thirty-admin.mts",
+    "comments:baseline": "node scripts/comment-baseline.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.8.0",

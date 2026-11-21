@@ -4,18 +4,15 @@ const nextConfig = {
   poweredByHeader: false,
   compress: true,
   productionBrowserSourceMaps: false,
-  // PostHog's API paths end in a slash; redirecting them would break capture.
   skipTrailingSlashRedirect: true,
 
   images: {
     formats: ["image/avif", "image/webp"],
     deviceSizes: [360, 640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days
+    minimumCacheTTL: 60 * 60 * 24 * 30,
   },
 
-  // Same-origin proxy for PostHog (POSTHOG_PROXY_PATH in src/lib/analytics/config.ts),
-  // so ad blockers that drop third-party analytics hosts keep the events.
   async rewrites() {
     return [
       { source: "/relay-dh/static/:path*", destination: "https://us-assets.i.posthog.com/static/:path*" },

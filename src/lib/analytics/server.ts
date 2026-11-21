@@ -1,11 +1,8 @@
-// Server-only. Sends one event to PostHog's capture endpoint. Never throws and
-// gives up after 2 seconds, so a slow or failing PostHog cannot hold up a run.
 import { analyticsEnvironment, posthogIngestHost, posthogKey } from "./config";
 
 export type ServerEvent = {
   event: string;
   distinctId: string;
-  /** The browser's PostHog session id, which links the event to its replay. */
   sessionId?: string;
   properties?: Record<string, unknown>;
   set?: Record<string, unknown>;
@@ -36,7 +33,6 @@ export async function captureServerEvent(
           ...e.properties,
           environment: analyticsEnvironment(),
           $lib: "davin-server",
-          // The request comes from Vercel, so its IP would place every visitor in a data center.
           $geoip_disable: true,
           ...(e.sessionId ? { $session_id: e.sessionId } : {}),
           ...(e.set ? { $set: e.set } : {}),

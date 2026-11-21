@@ -97,13 +97,6 @@ export type Project = {
   liveLink?: string;
   smartContractLink?: string;
   name: string;
-  /**
-   * When true, the project is treated as a work-in-progress and is hidden from
-   * public listings (home page, /portfolio, sitemap) and excluded from the
-   * static-params build. The detail page route still resolves so the project
-   * can be previewed by direct URL during iteration. Flip to `false` (or
-   * remove the field) to publish.
-   */
   draft?: boolean;
 };
 
@@ -143,25 +136,9 @@ const projectTags: { [key: string]: ProjectTag } = {
   NestJS: { title: "NestJS", icon: NestjsLogo },
 };
 
-/**
- * Returns every project that should be visible publicly (i.e. not flagged as
- * a `draft`). Use this anywhere projects are listed in navigation, the
- * sitemap, OG metadata, etc. The full `projects` array remains the source of
- * truth for direct-URL access so drafts can still be previewed by visiting
- * their detail route.
- */
 export const getPublishedProjects = (): Project[] =>
   projects.filter((project) => !project.draft);
 
-/**
- * Canonical path for a project's detail page. Centralized so the URL scheme
- * (and its encoding) lives in one place — the dynamic route, sitemap, header
- * dropdown, project cards, and metadata all consume this.
- *
- * `encodeURIComponent` is required because project names can contain spaces
- * and reserved characters; `encodeURI` would leave `&`, `?`, `#`, `+`, etc.
- * unescaped and break routing.
- */
 export const projectPath = (name: string): string =>
   `/portfolio/${encodeURIComponent(name)}`;
 

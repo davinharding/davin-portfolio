@@ -1,6 +1,3 @@
-// Server-only. Reads the environment on every call so tests (and a Vercel env
-// change picked up by a fresh function instance) see current values.
-
 export type Effort = "low" | "medium" | "high" | "xhigh" | "max";
 
 const EFFORTS: readonly Effort[] = ["low", "medium", "high", "xhigh", "max"];
@@ -9,17 +6,14 @@ export const DEFAULT_MODEL_RESEARCH = "claude-haiku-5-5";
 export const DEFAULT_MODEL_BLUEPRINT = "claude-sonnet-5-5";
 export const DEFAULT_USER_AGENT = "Mozilla/5.0 (compatible; BlueprintBot/1.0)";
 
-/** USD per million tokens. */
 export const PRICES: Record<string, { input: number; output: number }> = {
   "claude-haiku-5-5": { input: 0.1, output: 0.5 },
   "claude-sonnet-5-5": { input: 2.0, output: 10.0 },
   "claude-opus-5-5": { input: 4.0, output: 20.0 },
 };
-/** Unknown models are priced at the most expensive known rate so estimates err high. */
 const FALLBACK_PRICE = PRICES["claude-opus-5-5"];
 export const WEB_SEARCH_USD = 0.01;
 
-/** Budget reservation taken at run start, in micro-dollars ($0.15). */
 export const RESERVE_MICROS = 150_000;
 
 export const LIMITS = {
@@ -81,7 +75,6 @@ export function hasRedisEnv(): boolean {
   );
 }
 
-/** A store exists when Redis is configured, or outside production (in-memory). */
 export function hasStore(): boolean {
   return hasRedisEnv() || !isProduction();
 }
@@ -104,10 +97,6 @@ export function getConfig() {
 
 export type ThirtyConfig = ReturnType<typeof getConfig>;
 
-/**
- * Whether a fresh run may start. Availability is decided per request so the
- * kill switch works without a redeploy. Mock mode needs no API key.
- */
 export function isLiveEnabled(): boolean {
   const e = process.env;
   if ((e.THIRTY_LIVE ?? "on").trim().toLowerCase() === "off") return false;

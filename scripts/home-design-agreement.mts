@@ -1,12 +1,3 @@
-// Checks that the site's assignment hash agrees with PostHog's own evaluation.
-//
-//   npx tsx --env-file-if-exists=.env.local scripts/home-design-agreement.mts <flag-key> [count] [--write]
-//
-// <flag-key> must be an active multivariate flag in the PostHog project with the
-// same variants and split as EXPERIMENT_ARMS. The script asks PostHog's flags
-// endpoint for `count` random ids (default 200) and compares each answer with
-// assignVariant(). `--write` saves ten of the pairs as the unit test's fixed vectors.
-// It sends no events and creates no persons.
 import { writeFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import { fileURLToPath } from "node:url";

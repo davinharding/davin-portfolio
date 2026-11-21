@@ -5,7 +5,6 @@ type HeaderFooterProps = {
   children?: React.ReactNode;
   page?: string;
   mobile?: boolean;
-  /** Keep header, content, and footer within one screen; main takes the leftover height. */
   fitViewport?: boolean;
 };
 

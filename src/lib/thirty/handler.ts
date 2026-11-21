@@ -1,6 +1,3 @@
-// Server-only. POST /api/blueprint: the cheap checks in order, then a run (or
-// a cache hit, or a wait on someone else's run). Dependencies are injected so
-// the whole flow is testable without a network, a model, or Redis.
 import { captureServerEvent, type ReportEvent } from "@/lib/analytics/server";
 import { sanitizeAnalyticsId } from "@/lib/analytics/config";
 import { homeEventProps, readHomeAssignment } from "@/lib/experiments/homeDesign";
@@ -33,9 +30,7 @@ export type HandlerDeps = {
   isProduction: () => boolean;
   config: () => ThirtyConfig;
   startRun: (ctx: RunContext, emitter: RunEmitter, store: Store, mock: boolean) => Promise<RunOutcome>;
-  /** Keeps the function alive until the run settles (Next's `after`). */
   keepAlive: (work: Promise<unknown>) => void;
-  /** Sends a server-side analytics event; never throws. */
   report: ReportEvent;
   now: () => number;
   sleep: (ms: number) => Promise<void>;
@@ -111,11 +106,6 @@ function ndjson(events: RunEvent[]): Response {
   });
 }
 
-/**
- * Streams the emitter's events as NDJSON. A closed connection only detaches
- * this subscriber; the run itself carries on. `dropEarly` (mock `drop.test`)
- * closes the stream mid-run without a terminal event.
- */
 function streamEmitter(emitter: RunEmitter, dropEarly = false): Response {
   const encoder = new TextEncoder();
   let cleanup = () => undefined as void;
@@ -134,9 +124,7 @@ function streamEmitter(emitter: RunEmitter, dropEarly = false): Response {
         unsubscribe?.();
         try {
           controller.close();
-        } catch {
-          // Already closed by the client.
-        }
+        } catch {}
       };
       cleanup = close;
       const write = (event: RunEvent) => {
@@ -166,7 +154,6 @@ function streamEmitter(emitter: RunEmitter, dropEarly = false): Response {
 type ParsedBody = {
   url: unknown;
   honeypot: string;
-  /** The browser's PostHog distinct and session ids (JavaScript client only). */
   phId?: string;
   phSession?: string;
 };
@@ -219,7 +206,6 @@ function isCrossOrigin(request: Request, requestHost: string): boolean {
   return false;
 }
 
-/** Returns the slug if the host has a valid cached blueprint. */
 async function cachedSlug(store: Store, host: string): Promise<{ slug: string; createdAt: string } | null> {
   const slug = await store.get(keys.domain(host));
   if (!slug) return null;
@@ -247,7 +233,6 @@ async function waitForOtherRun(store: Store, host: string, deps: HandlerDeps): P
       if (hit) return { kind: "cached", ...hit };
       const neg = await store.get(keys.negative(host));
       if (neg && isErrorCode(neg)) return { kind: "error", code: neg };
-      // The other run finished without a result we can use (for example a timeout).
       const holder = await store.get(keys.lock(host));
       if (!holder) {
         const late = await cachedSlug(store, host);
@@ -269,24 +254,19 @@ export function createBlueprintHandler(deps: HandlerDeps) {
     const fail = (code: ErrorCode, host?: string | null, retryAfterSec?: number) =>
       errorResponse(mode, code, host, retryAfterSec);
 
-    // 1. Body
     if (mode === "json" && !contentType.includes("application/json")) return fail("bad_request");
     const body = await parseBody(request, mode);
     if (!body || typeof body.url !== "string") return fail("bad_request");
 
-    // 2. Same origin
     const requestHost = requestHostOf(request);
     if (isCrossOrigin(request, requestHost)) return fail("bad_request");
 
-    // 3. Honeypot
     if (body.honeypot.trim() !== "") return fail("bad_request");
 
     const cfg = deps.config();
     const mock = deps.isMockMode();
     const store = deps.getStore();
     const visitor = visitorId(clientIp(request.headers), cfg.ipSalt);
-    // Without JavaScript there is no browser id; the salted IP hash stands in (never the raw IP).
-    // The homepage design this visitor was served, so server events line up with the experiment.
     const home = readHomeAssignment(request.headers.get("cookie"));
     const analytics = {
       distinctId: body.phId ?? `visitor:${visitor}`,
@@ -296,12 +276,10 @@ export function createBlueprintHandler(deps: HandlerDeps) {
     const now = new Date(requestStartedAt);
 
     try {
-      // 4. Flood guard
       if (store && !(await checkFlood(store, visitor, now))) {
         return fail("too_fast", null, Math.max(1, 60 - now.getUTCSeconds()));
       }
 
-      // 5. Normalize
       const input = normalizeInput(body.url, { requestHost, allowTestTld: mock });
       if (!input.ok) return fail(input.code);
       const { host } = input;
@@ -313,7 +291,6 @@ export function createBlueprintHandler(deps: HandlerDeps) {
 
       const fresh = !deps.isProduction() && new URL(request.url).searchParams.get("fresh") === "1";
 
-      // 6. Positive cache
       if (store && !fresh) {
         const hit = await cachedSlug(store, host);
         if (hit) {
@@ -331,25 +308,20 @@ export function createBlueprintHandler(deps: HandlerDeps) {
             { t: "done", slug: hit.slug },
           ]);
         }
-        // 7. Negative cache
         const neg = await store.get(keys.negative(host));
         if (neg && isErrorCode(neg)) return fail(neg, host);
       }
 
-      // 8. Live availability
       if (!deps.isLiveEnabled() || !store || earlyMock("live_disabled")) return fail("live_disabled", host);
 
-      // 9. Store health: without the store we cannot enforce the budget.
       await store.get(keys.lock(host));
       if (earlyMock("unavailable")) return fail("unavailable", host);
 
-      // 10. Per-visitor daily limit
       const day = utcDay(now);
       if (earlyMock("rate_limited")) return fail("rate_limited", host, secondsToUtcMidnight(now));
       const visitorTake = await takeVisitorRun(store, visitor, now, cfg.ipDailyRuns);
       if (!visitorTake.ok) return fail("rate_limited", host, visitorTake.retryAfterSec);
 
-      // 11. Global daily cap, then the monthly budget
       const globalOk = !earlyMock("capacity") && (await takeGlobalRun(store, now, cfg.dailyRuns));
       if (!globalOk) {
         await refundVisitorRun(store, visitor, day);
@@ -362,7 +334,6 @@ export function createBlueprintHandler(deps: HandlerDeps) {
         return fail("capacity", host);
       }
 
-      // 12. Per-host lock
       const runId = newRunId();
       if (!(await acquireLock(store, host, runId))) {
         await refundVisitorRun(store, visitor, day);
@@ -387,7 +358,6 @@ export function createBlueprintHandler(deps: HandlerDeps) {
         return streamEmitter(emitter);
       }
 
-      // 13. Run
       const emitter = new RunEmitter();
       const ctx: RunContext = {
         runId,

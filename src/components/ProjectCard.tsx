@@ -20,12 +20,10 @@ type IProjectCardProps = {
 
 const ProjectCard: React.FC<IProjectCardProps> = ({ project, index = 0 }) => {
   const detailHref = projectPath(project.name);
-  // First row (lg:grid-cols-3) is above-the-fold on most viewports.
   const isAboveTheFold = index < 3;
 
   return (
     <Card className="flex flex-col h-full transition-all duration-200 hover:-translate-y-1 hover:border-primary/50">
-      {/* Image */}
       <Link
         href={detailHref}
         prefetch
@@ -73,7 +71,6 @@ const ProjectCard: React.FC<IProjectCardProps> = ({ project, index = 0 }) => {
       </CardHeader>
 
       <CardContent className="flex-1">
-        {/* Tech Stack */}
         <div className="flex flex-wrap gap-1.5">
           {project.projectTags.slice(0, 4).map((projectTag, index) => (
             <Badge key={index} variant="secondary" className="text-xs">
@@ -88,7 +85,6 @@ const ProjectCard: React.FC<IProjectCardProps> = ({ project, index = 0 }) => {
         </div>
       </CardContent>
 
-      {/* Links */}
       <CardFooter className="flex flex-wrap gap-2 pt-0">
         {project.liveLink && (
           <Button variant="link" size="sm" asChild className="h-auto p-0">

@@ -14,13 +14,10 @@ function animationsFinished(el: Element, skip?: Animation) {
   );
 }
 
-// A delayed animation reports no progress until its delay has elapsed.
 function hasStarted(animation: Animation): boolean {
   return animation.effect?.getComputedTiming().progress != null;
 }
 
-// The motion lives in globals.css. This only measures where the mark has to
-// land so it ends up exactly on top of the header logo.
 function dockOntoHeaderLogo(splash: HTMLElement, mark: Element | null) {
   const logo = document.querySelector("[data-splash-target]");
   if (mark && logo) {
@@ -43,8 +40,6 @@ export default function LoadingAnimation() {
   useEffect(() => {
     const splash = splashRef.current;
     const [failsafe] = splash?.getAnimations() ?? [];
-    // No failsafe animation means CSS is hiding the splash: a repeat visit in
-    // this session, or the visitor prefers reduced motion.
     if (!splash || !failsafe) return;
 
     sessionStorage.setItem(STORAGE_KEY, "true");
@@ -53,8 +48,6 @@ export default function LoadingAnimation() {
     const finishIntro = async () => {
       await animationsFinished(splash, failsafe);
       if (!active) return;
-      // If hydration was slow enough that the CSS failsafe is already fading
-      // the splash out, let it finish instead of restarting with a dock.
       if (hasStarted(failsafe)) await failsafe.finished;
       else await dockOntoHeaderLogo(splash, markRef.current);
       if (active) document.documentElement.classList.add(DONE_CLASS);

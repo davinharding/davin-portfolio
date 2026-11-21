@@ -21,11 +21,8 @@ import {
 type Origin = { x: number; y: number };
 
 type ThemeContextType = {
-  /** What the visitor chose: follow the OS, or force light/dark. */
   preference: ThemePreference;
-  /** The theme actually on screen. */
   theme: ResolvedTheme;
-  /** `origin` (viewport px) is where the day/night reveal starts from. */
   setPreference: (next: ThemePreference, origin?: Origin) => void;
 };
 
@@ -53,9 +50,7 @@ function readPreference(): ThemePreference {
   try {
     const stored = localStorage.getItem(THEME_STORAGE_KEY);
     if (stored === "light" || stored === "dark") return stored;
-  } catch {
-    /* storage may be unavailable (private mode, etc.) */
-  }
+  } catch {}
   return "system";
 }
 
@@ -63,22 +58,18 @@ function writePreference(preference: ThemePreference) {
   try {
     if (preference === "system") localStorage.removeItem(THEME_STORAGE_KEY);
     else localStorage.setItem(THEME_STORAGE_KEY, preference);
-  } catch {
-    /* storage may be unavailable (private mode, etc.) */
-  }
+  } catch {}
 }
 
 function paintTheme(theme: ResolvedTheme) {
   const root = document.documentElement;
   root.classList.toggle("light", theme === "light");
   root.style.colorScheme = theme;
-  // Keep the mobile browser chrome in step with a manual override, too
   document
     .querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')
     .forEach((meta) => meta.setAttribute("content", THEME_COLORS[theme]));
 }
 
-// Plain cross-fade of colors, for OS-driven changes and older browsers.
 function fadeToTheme(theme: ResolvedTheme) {
   const root = document.documentElement;
   root.classList.add("theme-transition");
@@ -86,8 +77,6 @@ function fadeToTheme(theme: ResolvedTheme) {
   window.setTimeout(() => root.classList.remove("theme-transition"), 300);
 }
 
-// Day spreads out from `origin` as a circle (or night does), via the View
-// Transitions API. The CSS half lives in globals.css under "Day/night reveal".
 function revealTheme(theme: ResolvedTheme, origin: Origin, commit: () => void) {
   const root = document.documentElement;
   const radius = Math.hypot(
@@ -103,7 +92,6 @@ function revealTheme(theme: ResolvedTheme, origin: Origin, commit: () => void) {
     () => {
       flushSync(commit);
       paintTheme(theme);
-      // Added inside the update so it lives in the revealed layer
       playThemeFx(theme, origin, radius);
     }
   );
@@ -113,9 +101,6 @@ function revealTheme(theme: ResolvedTheme, origin: Origin, commit: () => void) {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  // Server-safe defaults; the inline boot script in <head> has already painted
-  // the right theme, and we sync to it on mount. Nothing on first paint
-  // depends on these values (the logo and icon key off the html class).
   const [preference, setPreferenceState] = useState<ThemePreference>("system");
   const [theme, setTheme] = useState<ResolvedTheme>("dark");
   const themeRef = useRef<ResolvedTheme>("dark");
@@ -129,7 +114,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setPreferenceState(readPreference());
   }, []);
 
-  // Follow the OS live while the visitor hasn't picked a theme themselves
   useEffect(() => {
     if (preference !== "system") return;
     const media = window.matchMedia(LIGHT_QUERY);

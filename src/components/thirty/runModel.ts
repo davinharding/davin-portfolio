@@ -1,6 +1,3 @@
-// The run as data: its steps, how stream events change them, the agent slots the
-// homepage designs draw, and the copy every run view shares. Pure, so it is tested
-// without a browser; useBlueprintRun holds the state and the views draw it.
 import { MAX_AGENTS, STEP_ORDER, stepLabel, type RunEvent, type StepId } from "@/lib/thirty/events";
 
 export type ConsoleStepStatus = "pending" | "active" | "done" | "skipped" | "failed";
@@ -10,23 +7,19 @@ export type ConsoleStep = {
   label: string;
   status: ConsoleStepStatus;
   details: string[];
-  /** How far into the run the step became active, in milliseconds. */
   startedAt?: number;
 };
 
-/** After this long the run views say it is taking longer than usual. */
 export const SLOW_RUN_MS = 30_000;
 export const SLOW_RUN_NOTE = "Taking a little longer than usual.";
 export const RUN_PROMISE = "About 30 seconds. Reads your public site, nothing else.";
 
-/** Mirrors the server's first rules; the server stays the authority. */
 export function looksLikeWebsite(raw: string): boolean {
   const s = raw.trim();
   if (!s || s.length > 2048) return false;
   return s.split(/\s+/).some((t) => /[^.\s]\.[^.\s]/.test(t));
 }
 
-/** A display guess until the server's step labels arrive. */
 export function displayHost(raw: string): string {
   let s = raw.trim().split(/\s+/).find((t) => t.includes(".")) ?? raw.trim();
   s = s.replace(/^[a-z][a-z0-9+.-]*:\/\//i, "").replace(/^[^@/]*@/, "");
@@ -38,10 +31,6 @@ export function initialSteps(host: string): ConsoleStep[] {
   return STEP_ORDER.map((id) => ({ id, label: stepLabel(id, host), status: "pending", details: [] }));
 }
 
-/**
- * The steps after one stream event. Returns `prev` itself when the event changes
- * nothing. `msSinceStart` is read only when a step starts.
- */
 export function applyRunEvent(prev: ConsoleStep[], event: RunEvent, msSinceStart: () => number): ConsoleStep[] {
   const next = prev.map((s) => ({ ...s, details: [...s.details] }));
   const find = (id: string) => next.find((s) => s.id === id);
@@ -89,15 +78,10 @@ export function applyRunEvent(prev: ConsoleStep[], event: RunEvent, msSinceStart
   }
 }
 
-/** Open slots shown before the run says how many agents there are. */
 export const DEFAULT_AGENT_SLOTS = 4;
 
 export type AgentSlot = { name?: string; state: "drafted" | "drafting" | "open" | "unused" };
 
-/**
- * One entry per agent slot in the homepage designs: four until a fifth agent
- * arrives, never more than a blueprint can hold. Outside a run every slot is open.
- */
 export function agentSlots(
   agents: readonly string[],
   run: { busy: boolean; designing: boolean; teamComplete: boolean }

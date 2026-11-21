@@ -1,7 +1,5 @@
-// Client-safe. Reading cookies, including the one posthog-js keeps its own state in.
 import { sanitizeAnalyticsId } from "./config";
 
-/** posthog-js keeps its state, including the distinct id, in this cookie as URL-encoded JSON. */
 export function posthogCookieName(projectKey: string): string {
   return `ph_${projectKey}_posthog`;
 }
@@ -17,7 +15,6 @@ export function distinctIdFromPostHogCookie(raw: string | undefined): string | u
   }
 }
 
-/** Reads one cookie from a `Cookie` header or `document.cookie` string. */
 export function readCookie(cookieString: string | null | undefined, name: string): string | undefined {
   if (!cookieString) return undefined;
   for (const part of cookieString.split(";")) {

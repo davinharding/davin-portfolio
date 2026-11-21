@@ -30,12 +30,9 @@ function centerOf(element: Element) {
   return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
 }
 
-/** Header button: the icon morphs sun ⇄ moon, the menu picks the preference. */
 export function ThemeMenu() {
   const { preference, setPreference } = useTheme();
   const triggerRef = useRef<HTMLButtonElement>(null);
-  // Applied once the menu has finished closing, so it isn't frozen mid-fade
-  // in the snapshot the reveal starts from.
   const pendingRef = useRef<ThemePreference | null>(null);
 
   return (
@@ -84,7 +81,6 @@ export function ThemeMenu() {
   );
 }
 
-/** Mobile menu: a three-way segmented control. */
 export function ThemeSegmented() {
   const { preference, setPreference } = useTheme();
 

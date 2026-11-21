@@ -1,4 +1,9 @@
 {
     "editor.detectIndentation": false,
-    "editor.wordWrap": "on"
+    "editor.wordWrap": "on",
+    "eslint.options": {
+        "rulePaths": [
+            "eslint-rules"
+        ]
+    }
 }

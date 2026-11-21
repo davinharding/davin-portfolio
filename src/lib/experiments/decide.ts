@@ -1,5 +1,3 @@
-// The proxy's decision for one request, as a pure function so every branch is
-// unit-tested without Next. src/proxy.ts applies the result.
 import { sanitizeAnalyticsId } from "@/lib/analytics/config";
 import { distinctIdFromPostHogCookie } from "@/lib/analytics/cookies";
 import {
@@ -18,7 +16,6 @@ export type HomeDecisionInput = {
   cookies: {
     id?: string;
     force?: string;
-    /** The raw value of posthog-js's own cookie, if the visitor has one. */
     posthog?: string;
   };
   mode: DesignMode;
@@ -26,13 +23,7 @@ export type HomeDecisionInput = {
 };
 
 export type HomeDecision =
-  /**
-   * Any page but the homepage. `setId` is the visitor id to store when the visitor
-   * has none yet, so the page's own response hands posthog-js the id the
-   * homepage will later hash (UP-19).
-   */
   | { kind: "pass"; setId?: string }
-  /** Always to `/`. `force` sets or clears the preview cookie; `internal` marks the visitor. */
   | { kind: "redirect"; search: string; force?: HomeDesign | null; internal?: boolean }
   | ({ kind: "rewrite"; id: string } & HomeAssignment);
 
@@ -46,7 +37,6 @@ function searchWithoutVariant(params: URLSearchParams): string {
 export async function decideHome(input: HomeDecisionInput): Promise<HomeDecision> {
   const { pathname, searchParams, cookies, mode } = input;
 
-  // The per-design routes exist only as rewrite targets.
   if (pathname === "/home" || pathname.startsWith("/home/")) {
     const text = searchParams.toString();
     return { kind: "redirect", search: text ? `?${text}` : "" };
@@ -56,7 +46,6 @@ export async function decideHome(input: HomeDecisionInput): Promise<HomeDecision
 
   if (pathname !== "/") return known ? { kind: "pass" } : { kind: "pass", setId: visitorId() };
 
-  // A preview link. Repeated or unknown values are ignored.
   const requested = searchParams.getAll(VARIANT_PARAM);
   if (requested.length === 1) {
     const search = searchWithoutVariant(searchParams);

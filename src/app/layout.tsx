@@ -121,11 +121,6 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={inter.variable}>
       <head>
-        {/* Applies the theme (saved choice, else the OS setting) and skips the
-            splash for repeat visits before first paint: no flash.
-            React 19 logs a dev-only "Encountered a script tag" warning for these,
-            but the scripts execute correctly from the SSR HTML. The warning is
-            filtered in dev by `SilenceScriptWarning` mounted below. */}
         <script
           // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: themeBootScript }}

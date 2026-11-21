@@ -1,7 +1,3 @@
-// Regenerates the committed example blueprints through the real pipeline.
-// Needs ANTHROPIC_API_KEY only (an in-memory store stands in for Redis).
-//   npm run thirty:examples              all three
-//   npm run thirty:examples -- linear    one of them
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
 import { liveStages, newRunId, RunEmitter, runPipeline } from "../src/lib/thirty/pipeline";
@@ -57,7 +53,6 @@ for (const name of names) {
       requestStartedAt: Date.now(),
       analytics: { distinctId: "examples-script" },
     },
-    // Regenerating examples is not visitor traffic, so nothing goes to analytics.
     { store, stages, models, emitter, slugFor: () => `example-${name}`, report: async () => false }
   );
   if (!outcome.ok) {

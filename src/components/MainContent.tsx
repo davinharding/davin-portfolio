@@ -15,7 +15,6 @@ const MainContent: React.FC = () => {
       <WaveParticles />
       <div className="container-narrow w-full relative" style={{ zIndex: 1 }}>
         <div className="grid gap-8 md:gap-12 lg:gap-16 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-center py-12 md:py-16 lg:py-24">
-          {/* Left: Text Content */}
           <div className="order-2 lg:order-1">
             <Badge variant="secondary" className="mb-3 md:mb-4">
               Senior Full-Stack AI Engineer
@@ -36,7 +35,6 @@ const MainContent: React.FC = () => {
               if that interests you.
             </p>
 
-            {/* CTA Buttons */}
             <div className="flex flex-wrap gap-3 md:gap-4">
               <Button asChild size="lg" className="px-6 md:px-8 text-sm md:text-base">
                 <Link href="/call">
@@ -58,7 +56,6 @@ const MainContent: React.FC = () => {
             </div>
           </div>
 
-          {/* Right: Profile Image */}
           <div className="order-1 lg:order-2 flex justify-center lg:justify-end">
             <Card className="overflow-hidden">
               <CardContent className="p-3 md:p-4 flex flex-col items-center">
@@ -81,7 +78,6 @@ const MainContent: React.FC = () => {
         </div>
       </div>
 
-      {/* Scroll Indicator */}
       <div className="absolute bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce motion-reduce:animate-none">
         <Link
           href="#projects"

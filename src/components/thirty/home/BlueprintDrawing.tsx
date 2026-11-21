@@ -5,7 +5,6 @@ import { MAX_AGENTS } from "@/lib/thirty/events";
 import type { BlueprintRun } from "../useBlueprintRun";
 import { NARROW_VIEWBOX_WIDTH } from "./drawingScale";
 
-/** Which boxes carry a human-gate mark. Illustrative: gate status is not known until the run ends. */
 const GATED = [true, true, false, true, true];
 
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
@@ -14,7 +13,6 @@ const ring = (cx: number, cy: number, r: number) =>
   `M${cx - r} ${cy}a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0`;
 const clip = (text: string, max: number) => (text.length > max ? `${text.slice(0, max - 1)}…` : text);
 
-/** Splits a name over two lines of similar length, each cut to fit its box. */
 export function twoLines(name: string, maxChars: number): string[] {
   const words = name.split(/\s+/).filter(Boolean);
   if (words.length < 2 || name.length <= maxChars) return [clip(name, maxChars)];
@@ -34,7 +32,6 @@ type Slot = { name?: string; note: string; active: boolean; unused: boolean };
 
 const SLOT_LABEL = { drafted: "DRAFTED", drafting: "DRAFTING", open: "OPEN ROLE", unused: "NOT NEEDED" } as const;
 
-/** The run's agent slots as the drawing labels them. */
 function slotsFor(run: BlueprintRun): Slot[] {
   return run.slots.map(({ name, state }) => ({
     name: name?.toUpperCase(),
@@ -58,7 +55,6 @@ function titleBlock(run: BlueprintRun) {
   };
 }
 
-/** A dashed construction line that is inked over while `p` moves from `from` to `to`. */
 function Ink({ p, from, to, d, filled }: { p: number; from: number; to: number; d: string; filled?: boolean }) {
   const k = clamp01((p - from) / (to - from));
   return (
@@ -84,18 +80,14 @@ function Cell({ x, y, label, value, ink }: { x: number; y: number; label: string
 
 type DrawingProps = {
   run: BlueprintRun;
-  /** How much of the drawing is inked, from 0 to 1. */
   progress: number;
-  /** The visitor's host once it looks like one, else an empty string. */
   host: string;
-  /** Today's date, filled in after mount so the prerendered page hydrates cleanly. */
   today: string;
 };
 
 const ALT =
   "Schematic of an agent team: your team at the top and the agents below it, each with read and write tools and a human approval gate before any write.";
 
-/** The full schematic, for screens from 640 pixels wide. */
 function WideDrawing({ run, progress: p, host, today }: DrawingProps) {
   const slots = slotsFor(run);
   const n = slots.length;
@@ -155,7 +147,6 @@ function WideDrawing({ run, progress: p, host, today }: DrawingProps) {
               </g>
             )}
 
-            {/* Tools: two read, one write */}
             <Ink p={p} from={0.73} to={0.77} d={`M${cx} 202V212`} />
             {[-31, -7, 17].map((dx, j) => (
               <g key={dx}>
@@ -171,7 +162,6 @@ function WideDrawing({ run, progress: p, host, today }: DrawingProps) {
         );
       })}
 
-      {/* Callouts */}
       <Ink p={p} from={0.9} to={0.95} d={`M${last + 4} 125L${last + 15} 96H512`} />
       <text x="512" y="90" textAnchor="end" className="drafting-t drafting-fade" style={shown(0.93)}>
         HUMAN GATE
@@ -185,7 +175,6 @@ function WideDrawing({ run, progress: p, host, today }: DrawingProps) {
         ABOUT 30 S, START TO FINISH
       </text>
 
-      {/* Notes and title block */}
       <text x="10" y="302" className="drafting-t drafting-t--strong">
         FIG. 1
       </text>
@@ -217,7 +206,6 @@ function WideDrawing({ run, progress: p, host, today }: DrawingProps) {
   );
 }
 
-/** The tree and title block only, laid out two boxes wide so its text stays readable on a phone. */
 function NarrowDrawing({ run, progress: p, host }: DrawingProps) {
   const slots = slotsFor(run);
   const rows = Math.ceil(slots.length / 2);
@@ -291,10 +279,6 @@ function NarrowDrawing({ run, progress: p, host }: DrawingProps) {
   );
 }
 
-/**
- * The schematic on the Drafting table homepage. Both layouts are rendered and CSS
- * shows the one that fits, so the right drawing is there before JavaScript loads.
- */
 export function BlueprintDrawing(props: DrawingProps) {
   return (
     <>

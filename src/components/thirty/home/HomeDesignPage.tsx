@@ -5,7 +5,6 @@ import { ClassicHome } from "./ClassicHome";
 import { DraftingTableHome } from "./DraftingTableHome";
 import { OpenRolesHome } from "./OpenRolesHome";
 
-/** Renders one homepage design. Which one a visitor gets is decided in src/proxy.ts. */
 export function HomeDesignPage({ design }: { design: HomeDesign }) {
   switch (design) {
     case "open-roles":

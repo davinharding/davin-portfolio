@@ -1,10 +1,8 @@
-// Server-only. Committed example blueprints, served without touching Redis.
 import allbirds from "@/data/blueprints/example-allbirds.json";
 import linear from "@/data/blueprints/example-linear.json";
 import sweetgreen from "@/data/blueprints/example-sweetgreen.json";
 import { parseStoredBlueprint, type StoredBlueprint } from "./schema";
 
-// Parsed at module load: an invalid example fails the build, not a visitor.
 const ALL: readonly StoredBlueprint[] = [allbirds, linear, sweetgreen].map((raw) =>
   parseStoredBlueprint(raw)
 );

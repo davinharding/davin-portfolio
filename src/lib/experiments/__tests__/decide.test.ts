@@ -134,7 +134,6 @@ describe("decideHome: other paths", () => {
   });
 
   it("gives a visitor whose first page is not the homepage an id, and nothing else", async () => {
-    // UP-19: without this, the homepage prefetch could mint a second id that later replaced posthog-js's own.
     for (const pathname of ["/work", "/b/example-linear", "/call", "/sorry/rate-limited"]) {
       expect(await decide({ pathname, search: "variant=classic" })).toEqual({ kind: "pass", setId: "fresh-id" });
     }

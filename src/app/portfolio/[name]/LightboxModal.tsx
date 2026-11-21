@@ -20,8 +20,6 @@ type LightboxCSSProperties = CSSProperties & {
   [key: `--yarl__${string}`]: string;
 };
 
-// The Zoom plugin derives its max zoom from slide.width/height, so slides
-// without dimensions fall back to the built-in renderer, which measures them.
 function NextJsImage({ slide, offset, rect, zoom = 1 }: RenderSlideProps) {
   if (!isImageSlide(slide) || !slide.width || !slide.height) return undefined;
 

@@ -1,4 +1,3 @@
-// Server-only. Client construction, usage accounting, and SDK error mapping.
 import Anthropic, {
   APIConnectionError,
   APIUserAbortError,
@@ -14,13 +13,11 @@ import { RunError, type ErrorCode } from "./errors";
 
 let client: Anthropic | undefined;
 
-/** One shared client; `new Anthropic()` reads ANTHROPIC_API_KEY. */
 export function getAnthropic(): Anthropic {
   client ??= new Anthropic();
   return client;
 }
 
-/** The subset of the SDK's Usage object we account for. */
 export type UsageLike = {
   input_tokens?: number | null;
   output_tokens?: number | null;
@@ -36,7 +33,6 @@ export type UsageRecord = {
   webSearches: number;
 };
 
-/** Cache reads and writes are counted at the plain input rate so the estimate errs high. */
 export function toUsageRecord(model: string, usage: UsageLike | null | undefined): UsageRecord {
   const u = usage ?? {};
   return {
@@ -69,7 +65,6 @@ export function totals(records: UsageRecord[]) {
   );
 }
 
-/** Thrown by a stage when the model returned an unusable response. */
 export class ModelOutputError extends Error {
   constructor(
     readonly reason: "refusal" | "max_tokens" | "parse" | "empty",
@@ -80,10 +75,6 @@ export class ModelOutputError extends Error {
   }
 }
 
-/**
- * Maps any error thrown during a run to a visitor-facing code. Most specific
- * class first: several SDK classes inherit from each other.
- */
 export function mapRunError(err: unknown, deadlineHit: boolean): ErrorCode {
   if (err instanceof RunError) return err.code;
   if (deadlineHit) return "timeout";
@@ -93,8 +84,8 @@ export function mapRunError(err: unknown, deadlineHit: boolean): ErrorCode {
     return "live_disabled";
   }
   if (err instanceof RateLimitError) return "upstream";
-  if (err instanceof InternalServerError) return "upstream"; // includes 529 overloaded
-  if (err instanceof APIConnectionError) return "upstream"; // includes connection timeouts
+  if (err instanceof InternalServerError) return "upstream";
+  if (err instanceof APIConnectionError) return "upstream";
   if (err instanceof BadRequestError) {
     console.error("[thirty] Anthropic rejected the request shape:", err.message);
     return "internal";

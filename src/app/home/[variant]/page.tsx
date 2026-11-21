@@ -5,8 +5,6 @@ import { homeMetadata } from "@/lib/thirty/homeCopy";
 
 type Params = Promise<{ variant: string }>;
 
-// One prerendered page per design. Reached only through the proxy's rewrite of `/`;
-// the proxy redirects direct requests for these paths back to `/`.
 export const dynamicParams = false;
 
 export function generateStaticParams() {

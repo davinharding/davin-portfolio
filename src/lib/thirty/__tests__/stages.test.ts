@@ -142,7 +142,6 @@ describe("search fallback", () => {
 
 type Listener = (...args: unknown[]) => void;
 
-/** A stand-in for MessageStream that replays text deltas, then resolves or rejects finalMessage. */
 function fakeStream(deltas: string[], final: () => Promise<unknown>, snapshot?: Record<string, unknown>) {
   const listeners: Record<string, Listener[]> = {};
   return {

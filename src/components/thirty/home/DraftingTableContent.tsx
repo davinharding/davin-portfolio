@@ -9,15 +9,9 @@ import { UrlForm } from "../UrlForm";
 import { useBlueprintRun } from "../useBlueprintRun";
 import { BlueprintDrawing } from "./BlueprintDrawing";
 
-/** Typing this many characters inks the whole drawing. */
 const CHARS_TO_FULL_INK = 12;
-/** The root box is always inked, so the drawing never looks empty. */
 const RESTING_INK = 0.14;
 
-/**
- * Moves the bright patch of grid to follow the cursor. Written straight to CSS
- * variables on the stage, once per frame, so moving the mouse never re-renders.
- */
 function usePaperLight(insideStage: RefObject<HTMLElement | null>, readout: RefObject<HTMLElement | null>) {
   useEffect(() => {
     const stage = insideStage.current?.closest<HTMLElement>("[data-thirty-stage]");
@@ -48,7 +42,6 @@ function usePaperLight(insideStage: RefObject<HTMLElement | null>, readout: RefO
   }, [insideStage, readout]);
 }
 
-/** The Drafting table design's content: the form on the left, the drawing it inks on the right. */
 export function DraftingTableContent({ examples }: { examples: readonly ExampleLinkItem[] }) {
   const run = useBlueprintRun();
   const readoutRef = useRef<HTMLParagraphElement>(null);
@@ -56,7 +49,6 @@ export function DraftingTableContent({ examples }: { examples: readonly ExampleL
   useEffect(() => setToday(new Date().toISOString().slice(0, 10)), []);
   usePaperLight(run.rootRef, readoutRef);
 
-  // Ink follows what has been typed, and a run inks all of it.
   const typed = run.url.trim().length;
   const progress = run.busy ? 1 : Math.max(RESTING_INK, Math.min(1, typed / CHARS_TO_FULL_INK));
   const host = run.busy ? run.host : run.typedHost ?? "";
@@ -94,7 +86,6 @@ export function DraftingTableContent({ examples }: { examples: readonly ExampleL
             </>
           )}
         </div>
-        {/* On a phone the run console needs the whole screen. */}
         <div className={cn("min-w-0", run.busy && "hidden sm:block")}>
           <BlueprintDrawing run={run} progress={progress} host={host} today={today} />
           <p className="mt-3 text-center font-mono text-[11px] uppercase tracking-[0.14em] text-muted-foreground" aria-hidden="true">

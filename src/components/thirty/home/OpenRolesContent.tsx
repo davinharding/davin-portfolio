@@ -7,7 +7,6 @@ import { useBlueprintRun } from "../useBlueprintRun";
 import { RunStrip } from "./RunStrip";
 import { TeamChart } from "./TeamChart";
 
-/** The Open roles design's content: the form, and under it the team the run will fill. */
 export function OpenRolesContent({ teams }: { teams: readonly SampleTeam[] }) {
   const run = useBlueprintRun();
   return (

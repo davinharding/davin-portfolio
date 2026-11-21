@@ -1,4 +1,3 @@
-// Server-only. Visitor identity, flood guard, daily limits, and per-host locks.
 import { createHash } from "node:crypto";
 import { LIMITS } from "./config";
 import { keys, type Store } from "./store";
@@ -22,7 +21,6 @@ export function secondsToUtcMidnight(now: Date): number {
   return Math.max(1, Math.ceil((next - now.getTime()) / 1000));
 }
 
-/** The client IP from Vercel's headers; `unknown` when none is present. */
 export function clientIp(headers: Headers): string {
   const vercel = headers.get("x-vercel-forwarded-for")?.split(",")[0]?.trim();
   if (vercel) return vercel;
@@ -33,12 +31,10 @@ export function clientIp(headers: Headers): string {
   return "unknown";
 }
 
-/** Salted hash; the raw IP is never stored or logged. */
 export function visitorId(ip: string, salt: string): string {
   return createHash("sha256").update(salt + ip).digest("hex").slice(0, 32);
 }
 
-/** True when the visitor is within the per-minute request allowance. */
 export async function checkFlood(store: Store, visitor: string, now: Date): Promise<boolean> {
   const key = keys.visitorMinute(visitor, utcMinute(now));
   const count = await store.incr(key);
@@ -84,7 +80,6 @@ export async function acquireLock(store: Store, host: string, runId: string): Pr
   return store.set(keys.lock(host), runId, { nx: true, ex: LIMITS.lockTtlSec });
 }
 
-/** Releases the lock only if this run still holds it. */
 export async function releaseLock(store: Store, host: string, runId: string): Promise<void> {
   const holder = await store.get(keys.lock(host));
   if (holder === runId) await store.del(keys.lock(host));

@@ -7,9 +7,6 @@ import type { Project } from "@/data/projectData";
 
 import { collectProjectImages } from "./projectImages";
 
-// Defer loading the lightbox modal (yet-another-react-lightbox + plugins + css)
-// until the user actually clicks an image. The grid of thumbnails renders
-// immediately with just next/image so initial route navigation stays fast.
 const LightboxModal = dynamic(
   () => import("./LightboxModal").then((mod) => mod.LightboxModal),
   { ssr: false }
@@ -17,11 +14,6 @@ const LightboxModal = dynamic(
 
 interface ProjectGalleryProps {
   project: Project;
-  /**
-   * Number of leading images to hide from the visible thumbnail grid (e.g. when
-   * the first image is rendered separately as a hero). The lightbox itself
-   * still includes every image so the user can navigate back to the hero.
-   */
   skip?: number;
 }
 

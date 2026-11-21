@@ -1,5 +1,3 @@
-// Server-only. Guarded single-shot reads of a visitor-supplied site: manual
-// redirects checked hop by hop, connect-time address checks, size and time caps.
 import { Agent, fetch as undiciFetch } from "undici";
 import { getConfig, LIMITS } from "./config";
 import {
@@ -60,10 +58,7 @@ const ACCEPTED_TYPES = ["text/html", "application/xhtml+xml", "text/plain"];
 
 let sharedAgent: Agent | undefined;
 
-/** undici fetch through an Agent whose DNS lookup enforces the address policy. */
 export const guardedFetch: FetchLike = async (url, init) => {
-  // net.connect skips `lookup` for an IP literal, so the address policy would
-  // never run. Callers only pass hostnames; refuse literals here regardless.
   const literal = new URL(url).hostname.replace(/^\[|\]$/g, "");
   if (isIP(literal)) throw new BlockedAddressError(literal);
   sharedAgent ??= new Agent({
@@ -121,7 +116,6 @@ function decode(bytes: Uint8Array, contentType: string): string {
   }
 }
 
-/** Reads at most `cap` bytes, cancelling the stream at the cap. */
 export async function readCapped(
   body: ReadableStream<Uint8Array> | null,
   cap: number
@@ -168,7 +162,6 @@ export type FetchPageOptions = {
   maxBytes?: number;
 };
 
-/** One GET with manual redirects (at most 4 hops), each hop re-checked. */
 export async function fetchPage(startUrl: string, opts: FetchPageOptions): Promise<FetchedPage> {
   const fetchImpl = opts.fetchImpl ?? guardedFetch;
   const timeout = AbortSignal.timeout(opts.timeoutMs);
@@ -201,7 +194,6 @@ export async function fetchPage(startUrl: string, opts: FetchPageOptions): Promi
       }
       if (checkUrlShape(next)) return { ok: false, reason: "redirect_blocked" };
       const hostError = checkHost(next.hostname.toLowerCase(), opts.hostRules);
-      // A redirect to a platform or login host means the site is not readable by a bot.
       if (hostError === "platform_url") return { ok: false, reason: "redirect_platform" };
       if (hostError) return { ok: false, reason: "redirect_blocked" };
       if (/\/(login|signin|sign-in|auth)(\/|$|\?)/i.test(next.pathname)) {
@@ -260,10 +252,6 @@ function altHostname(hostname: string): string {
   return hostname.startsWith("www.") ? hostname.slice(4) : `www.${hostname}`;
 }
 
-/**
- * Reads the homepage plus up to three sub-pages. Never throws for site
- * problems; the result says which path the pipeline should take.
- */
 export async function readSite(input: ReadSiteInput, opts: ReadSiteOptions = {}): Promise<ReadResult> {
   const stage = AbortSignal.timeout(LIMITS.readStageMs);
   const signal = opts.signal ? AbortSignal.any([opts.signal, stage]) : stage;
@@ -276,7 +264,6 @@ export async function readSite(input: ReadSiteInput, opts: ReadSiteOptions = {})
     if (!home.ok && home.reason === "dns") return { kind: "unresolvable" };
   }
   if (!home.ok && (home.reason === "connect" || home.reason === "tls")) {
-    // The host resolves but https failed at connect: try plain http once.
     const viaHttp = await fetchPage(`http://${input.hostname}/`, homeOpts);
     if (viaHttp.ok || viaHttp.reason === "blocked_address") home = viaHttp;
   }

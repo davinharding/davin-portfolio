@@ -1,6 +1,3 @@
-// Server-only. Runs one blueprint from site read to stored result, emitting
-// progress events. The run owns its own deadline and is never tied to the
-// visitor's connection: the money is spent either way, so the result is kept.
 import { randomUUID } from "node:crypto";
 import type Anthropic from "@anthropic-ai/sdk";
 import { captureServerEvent, type ReportEvent } from "@/lib/analytics/server";
@@ -27,7 +24,6 @@ import { searchBrief, type SearchResult } from "./searchFallback";
 import { makeSlug } from "./slug";
 import { keys, type Store } from "./store";
 
-/** Buffers events so a subscriber that attaches late still sees the whole run. */
 export class RunEmitter {
   private readonly buffer: RunEvent[] = [];
   private readonly listeners = new Set<(event: RunEvent) => void>();
@@ -40,9 +36,7 @@ export class RunEmitter {
     for (const listener of this.listeners) {
       try {
         listener(event);
-      } catch {
-        // A closed or broken subscriber must never affect the run.
-      }
+      } catch {}
     }
   }
 
@@ -69,7 +63,6 @@ export class RunEmitter {
   }
 }
 
-/** The four model and network stages, injectable so tests and mock mode can replace them. */
 export type Stages = {
   readSite(input: ReadSiteInput, signal: AbortSignal): Promise<ReadResult>;
   searchBrief(host: string, signal: AbortSignal): Promise<SearchResult>;
@@ -113,16 +106,12 @@ export type RunContext = {
   inputUrl: string;
   extraPath?: string;
   visitor: string;
-  /** UTC day the visitor and global counts were taken on, for refunds. */
   day: string;
   reservation: Reservation;
-  /** When the request arrived; the overall deadline counts from here. */
   requestStartedAt: number;
-  /** Who to attribute the run to in analytics (browser ids, else the salted visitor hash). */
   analytics: {
     distinctId: string;
     sessionId?: string;
-    /** Added to every event for this run, such as the homepage design. */
     context?: Record<string, string>;
   };
 };
@@ -135,9 +124,7 @@ export type RunDeps = {
   now?: () => number;
   slugFor?: (host: string) => string;
   log?: (line: string) => void;
-  /** Server-side analytics; defaults to PostHog. */
   report?: ReportEvent;
-  /** Marks analytics events from mock runs. */
   mock?: boolean;
   deadlineMs?: number;
   minMsForDesignRetry?: number;
@@ -155,7 +142,6 @@ const NEGATIVE_CACHE: ReadonlySet<ErrorCode> = new Set([
   "declined",
 ]);
 
-/** Failures that are not the visitor's doing give the run back. */
 const REFUND_VISITOR: ReadonlySet<ErrorCode> = new Set([
   "upstream",
   "timeout",
@@ -167,22 +153,13 @@ const REFUND_VISITOR: ReadonlySet<ErrorCode> = new Set([
 
 type SearchFailure = Extract<SearchResult, { ok: false }>["reason"];
 
-/** Connection-level read failures: nothing answered at that address. */
 const NO_ANSWER: ReadonlySet<FetchFailure | "challenge"> = new Set(["connect", "tls", "timeout", "aborted"]);
 
-/**
- * The code for a failed search fallback. A search tool error is transient
- * (retry). Otherwise a site that answered but could not be researched is
- * "could not read enough", never "no website here". A search that runs past its
- * stage limit counts as not enough to go on: on bot-blocked sites it tends to
- * run long every time, and each retry would spend about as much again.
- */
 export function fallbackFailure(reason: SearchFailure, siteAnswered: boolean): ErrorCode {
   if (reason === "tool_error") return "upstream";
   return siteAnswered ? "not_enough_info" : "unreachable";
 }
 
-/** DNS-level unreachable never counts against anyone. */
 class DnsUnreachable extends RunError {
   constructor() {
     super("unreachable", "dns");
@@ -211,7 +188,6 @@ export async function runPipeline(ctx: RunContext, deps: RunDeps): Promise<RunOu
   let usedSearch = false;
   let settled = false;
   let slug: string | null = null;
-  /** A model call was cut off, so its cost never came back in `usage`. */
   let spendUnknown = false;
   let pagesRead = 0;
   let companyName: string | null = null;
@@ -233,7 +209,6 @@ export async function runPipeline(ctx: RunContext, deps: RunDeps): Promise<RunOu
     if (!settled) emitter.emit(event);
   };
 
-  /** Returns the research brief, or throws the code for a failed fallback. */
   const runSearch = async (siteAnswered: boolean): Promise<string> => {
     usedSearch = true;
     emit({ t: "note", text: FALLBACK_NOTE });
@@ -255,7 +230,6 @@ export async function runPipeline(ctx: RunContext, deps: RunDeps): Promise<RunOu
     emitter.emit({ t: "step", id: "validate", status: "start", label: stepLabel("validate", ctx.host) });
     step("validate", "done");
 
-    // Read
     step("read", "start");
     const read = await stages.readSite({ hostname: ctx.hostname, extraPath: ctx.extraPath }, signal);
     let pages: PageContent[] = [];
@@ -275,7 +249,6 @@ export async function runPipeline(ctx: RunContext, deps: RunDeps): Promise<RunOu
       step("read", "skip");
     }
 
-    // Research
     step("research", "start");
     let profile: Profile;
     if (read.kind === "blocked") {
@@ -307,7 +280,6 @@ export async function runPipeline(ctx: RunContext, deps: RunDeps): Promise<RunOu
     emit({ t: "company", name: company.name, oneLiner: company.oneLiner });
     step("research", "done");
 
-    // Design, with one retry when the gate fails and time allows
     step("design", "start");
     let blueprint: NormalizedBlueprint | null = null;
     let previous: PreviousAttempt | undefined;
@@ -346,7 +318,6 @@ export async function runPipeline(ctx: RunContext, deps: RunDeps): Promise<RunOu
     if (!blueprint) throw new RunError("quality");
     step("design", "done");
 
-    // Check and save
     step("check", "start");
     const newSlug = (deps.slugFor ?? makeSlug)(ctx.host);
     const stored: StoredBlueprint = {
@@ -365,7 +336,6 @@ export async function runPipeline(ctx: RunContext, deps: RunDeps): Promise<RunOu
       blueprint,
       receipt: null,
     };
-    // Close the check step before the receipt so its duration is included.
     const checkMs = Math.max(0, now() - (stepStarts.get("check") ?? now()));
     const receiptSteps = [...steps, { id: "check" as const, label: stepLabel("check", ctx.host), ms: checkMs }];
     const t = totals(usage);
@@ -408,8 +378,6 @@ export async function runPipeline(ctx: RunContext, deps: RunDeps): Promise<RunOu
   }
 
   const actualUsd = costUsd(usage);
-  // A call cut off by a stage limit or the deadline may still be billed, and
-  // its usage never arrived: keep at least the whole reservation for it.
   if (signal.aborted) spendUnknown = true;
   const chargedMicros = spendUnknown
     ? Math.max(usdToMicros(actualUsd), ctx.reservation.reservedMicros)
@@ -462,7 +430,6 @@ export async function runPipeline(ctx: RunContext, deps: RunDeps): Promise<RunOu
       outcome: outcome.ok ? "done" : outcome.code,
     })
   );
-  // After the terminal event, so it never delays the stream; capped at 2s and never throws.
   await (deps.report ?? captureServerEvent)({
     event: "blueprint_run",
     distinctId: ctx.analytics.distinctId,
@@ -499,7 +466,6 @@ function pageTitle(p: PageContent): string {
   }
 }
 
-/** Saves the blueprint and the host cache entry, retrying twice before giving up. */
 async function persist(store: Store, stored: StoredBlueprint): Promise<void> {
   let lastError: unknown;
   for (let attempt = 0; attempt < 3; attempt++) {

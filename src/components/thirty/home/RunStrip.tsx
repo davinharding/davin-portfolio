@@ -6,10 +6,6 @@ import { SLOW_RUN_NOTE } from "../runModel";
 import type { BlueprintRun } from "../useBlueprintRun";
 import { EXPECTED_STEP_MS, SHORT_STEP_LABEL, stepFill } from "./stepProgress";
 
-/**
- * The run as five progress bars. Used by the Open roles design, where the team
- * chart below shows what the run is finding.
- */
 export function RunStrip({ run }: { run: BlueprintRun }) {
   const { steps, elapsedMs, reducedMotion } = run;
   const seconds = reducedMotion ? Math.floor(elapsedMs / 1000).toFixed(1) : (elapsedMs / 1000).toFixed(1);

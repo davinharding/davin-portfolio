@@ -1,4 +1,3 @@
-// Server-only. Profile extraction with the research model.
 import type Anthropic from "@anthropic-ai/sdk";
 import { AnthropicError, APIError } from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
@@ -8,7 +7,6 @@ import type { PageContent } from "./extract";
 import { RESEARCH_SYSTEM } from "./prompts";
 import { ProfileSchema, type Profile } from "./schema";
 
-/** Keeps scraped text from closing our delimiters or opening new tags. */
 function neutralize(s: string): string {
   return s.replace(/</g, "‹").replace(/>/g, "›");
 }
@@ -75,8 +73,6 @@ export async function extractProfile(input: ResearchInput): Promise<ResearchResu
     if (!profile) throw new ModelOutputError("empty", usage);
     return { profile, usage };
   } catch (err) {
-    // `parse` throws a plain AnthropicError (not an APIError) when the text does
-    // not match the schema, which is how a refusal or truncation surfaces here.
     if (err instanceof AnthropicError && !(err instanceof APIError)) {
       throw new ModelOutputError("refusal", null);
     }

@@ -55,7 +55,6 @@ describe("normalizeInput", () => {
     expect(code("http://[::1]")).toBe("blocked_host");
     expect(code("http://169.254.169.254/latest/meta-data")).toBe("blocked_host");
     expect(code("8.8.8.8")).toBe("blocked_host");
-    // Numeric shorthand is canonicalized by the URL parser and still caught.
     expect(code("http://2130706433")).toBe("blocked_host");
   });
 

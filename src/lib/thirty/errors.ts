@@ -1,5 +1,3 @@
-// Client-safe: imported by the launcher, the /sorry pages, and the API route.
-
 export const ERROR_CODES = [
   "bad_request",
   "invalid_url",
@@ -24,12 +22,10 @@ export const ERROR_CODES = [
 
 export type ErrorCode = (typeof ERROR_CODES)[number];
 
-/** What the UI offers after an error. */
 export type NextStep = "retry" | "fix_input" | "retry_after" | "examples" | "book_call";
 
 type ErrorInfo = {
   status: number;
-  /** `{host}` is replaced with the host, or "that address" when unknown. */
   message: string;
   next: readonly NextStep[];
 };
@@ -136,7 +132,6 @@ export const ERRORS: Record<ErrorCode, ErrorInfo> = {
   },
 };
 
-/** Thrown inside a run to end it with a specific visitor-facing code. */
 export class RunError extends Error {
   constructor(
     readonly code: ErrorCode,
@@ -159,13 +154,11 @@ export function errorMessage(code: ErrorCode, host?: string | null): string {
   const message = ERRORS[code].message;
   if (!message.includes("{host}")) return message;
   if (host) return message.replace("{host}", host);
-  // Sentence-initial placeholder needs a capital letter.
   return message.startsWith("{host}")
     ? message.replace("{host}", "That address")
     : message.replace("{host}", "that address");
 }
 
-/** URL segment for /sorry/<param>. Hyphenated so the URL reads naturally. */
 export function sorryParam(code: ErrorCode): string {
   return code.replace(/_/g, "-");
 }

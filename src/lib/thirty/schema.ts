@@ -1,6 +1,3 @@
-// Server-only. Zod schemas for the model-facing outputs and stored blueprints.
-// The model-facing schemas carry no numeric or length constraints (structured
-// outputs support a limited JSON Schema subset); quality.ts enforces limits.
 import { z } from "zod";
 import { PROJECT_KEYS } from "./projectCatalog";
 import { MAX_AGENTS, type StepId } from "./events";
@@ -57,7 +54,6 @@ export const ModelBlueprintSchema = z.object({
 
 export type ModelBlueprint = z.infer<typeof ModelBlueprintSchema>;
 
-/** Same shape as the model output; used to validate what we stored. */
 export const NormalizedBlueprintSchema = ModelBlueprintSchema.extend({
   agents: z.array(AgentSchema).min(1).max(MAX_AGENTS),
 });
@@ -106,10 +102,6 @@ export const StoredBlueprintSchema = z.object({
 export type StoredBlueprint = z.infer<typeof StoredBlueprintSchema>;
 export type Receipt = NonNullable<StoredBlueprint["receipt"]>;
 
-/**
- * Upgrades an older stored blueprint to the current shape. v1 is current, so
- * this is the identity; future schema versions add cases here.
- */
 export function migrate(raw: unknown): unknown {
   if (raw && typeof raw === "object" && "v" in raw) {
     const v = (raw as { v: unknown }).v;

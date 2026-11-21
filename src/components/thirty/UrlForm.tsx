@@ -11,10 +11,6 @@ import type { BlueprintRun } from "./useBlueprintRun";
 const ERROR_ID = "blueprint-error";
 const HELP_ID = "blueprint-help";
 
-/**
- * The address field, the submit button, and whatever the last error offers next.
- * Posts natively to /api/blueprint when JavaScript has not loaded.
- */
 export function UrlForm({ run, className }: { run: BlueprintRun; className?: string }) {
   const { error, next, retryNote } = run;
   const showActions = error && (error.code === "lost" || next.includes("retry") || next.includes("book_call"));
@@ -61,7 +57,6 @@ export function UrlForm({ run, className }: { run: BlueprintRun; className?: str
           <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </Button>
       </div>
-      {/* Honeypot: real visitors never see or fill this. */}
       <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
         <label>
           Confirm website
