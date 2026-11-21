@@ -64,24 +64,27 @@ export function callEventProps(slug?: string): Record<string, string> {
   return slug ? { blueprint_slug: slug } : {};
 }
 
+/** Reported at most once per page load: Calendly announces both more than once (the calendar view twice on load). */
+const ONCE_PER_PAGE: ReadonlySet<CallEvent> = new Set(["call_calendar_viewed", "call_booked"]);
+
 /**
  * Returns a handler for window messages. It reports Calendly's own messages and
- * nothing else, and reports a booking at most once however often it is announced.
- * Calendly's event and invitee links are never passed on.
+ * nothing else, and reports the calendar view and the booking at most once each
+ * however often they are announced. Calendly's event and invitee links are never passed on.
  */
 export function createCallTracker(
   report: (event: CallEvent, props: Record<string, string>) => void,
   slug?: string
 ): (origin: string, data: unknown) => void {
-  let booked = false;
+  const reported = new Set<CallEvent>();
   return (origin, data) => {
     if (origin !== CALENDLY_ORIGIN || !data || typeof data !== "object") return;
     const name = (data as { event?: unknown }).event;
     const event = typeof name === "string" ? CALL_EVENTS[name] : undefined;
     if (!event) return;
-    if (event === "call_booked") {
-      if (booked) return;
-      booked = true;
+    if (ONCE_PER_PAGE.has(event)) {
+      if (reported.has(event)) return;
+      reported.add(event);
     }
     report(event, callEventProps(slug));
   };

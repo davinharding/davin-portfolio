@@ -76,6 +76,22 @@ describe("createCallTracker", () => {
     expect(report).toHaveBeenCalledWith("call_booked", {});
   });
 
+  it("reports the calendar view once, though Calendly announces it twice on load", () => {
+    const report = vi.fn();
+    const handle = createCallTracker(report, "example-linear");
+    handle(CALENDLY_ORIGIN, message("calendly.event_type_viewed"));
+    handle(CALENDLY_ORIGIN, message("calendly.event_type_viewed"));
+    expect(report.mock.calls).toEqual([["call_calendar_viewed", { blueprint_slug: "example-linear" }]]);
+  });
+
+  it("still reports every time pick", () => {
+    const report = vi.fn();
+    const handle = createCallTracker(report);
+    handle(CALENDLY_ORIGIN, message("calendly.date_and_time_selected"));
+    handle(CALENDLY_ORIGIN, message("calendly.date_and_time_selected"));
+    expect(report).toHaveBeenCalledTimes(2);
+  });
+
   it("ignores messages from any other origin", () => {
     const report = vi.fn();
     const handle = createCallTracker(report);
