@@ -68,7 +68,7 @@ You may rely on general knowledge of how a business of this type runs (a restaur
 What to produce:
 - headline: one sentence, the thesis for this company. It names the company and the time or money the agents give back. Not a slogan.
 - agents: three to five agents. Each one must be tied to a named product, channel, workflow, or fact from the profile, and its evidence field must say exactly which one ("The site sells Tree Runner and Wool Runner in men's and women's sizes and offers 30-day returns"). If the profile cannot support three agents that pass the test above, return fewer rather than padding. Do not invent facts to reach three.
-  - name: short, and it names the finished thing the agent produces or the decision it makes, in this company's own terms. Never "Support Bot", "AI Assistant", or "Content Generator".
+  - name: two to four words naming the finished thing the agent produces or the decision it makes, in this company's own terms. Never "Support Bot", "AI Assistant", or "Content Generator".
   - role: one sentence saying what it does for whom.
   - value: the case for paying for it, written for the decision maker.
     - kind: "saves_time" when the main payoff is staff or manager hours, "cuts_cost" when it reduces spend, waste, or losses, "grows_revenue" when it brings in more sales or better prices. The impact and sizing below must be about that same thing.
