@@ -311,6 +311,36 @@ describe("runs", () => {
     expect((await errorOf(res)).code).toBe("capacity");
   });
 
+  it("drafts a host again when its cached blueprint predates the value case, and keeps the old page", async () => {
+    const handle = createBlueprintHandler(makeDeps());
+    await events(await handle(jsonReq({ url: "acme.test" })));
+    await Promise.all(pending);
+    const oldSlug = (await store.get(keys.domain("acme.test")))!;
+    const current = JSON.parse((await store.get(keys.blueprint(oldSlug)))!);
+    const legacy = {
+      ...current,
+      blueprint: {
+        ...current.blueprint,
+        agents: current.blueprint.agents.map(({ value: _value, ...a }: { value: unknown }) => a),
+      },
+    };
+    await store.set(keys.blueprint(oldSlug), JSON.stringify(legacy));
+
+    pending = [];
+    const evs = await events(await handle(jsonReq({ url: "acme.test" }, { ip: "5.6.7.8" })));
+    await Promise.all(pending);
+    expect(evs.map((e) => e.t)).not.toContain("cached");
+    expect(evs[evs.length - 1].t).toBe("done");
+    expect(startRun).toHaveBeenCalledTimes(2);
+    const newSlug = await store.get(keys.domain("acme.test"));
+    expect(newSlug).not.toBe(oldSlug);
+    expect(JSON.parse((await store.get(keys.blueprint(newSlug!)))!).blueprint.agents[0].value).toBeTruthy();
+    expect(JSON.parse((await store.get(keys.blueprint(oldSlug)))!)).toEqual(legacy);
+
+    const third = await events(await handle(jsonReq({ url: "acme.test" }, { ip: "9.9.9.9" })));
+    expect(third.map((e) => e.t)).toEqual(["cached", "done"]);
+  });
+
   it("waits on another run's lock, then resolves from its result without a second run", async () => {
     const handle = createBlueprintHandler(makeDeps());
     await store.set(keys.lock("acme.test"), "someone-else", { ex: 100 });

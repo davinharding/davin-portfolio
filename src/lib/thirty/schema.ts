@@ -28,17 +28,29 @@ const ToolSchema = z.object({
   system: z.string(),
 });
 
+export const VALUE_KINDS = ["saves_time", "cuts_cost", "grows_revenue"] as const;
+
+const ValueSchema = z.object({
+  kind: z.enum(VALUE_KINDS),
+  who: z.string(),
+  today: z.string(),
+  sizing: z.string(),
+});
+
 const AgentSchema = z.object({
   name: z.string(),
   role: z.string(),
+  value: ValueSchema,
+  impact: z.string(),
   trigger: z.string(),
   does: z.array(z.string()),
   tools: z.array(ToolSchema),
   humanGate: z.object({ required: z.boolean(), detail: z.string() }),
   evidence: z.string(),
-  impact: z.string(),
   relatedProject: RelatedProject,
 });
+
+const StoredAgentSchema = AgentSchema.extend({ value: ValueSchema.optional() });
 
 export const ModelBlueprintSchema = z.object({
   headline: z.string(),
@@ -55,10 +67,11 @@ export const ModelBlueprintSchema = z.object({
 export type ModelBlueprint = z.infer<typeof ModelBlueprintSchema>;
 
 export const NormalizedBlueprintSchema = ModelBlueprintSchema.extend({
-  agents: z.array(AgentSchema).min(1).max(MAX_AGENTS),
+  agents: z.array(StoredAgentSchema).min(1).max(MAX_AGENTS),
 });
-export type NormalizedBlueprint = ModelBlueprint;
+export type NormalizedBlueprint = z.infer<typeof NormalizedBlueprintSchema>;
 export type NormalizedAgent = NormalizedBlueprint["agents"][number];
+export type AgentValue = z.infer<typeof ValueSchema>;
 
 const STEP_IDS = ["validate", "read", "research", "design", "check"] as const satisfies readonly StepId[];
 

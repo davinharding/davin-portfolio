@@ -103,6 +103,13 @@ export function mockBlueprint(host: string): ModelBlueprint {
       {
         name: "Rush Quote Drafter",
         role: "Drafts a priced quote for every Rush Quote Desk request using past jobs with similar materials and tolerances.",
+        value: {
+          kind: "grows_revenue",
+          who: "the estimators who answer Rush Quote Desk requests",
+          today: "An estimator digs through past job folders and the machine-hour sheet by hand before pricing each rush request.",
+          sizing: "Rush requests lost each month to slow replies, times the average rush job value.",
+        },
+        impact: "Rush requests get a reviewed price the same day instead of waiting in a shared inbox.",
         trigger: "When a Rush Quote Desk form is submitted",
         does: [
           "Matches the request to past jobs by material, tolerance, and quantity",
@@ -119,12 +126,18 @@ export function mockBlueprint(host: string): ModelBlueprint {
           detail: "Every quote is sent only after an estimator approves the price and lead time.",
         },
         evidence: "The site routes rush jobs through the Rush Quote Desk form and invoices through QuickBooks.",
-        impact: "Rush requests get a reviewed price the same day instead of waiting in a shared inbox.",
         relatedProject: "apparelmagic-agents",
       },
       {
         name: "ToolCrib Reorder Planner",
         role: "Proposes each customer's next ToolCrib shipment from their scheduled jobs.",
+        value: {
+          kind: "cuts_cost",
+          who: "the account managers who run ToolCrib Subscriptions",
+          today: "Each monthly ToolCrib order is copied from last month's order sheet regardless of upcoming jobs.",
+          sizing: "Inserts over-shipped or rushed each month, times their cost and shipping.",
+        },
+        impact: "Customers stop running out of inserts mid-job, and over-shipping drops.",
         trigger: "Every Monday at 06:00, before the monthly ToolCrib cycle closes",
         does: [
           "Reads the next month of scheduled jobs per customer",
@@ -140,12 +153,18 @@ export function mockBlueprint(host: string): ModelBlueprint {
           detail: "Changes over 20 percent of a customer's usual order wait for account manager approval.",
         },
         evidence: "ToolCrib Subscriptions ship replacement inserts monthly to shops that also use ShopFloor Scheduler.",
-        impact: "Customers stop running out of inserts mid-job, and over-shipping drops.",
         relatedProject: "vitals-health-agent",
       },
       {
         name: "Onboarding Health Watcher",
         role: "Watches new ShopFloor Scheduler accounts for signs they are stuck and briefs customer success.",
+        value: {
+          kind: "saves_time",
+          who: "the customer success team",
+          today: "Customer success opens every new account's activity log by hand to find the stuck ones.",
+          sizing: "New accounts per month, times the hours spent checking each one.",
+        },
+        impact: "The new customer success hires spend their time on the accounts that need them.",
         trigger: "Every weekday at 08:00",
         does: [
           "Reads activity for accounts in their first 60 days",
@@ -157,7 +176,6 @@ export function mockBlueprint(host: string): ModelBlueprint {
           detail: "Read-only; it writes an internal brief and never contacts customers.",
         },
         evidence: "The company is hiring two customer success managers, which suggests onboarding load.",
-        impact: "The new customer success hires spend their time on the accounts that need them.",
         relatedProject: "openclaw-ops",
       },
     ],
@@ -199,12 +217,13 @@ function genericBlueprint(): ModelBlueprint {
       {
         name: "Support Bot",
         role: "Answers questions.",
+        value: { kind: "saves_time", who: "", today: "", sizing: "" },
+        impact: "Better support.",
         trigger: "On demand",
         does: ["Answers questions"],
         tools: [],
         humanGate: { required: false, detail: "" },
         evidence: "",
-        impact: "Better support.",
         relatedProject: "none",
       },
     ],

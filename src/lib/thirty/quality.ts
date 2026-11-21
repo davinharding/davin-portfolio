@@ -1,5 +1,5 @@
 import { PROJECT_KEYS } from "./projectCatalog";
-import type { ModelBlueprint, NormalizedBlueprint } from "./schema";
+import { VALUE_KINDS, type AgentValue, type ModelBlueprint, type NormalizedBlueprint } from "./schema";
 
 export const CAPS = {
   name: 60,
@@ -8,6 +8,9 @@ export const CAPS = {
   bullet: 220,
   evidence: 300,
   impact: 240,
+  valueWho: 120,
+  valueToday: 240,
+  valueSizing: 240,
   headline: 220,
   nonObvious: 500,
   caveat: 220,
@@ -52,31 +55,47 @@ function cleanList(values: unknown, cap: number, maxItems: number): string[] {
 }
 
 const RELATED = new Set<string>([...PROJECT_KEYS, "none"]);
+const KINDS = new Set<string>(VALUE_KINDS);
 
-export function normalizeBlueprint(raw: ModelBlueprint): NormalizedBlueprint {
+function normalizeValue(raw: unknown): AgentValue | undefined {
+  if (!raw || typeof raw !== "object") return undefined;
+  const v = raw as Record<string, unknown>;
+  return {
+    kind: typeof v.kind === "string" && KINDS.has(v.kind) ? (v.kind as AgentValue["kind"]) : "saves_time",
+    who: cleanText(v.who, CAPS.valueWho),
+    today: cleanText(v.today, CAPS.valueToday),
+    sizing: cleanText(v.sizing, CAPS.valueSizing),
+  };
+}
+
+export function normalizeBlueprint(raw: NormalizedBlueprint): NormalizedBlueprint {
   const agents = (Array.isArray(raw.agents) ? raw.agents : [])
-    .map((a) => ({
-      name: cleanText(a?.name, CAPS.name),
-      role: cleanText(a?.role, CAPS.role),
-      trigger: cleanText(a?.trigger, CAPS.trigger),
-      does: cleanList(a?.does, CAPS.bullet, ARRAY_CAPS.does),
-      tools: (Array.isArray(a?.tools) ? a.tools : [])
-        .map((t) => ({
-          name: cleanText(t?.name, CAPS.toolName),
-          access: t?.access === "write" ? ("write" as const) : ("read" as const),
-          system: cleanText(t?.system, CAPS.toolSystem),
-        }))
-        .filter((t) => t.name)
-        .slice(0, ARRAY_CAPS.tools),
-      humanGate: {
-        required: Boolean(a?.humanGate?.required),
-        detail: stripGateLabel(cleanText(a?.humanGate?.detail, CAPS.gateDetail)),
-      },
-      evidence: cleanText(a?.evidence, CAPS.evidence),
-      impact: cleanText(a?.impact, CAPS.impact),
-      relatedProject: (RELATED.has(a?.relatedProject) ? a.relatedProject : "none") as
-        ModelBlueprint["agents"][number]["relatedProject"],
-    }))
+    .map((a) => {
+      const value = normalizeValue(a?.value);
+      return {
+        name: cleanText(a?.name, CAPS.name),
+        role: cleanText(a?.role, CAPS.role),
+        ...(value && { value }),
+        impact: cleanText(a?.impact, CAPS.impact),
+        trigger: cleanText(a?.trigger, CAPS.trigger),
+        does: cleanList(a?.does, CAPS.bullet, ARRAY_CAPS.does),
+        tools: (Array.isArray(a?.tools) ? a.tools : [])
+          .map((t) => ({
+            name: cleanText(t?.name, CAPS.toolName),
+            access: t?.access === "write" ? ("write" as const) : ("read" as const),
+            system: cleanText(t?.system, CAPS.toolSystem),
+          }))
+          .filter((t) => t.name)
+          .slice(0, ARRAY_CAPS.tools),
+        humanGate: {
+          required: Boolean(a?.humanGate?.required),
+          detail: stripGateLabel(cleanText(a?.humanGate?.detail, CAPS.gateDetail)),
+        },
+        evidence: cleanText(a?.evidence, CAPS.evidence),
+        relatedProject: (RELATED.has(a?.relatedProject) ? a.relatedProject : "none") as
+          ModelBlueprint["agents"][number]["relatedProject"],
+      };
+    })
     .filter((a) => a.name)
     .slice(0, ARRAY_CAPS.agents);
 
@@ -102,6 +121,7 @@ export function blueprintStrings(bp: NormalizedBlueprint): string[] {
   out.push(...bp.firstBuild.scope, ...bp.caveats);
   for (const a of bp.agents) {
     out.push(a.name, a.role, a.trigger, a.evidence, a.impact, a.humanGate.detail, ...a.does);
+    if (a.value) out.push(a.value.who, a.value.today, a.value.sizing);
     for (const t of a.tools) out.push(t.name, t.system);
   }
   return out;
@@ -143,6 +163,16 @@ export function checkQuality(bp: NormalizedBlueprint, ctx: GateInput): GateResul
     if (!a.evidence) failures.push(`Agent "${a.name}" has no evidence from the profile.`);
     if (a.does.length < 2) failures.push(`Agent "${a.name}" needs at least 2 concrete actions in "does".`);
     if (a.tools.length < 1) failures.push(`Agent "${a.name}" needs at least 1 tool.`);
+    if (!a.impact) failures.push(`Agent "${a.name}" has no impact; state its payoff in one plain sentence.`);
+    if (!a.value) {
+      failures.push(`Agent "${a.name}" has no value case; fill in value.who, value.today and value.sizing.`);
+    } else {
+      const value = a.value;
+      const missing = (["who", "today", "sizing"] as const).filter((k) => !value[k]);
+      if (missing.length > 0) {
+        failures.push(`Agent "${a.name}" leaves ${missing.map((k) => `value.${k}`).join(", ")} empty.`);
+      }
+    }
   }
 
   if (!bp.agents.some((a) => a.humanGate.required)) {

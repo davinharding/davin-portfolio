@@ -20,6 +20,7 @@ Each run produces a blueprint stored in Upstash Redis and shown at `/b/<slug>`. 
 - Blueprints are immutable, so the raw stored value is cached for 5 minutes and repeat views skip Redis. Errors are not cached.
 - `/b/[slug]` renders per request (`force-dynamic`) so a store outage reaches `error.tsx`. An ISR page whose first render throws is served as a bare 500 instead.
 - A missing blueprint returns null (404). A store failure or invalid stored data throws `BlueprintUnavailableError`, which the error boundary turns into a retry page.
+- Agents gained a `value` case after launch. The model must write one, but the stored shape keeps it optional (`StoredAgentSchema`), so blueprints stored before it still parse, and normalization leaves them without one rather than inventing it. Their own pages keep working. A new run for that host does not reuse them, though: `isCurrentBlueprint` in the handler skips a cached blueprint whose agents lack `value`, so the host is drafted again with the current prompt.
 - Stored blueprints carry a schema version `v` (currently 1). `parseStoredBlueprint` rejects any other version with `UnsupportedVersionError`, which names the version, before Zod validation. When a v2 exists, its upgrade from v1 goes in `parseStoredBlueprint`, ahead of that check.
 - `/b/` stays crawlable in `robots.ts` so crawlers can read each page's `noindex` tag and drop it.
 - A company's host or name can be one long unbroken word (a 60-character subdomain), so the page uses `overflow-wrap: anywhere` and never scrolls sideways.
