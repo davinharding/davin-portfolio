@@ -217,6 +217,30 @@ describe("runs", () => {
     expect(cacheHit?.sessionId).toBeUndefined();
   });
 
+  it("adds the visitor's homepage design to run and cache-hit events, and drops a tampered cookie", async () => {
+    const handle = createBlueprintHandler(makeDeps());
+    const cookie = { cookie: "other=1; dh_home=drafting-table.ab; dh_id=abc" };
+    await events(await handle(jsonReq({ url: "acme.test" }, { headers: cookie })));
+    await Promise.all(pending);
+    expect(reported.find((e) => e.event === "blueprint_run")?.properties).toMatchObject({
+      home_variant: "drafting-table",
+      home_variant_source: "ab",
+      "$feature/home-design": "drafting-table",
+      outcome: "done",
+    });
+
+    await events(await handle(jsonReq({ url: "acme.test" }, { headers: { cookie: "dh_home=open-roles.qa" } })));
+    await Promise.all(pending);
+    const hit = reported.find((e) => e.event === "blueprint_cache_hit")?.properties;
+    expect(hit).toMatchObject({ home_variant: "open-roles", home_variant_source: "qa", host: "acme.test" });
+    expect(hit).not.toHaveProperty("$feature/home-design");
+
+    reported.length = 0;
+    await events(await handle(jsonReq({ url: "acme.test" }, { headers: { cookie: "dh_home=<script>.ab" } })));
+    await Promise.all(pending);
+    expect(reported[0]?.properties).not.toHaveProperty("home_variant");
+  });
+
   it("form posts fall back to the salted visitor hash for analytics", async () => {
     await createBlueprintHandler(makeDeps())(formReq({ url: "acme.test" }));
     const run = reported.find((e) => e.event === "blueprint_run");

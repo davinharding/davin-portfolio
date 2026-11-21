@@ -48,15 +48,18 @@ A modern, responsive portfolio showcasing 8+ years of full-stack development, fr
 ```
 src/
 ├── app/
-│   ├── page.tsx              # Home: one sentence and the blueprint launcher
+│   ├── page.tsx              # Home fallback (classic design) if the proxy does not run
+│   ├── home/[variant]/       # The homepage designs, prerendered; reached through the proxy
 │   ├── work/                 # The previous homepage: hero, projects, skills, timeline
 │   ├── b/[slug]/             # Blueprint pages (examples from JSON, runs from Redis)
 │   ├── sorry/[code]/         # Error landing for no-JavaScript form posts
 │   ├── api/blueprint/        # POST: starts or resolves a run, streams NDJSON
 │   ├── portfolio/[name]/     # Project detail pages
 │   └── call/                 # Book a Call (Calendly embed)
+├── proxy.ts                  # Picks each visitor's homepage design and rewrites `/`
 ├── components/
 │   ├── thirty/               # Launcher, run console, blueprint view
+│   │   └── home/             # The homepage designs
 │   └── ui/                   # Radix-based UI primitives
 ├── data/
 │   ├── blueprints/           # Committed example blueprints
@@ -80,6 +83,23 @@ npm run thirty:admin -- stats     # get <slug> | delete <slug> | stats (needs Re
 ```
 
 Live runs need `ANTHROPIC_API_KEY`, Upstash Redis (`KV_REST_API_URL`, `KV_REST_API_TOKEN`), and in production `THIRTY_IP_SALT`. `THIRTY_LIVE=off` is the kill switch; spend is capped at `THIRTY_MONTHLY_BUDGET_USD` (default $10/month).
+
+## 🔀 Homepage design experiment
+
+The homepage has two designs, "Open roles" and "Drafting table", split 50/50 and measured in PostHog (flag `home-design`). `src/proxy.ts` picks a visitor's design before the page is sent, using the same hash PostHog uses for its flags, and rewrites `/` to a prerendered page under `/home/<design>`. The spec is `docs/specs/home-design-experiment.md`.
+
+```bash
+# Look at a design. This forces it for the browser session and keeps you out of the results.
+open "http://localhost:3000/?variant=open-roles"      # or drafting-table, classic
+open "http://localhost:3000/?variant=auto"            # back to the split
+
+HOME_DESIGN=open-roles npm run dev                    # serve one design to everyone (how a winner ships)
+
+# Check that the site's hash still agrees with PostHog (needs an active flag with the same variants)
+npx tsx --env-file-if-exists=.env.local scripts/home-design-agreement.mts <flag-key>
+```
+
+Share the bare URL for real traffic, with UTM parameters per channel. A `?variant=` link excludes whoever opens it. Never edit the flag's variants or split in PostHog: the site does not read them.
 
 ## 🚀 Getting Started
 

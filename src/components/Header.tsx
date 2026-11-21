@@ -21,6 +21,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useState } from "react";
+import { trackCallCta } from "@/lib/analytics/track";
 
 type IHeaderProps = {
   page?: string;
@@ -29,7 +30,7 @@ type IHeaderProps = {
 
 const navProjects = getPublishedProjects();
 
-const Header: React.FC<IHeaderProps> = () => {
+const Header: React.FC<IHeaderProps> = ({ page }) => {
   const pathName = usePathname();
   const router = useRouter();
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -58,7 +59,9 @@ const Header: React.FC<IHeaderProps> = () => {
         <Link
           href="/"
           aria-label="Davin Harding — Home"
-          aria-current={pathName === "/" ? "page" : undefined}
+          // From the prop, not the path: the homepage is prerendered at /home/<design>
+          // and rewritten to `/`, so the path differs between server and browser.
+          aria-current={page === "index" ? "page" : undefined}
           className="transition-opacity hover:opacity-80"
           prefetch
         >
@@ -141,6 +144,7 @@ const Header: React.FC<IHeaderProps> = () => {
             <Link
               href="/call"
               aria-current={isCall ? "page" : undefined}
+              onClick={() => trackCallCta("header")}
             >
               <Calendar className="mr-1 h-4 w-4" aria-hidden="true" />
               Book a Call
@@ -220,7 +224,7 @@ const Header: React.FC<IHeaderProps> = () => {
                   className="w-full justify-start"
                   onClick={() => setSheetOpen(false)}
                 >
-                  <Link href="/call">
+                  <Link href="/call" onClick={() => trackCallCta("header")}>
                     <Calendar className="mr-2 h-4 w-4" aria-hidden="true" />
                     Book a Call
                   </Link>

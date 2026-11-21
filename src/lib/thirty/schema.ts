@@ -3,7 +3,7 @@
 // outputs support a limited JSON Schema subset); quality.ts enforces limits.
 import { z } from "zod";
 import { PROJECT_KEYS } from "./projectCatalog";
-import type { StepId } from "./events";
+import { MAX_AGENTS, type StepId } from "./events";
 
 export const ProfileSchema = z.object({
   companyName: z.string(),
@@ -59,7 +59,7 @@ export type ModelBlueprint = z.infer<typeof ModelBlueprintSchema>;
 
 /** Same shape as the model output; used to validate what we stored. */
 export const NormalizedBlueprintSchema = ModelBlueprintSchema.extend({
-  agents: z.array(AgentSchema).min(1).max(5),
+  agents: z.array(AgentSchema).min(1).max(MAX_AGENTS),
 });
 export type NormalizedBlueprint = ModelBlueprint;
 export type NormalizedAgent = NormalizedBlueprint["agents"][number];

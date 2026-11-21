@@ -3,6 +3,7 @@
 // the whole flow is testable without a network, a model, or Redis.
 import { captureServerEvent, type ReportEvent } from "@/lib/analytics/server";
 import { sanitizeAnalyticsId } from "@/lib/analytics/config";
+import { homeEventProps, readHomeAssignment } from "@/lib/experiments/homeDesign";
 import { getConfig, isLiveEnabled, isMockMode, isProduction, LIMITS, type ThirtyConfig } from "./config";
 import { releaseBudget, reserveBudget } from "./budget";
 import { errorMessage, errorStatus, isErrorCode, sorryParam, type ErrorCode } from "./errors";
@@ -285,7 +286,13 @@ export function createBlueprintHandler(deps: HandlerDeps) {
     const store = deps.getStore();
     const visitor = visitorId(clientIp(request.headers), cfg.ipSalt);
     // Without JavaScript there is no browser id; the salted IP hash stands in (never the raw IP).
-    const analytics = { distinctId: body.phId ?? `visitor:${visitor}`, sessionId: body.phSession };
+    // The homepage design this visitor was served, so server events line up with the experiment.
+    const home = readHomeAssignment(request.headers.get("cookie"));
+    const analytics = {
+      distinctId: body.phId ?? `visitor:${visitor}`,
+      sessionId: body.phSession,
+      context: home ? homeEventProps(home) : undefined,
+    };
     const now = new Date(requestStartedAt);
 
     try {
@@ -313,8 +320,9 @@ export function createBlueprintHandler(deps: HandlerDeps) {
           deps.keepAlive(
             deps.report({
               event: "blueprint_cache_hit",
-              ...analytics,
-              properties: { host, slug: hit.slug, form: mode === "form" },
+              distinctId: analytics.distinctId,
+              sessionId: analytics.sessionId,
+              properties: { ...analytics.context, host, slug: hit.slug, form: mode === "form" },
             })
           );
           if (mode === "form") return redirectToBlueprint(hit.slug);

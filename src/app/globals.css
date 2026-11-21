@@ -339,7 +339,7 @@ html.loader-done .splash {
 .thirty-hero {
   transition: font-size 200ms ease, margin 200ms ease;
 }
-.thirty-stage:not([data-step="idle"]) .thirty-hero {
+[data-thirty-stage]:not([data-step="idle"]) .thirty-hero {
   @apply text-3xl md:text-4xl mb-5 md:mb-6;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -419,6 +419,182 @@ html.loader-done .splash {
     margin: 0 auto;
     background: hsl(var(--border));
   }
+}
+
+/* ---------------------------------------------------------------------------
+   Homepage designs (docs/specs/home-design-experiment.md)
+   --------------------------------------------------------------------------- */
+
+/* Open roles: on the homepage the chart is a two-column grid on phones, not a rail. */
+@media (max-width: 767px) {
+  .org-chart__agents--grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding-left: 0;
+  }
+  .org-chart__agents--grid::before,
+  .org-chart__agents--grid .org-chart__agent::before {
+    display: none;
+  }
+  .org-chart__agents--grid .org-chart__gate {
+    left: auto;
+    right: 0.4rem;
+    top: 0.4rem;
+  }
+}
+
+/* Open roles: one role in the chart, open until the run fills it. */
+.team-slot {
+  display: block;
+  height: 100%;
+  min-height: 3.75rem;
+  padding: 0.625rem 0.75rem;
+  border: 1px dashed hsl(var(--muted-foreground) / 0.38);
+  border-radius: var(--radius);
+  background: hsl(var(--card) / 0.6);
+  text-align: left;
+  transition: border-color 0.25s ease, background-color 0.25s ease, opacity 0.4s ease;
+}
+a.team-slot:hover {
+  border-color: hsl(var(--primary) / 0.6);
+}
+.team-slot--filled {
+  border-style: solid;
+  border-color: hsl(var(--primary) / 0.55);
+  background: hsl(var(--primary) / 0.08);
+  animation: team-hire 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+.team-slot--drafting {
+  border-color: hsl(var(--primary) / 0.5);
+  background-image: linear-gradient(100deg, transparent 30%, hsl(var(--primary) / 0.14) 50%, transparent 70%);
+  background-size: 220% 100%;
+  animation: team-scan 1.4s linear infinite;
+}
+.team-swap {
+  animation: team-swap 0.5s ease both;
+}
+@keyframes team-hire {
+  from { opacity: 0.4; transform: scale(0.96); }
+}
+@keyframes team-scan {
+  from { background-position: 120% 0; }
+  to { background-position: -100% 0; }
+}
+@keyframes team-swap {
+  from { opacity: 0; transform: translateY(4px); }
+}
+
+/* Drafting table: grid paper, with a brighter patch that follows the cursor
+   (--paper-x and --paper-y are set by DraftingTableContent). */
+.drafting-paper {
+  isolation: isolate;
+  --paper-x: 72%;
+  --paper-y: 42%;
+}
+.drafting-paper::before,
+.drafting-paper::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(hsl(var(--primary) / var(--paper-minor)) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--primary) / var(--paper-minor)) 1px, transparent 1px),
+    linear-gradient(hsl(var(--primary) / var(--paper-major)) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--primary) / var(--paper-major)) 1px, transparent 1px);
+  background-size: 24px 24px, 24px 24px, 120px 120px, 120px 120px;
+  background-position: center top;
+}
+.drafting-paper::before {
+  --paper-minor: 0.035;
+  --paper-major: 0.07;
+}
+.drafting-paper::after {
+  --paper-minor: 0.16;
+  --paper-major: 0.3;
+  -webkit-mask-image: radial-gradient(280px circle at var(--paper-x) var(--paper-y), #000, transparent);
+  mask-image: radial-gradient(280px circle at var(--paper-x) var(--paper-y), #000, transparent);
+}
+.light .drafting-paper::before {
+  --paper-minor: 0.06;
+  --paper-major: 0.11;
+}
+.light .drafting-paper::after {
+  --paper-minor: 0.22;
+  --paper-major: 0.4;
+}
+.drafting-coords {
+  display: none;
+}
+@media (hover: hover) and (min-width: 1024px) {
+  .drafting-coords {
+    display: block;
+  }
+}
+
+/* Drafting table: the schematic. Every line is a dashed construction line with
+   a solid ink line over it; BlueprintDrawing sets how much ink is drawn. */
+.drafting-construct {
+  fill: none;
+  stroke: hsl(var(--foreground) / 0.2);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+.drafting-construct--filled,
+.drafting-mask {
+  fill: hsl(var(--background));
+}
+.drafting-ink {
+  fill: none;
+  stroke: hsl(var(--primary));
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1 1;
+  transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+}
+.drafting-t {
+  font: 500 7.5px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  letter-spacing: 0.08em;
+  fill: hsl(var(--muted-foreground));
+}
+.drafting-t--strong {
+  font-size: 9.5px;
+  font-weight: 600;
+  fill: hsl(var(--foreground));
+}
+.drafting-t--label {
+  font-size: 6.5px;
+}
+.drafting-t--value {
+  font-size: 8.5px;
+  font-weight: 600;
+  fill: hsl(var(--foreground));
+}
+.drafting-t--tight {
+  font-size: 7.5px;
+}
+.drafting-t--ink {
+  fill: hsl(var(--primary));
+}
+/* The phone layout is drawn at a smaller scale, so its type is set larger: at
+   least 10 px on screen in a 328 px container (drawingScale.ts). */
+.drafting-drawing--narrow .drafting-t,
+.drafting-drawing--narrow .drafting-t--label {
+  font-size: 9.5px;
+}
+.drafting-drawing--narrow .drafting-t--strong,
+.drafting-drawing--narrow .drafting-t--value {
+  font-size: 10.5px;
+}
+.drafting-fade {
+  transition: opacity 0.45s ease;
+}
+.drafting-pop {
+  animation: drafting-pop 0.5s ease both;
+}
+@keyframes drafting-pop {
+  from { opacity: 0; transform: translateY(3px); }
 }
 
 /* Mobile viewport height fix - accounts for browser UI */

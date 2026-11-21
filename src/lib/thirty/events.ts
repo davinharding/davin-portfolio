@@ -1,6 +1,9 @@
 // Client-safe: the NDJSON event contract between the API route and the launcher.
 import type { ErrorCode } from "./errors";
 
+/** The most agents a blueprint can have (the schema enforces it). */
+export const MAX_AGENTS = 5;
+
 export type StepId = "validate" | "read" | "research" | "design" | "check";
 
 export type StepStatus = "start" | "done" | "skip" | "fail";

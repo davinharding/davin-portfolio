@@ -2,6 +2,18 @@ import type { CSSProperties } from "react";
 import { Lock, UserCheck } from "lucide-react";
 import type { NormalizedAgent } from "@/lib/thirty/schema";
 
+/** The lock on an agent that needs a person's approval before it acts. */
+export function GateBadge() {
+  return (
+    <span
+      className="org-chart__gate inline-flex h-5 w-5 items-center justify-center rounded-full border border-amber-500/70 bg-background text-amber-400 [.light_&]:text-amber-700"
+      title="Needs human approval"
+    >
+      <Lock className="h-3 w-3" aria-hidden="true" />
+    </span>
+  );
+}
+
 export function OrgChart({ agents, companyName }: { agents: NormalizedAgent[]; companyName: string }) {
   return (
     <figure aria-label={`Agent team for ${companyName}`} className="org-chart">
@@ -21,14 +33,7 @@ export function OrgChart({ agents, companyName }: { agents: NormalizedAgent[]; c
       >
         {agents.map((agent) => (
           <li key={agent.name} className="org-chart__agent">
-            {agent.humanGate.required ? (
-              <span
-                className="org-chart__gate inline-flex h-5 w-5 items-center justify-center rounded-full border border-amber-500/70 bg-background text-amber-400 [.light_&]:text-amber-700"
-                title="Needs human approval"
-              >
-                <Lock className="h-3 w-3" aria-hidden="true" />
-              </span>
-            ) : null}
+            {agent.humanGate.required ? <GateBadge /> : null}
             <a
               href={`#agent-${slugify(agent.name)}`}
               className="block h-full rounded-lg border border-border bg-card px-3 py-2.5 transition-colors hover:border-primary/50"

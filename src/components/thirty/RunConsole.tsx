@@ -1,29 +1,10 @@
 "use client";
 
-import { forwardRef } from "react";
 import { Check, Circle, Loader2, Minus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { StepId } from "@/lib/thirty/events";
 import { cn } from "@/lib/utils";
-
-export type ConsoleStepStatus = "pending" | "active" | "done" | "skipped" | "failed";
-
-export type ConsoleStep = {
-  id: StepId;
-  label: string;
-  status: ConsoleStepStatus;
-  details: string[];
-};
-
-type RunConsoleProps = {
-  host: string;
-  steps: ConsoleStep[];
-  elapsedMs: number;
-  reducedMotion: boolean;
-  /** Replaces the step list footer, for example "Blueprint ready". */
-  statusLine?: string | null;
-  onCancel?: () => void;
-};
+import { RUN_PROMISE, SLOW_RUN_NOTE, type ConsoleStepStatus } from "./runModel";
+import type { BlueprintRun } from "./useBlueprintRun";
 
 const STATUS_TEXT: Record<ConsoleStepStatus, string> = {
   pending: "pending",
@@ -49,12 +30,10 @@ function StepIcon({ status }: { status: ConsoleStepStatus }) {
   }
 }
 
-export const RunConsole = forwardRef<HTMLHeadingElement, RunConsoleProps>(function RunConsole(
-  { host, steps, elapsedMs, reducedMotion, statusLine, onCancel },
-  headingRef
-) {
+/** The run as a list of steps with what each one found. Takes the form's place while a run is on screen. */
+export function RunConsole({ run }: { run: BlueprintRun }) {
+  const { host, steps, elapsedMs, reducedMotion, statusLine, slow, cancel } = run;
   const seconds = reducedMotion ? Math.floor(elapsedMs / 1000).toFixed(1) : (elapsedMs / 1000).toFixed(1);
-  const slow = elapsedMs >= 30_000;
 
   return (
     <section
@@ -65,7 +44,7 @@ export const RunConsole = forwardRef<HTMLHeadingElement, RunConsoleProps>(functi
         <div className="min-w-0">
           <h2
             id="run-console-title"
-            ref={headingRef}
+            ref={run.headingRef}
             tabIndex={-1}
             className="text-base font-semibold text-foreground break-words"
           >
@@ -73,7 +52,7 @@ export const RunConsole = forwardRef<HTMLHeadingElement, RunConsoleProps>(functi
           </h2>
           {/* Compact screens skip the reminder (the form just said it) to keep the run on one screen. */}
           <p className={cn("text-xs text-muted-foreground mt-1", !slow && "compact:hidden")}>
-            {slow ? "Taking a little longer than usual." : "About 30 seconds. Reads your public site, nothing else."}
+            {slow ? SLOW_RUN_NOTE : RUN_PROMISE}
           </p>
         </div>
         <p
@@ -125,12 +104,12 @@ export const RunConsole = forwardRef<HTMLHeadingElement, RunConsoleProps>(functi
         <p className="text-sm text-foreground" role="status">
           {statusLine ?? ""}
         </p>
-        {onCancel ? (
-          <Button type="button" variant="ghost" size="sm" onClick={onCancel}>
+        {cancel ? (
+          <Button type="button" variant="ghost" size="sm" onClick={cancel}>
             Cancel
           </Button>
         ) : null}
       </div>
     </section>
   );
-});
+}

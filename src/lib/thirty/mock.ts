@@ -14,10 +14,10 @@ export const MOCK_MODELS: Models = {
 };
 
 /** The error code a mock host asks for, if any (`not-a-company.test` → `not_a_company`). */
-export function mockTrigger(host: string): ErrorCode | "slow" | "fallback" | "drop" | null {
+export function mockTrigger(host: string): ErrorCode | "slow" | "fallback" | "drop" | "five-agents" | null {
   if (!host.endsWith(".test")) return null;
   const label = host.slice(0, -".test".length).split(".").pop() ?? "";
-  if (label === "slow" || label === "fallback" || label === "drop") return label;
+  if (label === "slow" || label === "fallback" || label === "drop" || label === "five-agents") return label;
   const code = label.replace(/-/g, "_");
   return isErrorCode(code) ? code : null;
 }
@@ -180,6 +180,24 @@ export function mockBlueprint(host: string): ModelBlueprint {
   };
 }
 
+/** `five-agents.test`: the most agents a blueprint can have, to exercise the widest layouts. */
+function fiveAgentBlueprint(host: string): ModelBlueprint {
+  const base = mockBlueprint(host);
+  const extra = (name: string, role: string): ModelBlueprint["agents"][number] => ({
+    ...base.agents[2],
+    name,
+    role,
+  });
+  return {
+    ...base,
+    agents: [
+      ...base.agents,
+      extra("Invoice Dispute Triage Desk", "Sorts QuickBooks invoice disputes by cause and drafts a reply for billing."),
+      extra("Machine Downtime Correlation Analyst", "Links schedule slips in ShopFloor Scheduler to machine downtime."),
+    ],
+  };
+}
+
 function genericBlueprint(): ModelBlueprint {
   return {
     headline: "AI can help this business grow.",
@@ -248,7 +266,12 @@ export function mockStages(host: string, totalMs: number): Stages {
         await sleep(d(0.1), args.signal);
         throw new Error("Mock internal failure");
       }
-      const blueprint = trigger === "quality" ? genericBlueprint() : mockBlueprint(host);
+      const blueprint =
+        trigger === "quality"
+          ? genericBlueprint()
+          : trigger === "five-agents"
+            ? fiveAgentBlueprint(host)
+            : mockBlueprint(host);
       const per = d(0.45) / blueprint.agents.length;
       for (const agent of blueprint.agents) {
         await sleep(per, args.signal);
