@@ -77,6 +77,33 @@ describe("normalizeBlueprint", () => {
     expect(normalizeBlueprint(raw).firstBuild.agentName).toBe("ToolCrib Reorder Planner");
   });
 
+  it("cleans and caps the value case", () => {
+    const long = "y ".repeat(500);
+    const raw = base();
+    raw.agents[0].value = { kind: "cuts_cost", who: `  the <b>owner</b>  ${long}`, today: long, sizing: long };
+    const v = normalizeBlueprint(raw).agents[0].value!;
+    expect(v.kind).toBe("cuts_cost");
+    expect(v.who.startsWith("the owner y")).toBe(true);
+    expect(v.who.length).toBeLessThanOrEqual(CAPS.valueWho);
+    expect(v.today.length).toBeLessThanOrEqual(CAPS.valueToday);
+    expect(v.sizing.length).toBeLessThanOrEqual(CAPS.valueSizing);
+  });
+
+  it("falls back to saves_time for an unknown value kind", () => {
+    const raw = base();
+    (raw.agents[0].value as { kind: string }).kind = "vibes";
+    expect(normalizeBlueprint(raw).agents[0].value?.kind).toBe("saves_time");
+  });
+
+  it("leaves an agent stored before the value case without one", () => {
+    const raw = base();
+    const { value: _value, ...legacy } = raw.agents[0];
+    void _value;
+    const n = normalizeBlueprint({ ...raw, agents: [legacy, ...raw.agents.slice(1)] });
+    expect("value" in n.agents[0]).toBe(false);
+    expect(n.agents[1].value).toEqual(raw.agents[1].value);
+  });
+
   it("coerces an unknown related project to none", () => {
     const raw = base() as unknown as { agents: Array<{ relatedProject: string }> };
     raw.agents[0].relatedProject = "made-up-project";
@@ -136,6 +163,38 @@ describe("checkQuality", () => {
     expect(r.ok).toBe(true);
   });
 
+  it("fails when an agent has no impact", () => {
+    expect(gate((bp) => (bp.agents[1].impact = "  ")).failures.join()).toMatch(/"ToolCrib Reorder Planner" has no impact/);
+  });
+
+  it.each(["who", "today", "sizing"] as const)("fails when value.%s is empty", (key) => {
+    const r = gate((bp) => (bp.agents[0].value[key] = ""));
+    expect(r.ok).toBe(false);
+    expect(r.failures).toEqual([`Agent "Rush Quote Drafter" leaves value.${key} empty.`]);
+  });
+
+  it("names every empty value field in one failure", () => {
+    const r = gate((bp) => (bp.agents[2].value = { kind: "saves_time", who: "", today: "", sizing: "<p></p>" }));
+    expect(r.failures).toEqual(['Agent "Onboarding Health Watcher" leaves value.who, value.today, value.sizing empty.']);
+  });
+
+  it("fails when an agent has no value case at all", () => {
+    const raw = base();
+    const { value: _value, ...legacy } = raw.agents[0];
+    void _value;
+    const r = checkQuality(normalizeBlueprint({ ...raw, agents: [legacy, ...raw.agents.slice(1)] }), ctx);
+    expect(r.failures.join()).toMatch(/"Rush Quote Drafter" has no value case/);
+  });
+
+  it("checks the value case for contact details too", () => {
+    expect(gate((bp) => (bp.agents[0].value.sizing = "Ask sales@acme.com")).failures.join()).toMatch(/URL, an email/);
+  });
+
+  it("counts the value case toward grounding", () => {
+    const r = checkQuality(normalizeBlueprint(base()), { companyName: "Globex", offerings: ["estimators", "account managers"] });
+    expect(r.ok).toBe(true);
+  });
+
   it.each([
     ["a URL", "See https://acme.com for details"],
     ["a www host", "Visit www.acme.com today"],
@@ -148,13 +207,14 @@ describe("checkQuality", () => {
 });
 
 describe("committed examples", () => {
-  it.each(allExamples().map((e) => [e.slug, e] as const))("%s passes normalization unchanged and the gate", (_slug, example) => {
+  // The examples predate the value case, so the only checks they may fail are
+  // the ones asking for it; every other check still holds.
+  it.each(allExamples().map((e) => [e.slug, e] as const))("%s passes normalization unchanged and every pre-value check", (_slug, example) => {
     const normalized = normalizeBlueprint(example.blueprint);
     expect(normalized).toEqual(example.blueprint);
-    expect(checkQuality(normalized, { companyName: example.company.name, offerings: example.company.offerings })).toEqual({
-      ok: true,
-      failures: [],
-    });
+    expect(normalized.agents.every((a) => !("value" in a))).toBe(true);
+    const gate = checkQuality(normalized, { companyName: example.company.name, offerings: example.company.offerings });
+    expect(gate.failures.filter((f) => !/has no value case/.test(f))).toEqual([]);
     expect(example.kind).toBe("example");
     expect(example.receipt).toBeNull();
     expect(example.source.method).toBe("curated");
