@@ -15,8 +15,8 @@ describe("errors table", () => {
   });
 
   it("substitutes the host where the message mentions it", () => {
-    expect(errorMessage("unreachable", "acme.com")).toBe("I could not find a website at acme.com. Check the spelling.");
-    expect(errorMessage("not_a_company")).toMatch(/^That address does not look/);
+    expect(errorMessage("unreachable", "acme.com")).toBe("I couldn't find a website at acme.com. Check the spelling.");
+    expect(errorMessage("not_a_company")).toMatch(/^That address doesn't look/);
   });
 
   it("rejects unknown sorry params", () => {

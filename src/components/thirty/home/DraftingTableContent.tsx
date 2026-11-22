@@ -58,9 +58,9 @@ export function DraftingTableContent({ examples }: { examples: readonly ExampleL
       ? "Drawing checked"
       : "Drafting"
     : typed === 0
-      ? "Type your address to ink the drawing"
+      ? "Type your website to start the drawing"
       : progress < 1
-        ? "Keep going"
+        ? "Keep typing"
         : "Ready to draft";
 
   return (
@@ -70,7 +70,6 @@ export function DraftingTableContent({ examples }: { examples: readonly ExampleL
         className="mx-auto grid w-full max-w-6xl flex-1 items-center gap-10 px-4 pb-10 pt-24 md:px-6 lg:grid-cols-2 lg:gap-14 lg:px-8"
       >
         <div className="min-w-0">
-          <p className="text-meta mb-4">Thirty Seconds</p>
           <h1
             id="home-title"
             className="thirty-hero mb-8 text-balance text-4xl font-semibold tracking-tight text-foreground md:text-5xl lg:text-6xl"

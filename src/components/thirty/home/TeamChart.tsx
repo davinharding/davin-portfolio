@@ -102,7 +102,7 @@ export function TeamChart({ run, teams }: { run: BlueprintRun; teams: readonly S
             <span className="text-foreground">
               Four open roles{typedHost ? <> at <span className="break-all">{typedHost}</span></> : null}.
             </span>{" "}
-            Press Enter and my agents fill them.
+            Press Enter to see who&apos;d fill them.
           </p>
         ) : (
           <p className="text-muted-foreground" aria-live="polite">

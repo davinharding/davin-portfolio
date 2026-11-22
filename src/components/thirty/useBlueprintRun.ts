@@ -43,7 +43,7 @@ function formatRetry(code: ClientErrorCode, seconds?: number): string | null {
   if (code === "rate_limited") {
     const h = Math.floor(seconds / 3600);
     const m = Math.max(1, Math.round((seconds % 3600) / 60));
-    return h > 0 ? `That is in about ${h} h ${m} min.` : `That is in about ${m} min.`;
+    return h > 0 ? `That's in about ${h} h ${m} min.` : `That's in about ${m} min.`;
   }
   return null;
 }

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const HEADLINE = "Your next hire is an AI agent. Davin builds it";
 const TITLE = "Your next hire is an AI agent. Davin Harding builds it.";
 const DESCRIPTION =
-  "Enter your company's website and watch my agents draft a blueprint of the AI agents I would build for you, in about 30 seconds.";
+  "Enter your company's website and get a blueprint of the AI agents I'd build for you. It takes about 30 seconds.";
 
 export const HOME_SOCIAL_IMAGE = {
   url: "/social/home/opengraph-image",
