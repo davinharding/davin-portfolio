@@ -508,7 +508,8 @@ a.team-slot:hover {
   stroke-width: 1;
   stroke-dasharray: 3 4;
 }
-.drafting-construct--filled {
+.drafting-construct--filled,
+.drafting-mask {
   fill: hsl(var(--background));
 }
 .drafting-ink {

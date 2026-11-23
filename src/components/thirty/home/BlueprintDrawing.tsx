@@ -169,6 +169,11 @@ function WideDrawing({ run, progress: p, host, today }: DrawingProps) {
       <text x="10" y="246" className="drafting-t drafting-fade" style={shown(0.88)}>
         R READ · W WRITE, BEHIND THE GATE
       </text>
+      <Ink p={p} from={0.9} to={0.96} d="M10 262H510M10 256v12M510 256v12" />
+      <rect x="196" y="255" width="128" height="14" className="drafting-mask" />
+      <text x="260" y="265" textAnchor="middle" className="drafting-t">
+        ABOUT 30 S, START TO FINISH
+      </text>
 
       <text x="10" y="302" className="drafting-t drafting-t--strong">
         FIG. 1
@@ -183,7 +188,10 @@ function WideDrawing({ run, progress: p, host, today }: DrawingProps) {
         1. EVERY WRITE WAITS FOR A PERSON.
       </text>
       <text x="10" y="371" className="drafting-t">
-        2. READS ONLY YOUR PUBLIC WEBSITE.
+        2. READS YOUR PUBLIC SITE, NOTHING ELSE.
+      </text>
+      <text x="10" y="384" className="drafting-t">
+        3. DRAWN IN ABOUT THIRTY SECONDS.
       </text>
 
       <Ink p={p} from={0.94} to={1} d={`${box(270, 292, 240, 112)}M270 320H510M270 348H510M270 376H510M390 320V404`} />

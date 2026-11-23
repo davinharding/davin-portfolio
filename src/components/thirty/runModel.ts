@@ -12,7 +12,7 @@ export type ConsoleStep = {
 
 export const SLOW_RUN_MS = 30_000;
 export const SLOW_RUN_NOTE = "Taking a little longer than usual.";
-export const RUN_PROMISE = "Takes about 30 seconds and only reads your public website.";
+export const RUN_PROMISE = "About 30 seconds. Reads your public site, nothing else.";
 
 export function looksLikeWebsite(raw: string): boolean {
   const s = raw.trim();
