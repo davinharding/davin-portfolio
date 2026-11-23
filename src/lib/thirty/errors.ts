@@ -33,48 +33,48 @@ type ErrorInfo = {
 export const ERRORS: Record<ErrorCode, ErrorInfo> = {
   bad_request: {
     status: 400,
-    message: "That request did not look right. Reload the page and try again.",
+    message: "Something was off with that request. Reload the page and try again.",
     next: ["retry"],
   },
   invalid_url: {
     status: 400,
-    message: "That does not look like a website address. Try something like yourcompany.com.",
+    message: "That doesn't look like a website address. Try something like yourcompany.com.",
     next: ["fix_input"],
   },
   blocked_host: {
     status: 400,
-    message: "That address is not a public website.",
+    message: "That address isn't a public website.",
     next: ["fix_input"],
   },
   platform_url: {
     status: 400,
-    message: "That is a page on someone else's platform. Enter the company's own website.",
+    message: "That's a page on someone else's platform. Enter the company's own website.",
     next: ["fix_input"],
   },
   self_url: {
     status: 400,
-    message: "That is this site. Try your company's.",
+    message: "That's this site. Try your company's.",
     next: ["fix_input"],
   },
   too_fast: {
     status: 429,
-    message: "Slow down a moment, then try again.",
+    message: "Too many tries in a row.",
     next: ["retry_after"],
   },
   rate_limited: {
     status: 429,
-    message: "You have used today's three live runs. They reset at midnight UTC.",
+    message: "You've used today's three live runs. They reset at midnight UTC.",
     next: ["examples", "book_call"],
   },
   capacity: {
     status: 503,
     message:
-      "Live runs are paused for now; I cap what this page can spend. The examples show the same thing.",
+      "This page hit its spending cap, so live runs are paused. The examples show what you'd get.",
     next: ["examples", "book_call"],
   },
   live_disabled: {
     status: 503,
-    message: "Live runs are switched off at the moment. The examples show the same thing.",
+    message: "Live runs are switched off right now. The examples show what you'd get.",
     next: ["examples", "book_call"],
   },
   unavailable: {
@@ -84,19 +84,19 @@ export const ERRORS: Record<ErrorCode, ErrorInfo> = {
   },
   unreachable: {
     status: 422,
-    message: "I could not find a website at {host}. Check the spelling.",
+    message: "I couldn't find a website at {host}. Check the spelling.",
     next: ["fix_input"],
   },
   not_a_company: {
     status: 422,
     message:
-      "{host} does not look like a company website, so there is nothing to design agents for.",
+      "{host} doesn't look like a company website, so there's nothing to design agents for.",
     next: ["fix_input", "examples"],
   },
   not_enough_info: {
     status: 422,
     message:
-      "I could not read enough about {host} to say anything specific, and I would rather not guess.",
+      "I couldn't find enough about {host} to say anything specific, and I'd rather not guess.",
     next: ["book_call", "examples"],
   },
   unsafe: {
@@ -106,13 +106,13 @@ export const ERRORS: Record<ErrorCode, ErrorInfo> = {
   },
   declined: {
     status: 422,
-    message: "The model declined to work on that site.",
+    message: "The AI model refused to work on that site.",
     next: ["examples"],
   },
   quality: {
     status: 502,
     message:
-      "The draft was not specific enough to show you. Try again, or book a call and I will do it by hand.",
+      "The draft wasn't specific enough to show you. Try again, or book a call and I'll do it by hand.",
     next: ["retry", "book_call"],
   },
   upstream: {

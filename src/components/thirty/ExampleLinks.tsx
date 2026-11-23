@@ -12,7 +12,7 @@ type ExampleLinksProps = {
   className?: string;
 };
 
-export const EXAMPLES_OFFERED_LEAD = "These show the same thing:";
+export const EXAMPLES_OFFERED_LEAD = "Open one of these instead:";
 
 export function trackExampleOpened(slug: string, via: "links" | "chart"): void {
   track("example_opened", { example: slug, via });

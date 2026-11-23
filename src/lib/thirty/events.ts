@@ -37,4 +37,4 @@ export function stepLabel(id: StepId, host: string): string {
 }
 
 export const LOCK_WAIT_LABEL = "Someone is already running this one. Waiting for it.";
-export const FALLBACK_NOTE = "The site would not load for a bot. Searching the web instead.";
+export const FALLBACK_NOTE = "The site wouldn't load for my bot. Searching the web instead.";
